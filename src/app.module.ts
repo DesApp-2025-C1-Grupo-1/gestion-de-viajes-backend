@@ -18,7 +18,7 @@ import { TipoVehiculoModule } from './tipo_vehiculo/tipo_vehiculo.module';
           process.env.MONGO_PASS || 'ContraseñaQueVaAFallar',
         );
 
-        const uri = `mongodb+srv://${user}:${pass}@gestion-viajes.n4d4ucz.mongodb.net/gestion_de_viajes?retryWrites=true&w=majority&appName=gestion-viajes`;
+        const uri = `mongodb+srv://${user}:${pass}@gestion-viajes.n4d4ucz.mongodb.net/entidades?retryWrites=true&w=majority&appName=gestion-viajes`;
 
         return { uri };
       },
