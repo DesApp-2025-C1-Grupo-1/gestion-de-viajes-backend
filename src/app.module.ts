@@ -3,9 +3,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TipoVehiculoModule } from './tipo_vehiculo/tipo_vehiculo.module';
 
 @Module({
   imports: [
+    TipoVehiculoModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       useFactory: () => {
