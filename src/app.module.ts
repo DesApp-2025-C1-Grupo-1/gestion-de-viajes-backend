@@ -3,9 +3,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TipoVehiculoModule } from './tipo_vehiculo/tipo_vehiculo.module';
 
 @Module({
   imports: [
+    TipoVehiculoModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       useFactory: () => {
@@ -16,7 +18,7 @@ import { AppService } from './app.service';
           process.env.MONGO_PASS || 'ContraseñaQueVaAFallar',
         );
 
-        const uri = `mongodb+srv://${user}:${pass}@gestion-viajes.n4d4ucz.mongodb.net/gestion_de_viajes?retryWrites=true&w=majority&appName=gestion-viajes`;
+        const uri = `mongodb+srv://${user}:${pass}@gestion-viajes.n4d4ucz.mongodb.net/entidades?retryWrites=true&w=majority&appName=gestion-viajes`;
 
         return { uri };
       },
