@@ -37,8 +37,8 @@ export class TipoVehiculoController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
-    @Body(EmptyObjectPipe, ParseObjectIdPipe)
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body(EmptyObjectPipe)
     updateTipoVehiculoDto: UpdateTipoVehiculoDto,
   ) {
     return this.tipoVehiculoService.update(id, updateTipoVehiculoDto);
