@@ -15,5 +15,6 @@ import {
   ],
   controllers: [TipoVehiculoController],
   providers: [TipoVehiculoService],
+  exports: [MongooseModule],
 })
 export class TipoVehiculoModule {}

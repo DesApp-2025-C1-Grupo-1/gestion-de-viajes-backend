@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TipoVehiculoModule } from './tipo_vehiculo/tipo_vehiculo.module';
+import { VehiculoModule } from './vehiculo/vehiculo.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TipoVehiculoModule } from './tipo_vehiculo/tipo_vehiculo.module';
         return { uri };
       },
     }),
+    VehiculoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

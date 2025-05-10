@@ -1,8 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+export type TipoVehiculoDocument = TipoVehiculo & Document;
+
 @Schema({ collection: 'tipo_vehiculo' })
-export class TipoVehiculo extends Document {
+export class TipoVehiculo {
   @Prop({ required: true })
   nombre: string;
 
