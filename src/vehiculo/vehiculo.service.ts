@@ -22,7 +22,7 @@ export class VehiculoService {
       this.vehiculoModel
         .find()
         .populate('tipo')
-        //.populate('empresa') Cuando empresa esté implementada descomentar
+        .populate('empresa')
         .exec()
     );
   }
@@ -31,7 +31,7 @@ export class VehiculoService {
     const vehiculo = await this.vehiculoModel
       .findById(id)
       .populate('tipo')
-      //.populate('empresa') Cuando empresa esté implementada descomentar
+      .populate('empresa')
       .exec();
     if (!vehiculo) {
       throw new NotFoundException(`Vehiculo with id ${id} not found`);
