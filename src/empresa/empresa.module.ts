@@ -12,4 +12,4 @@ import { EmpresaService } from './empresa.service';
   providers: [EmpresaService],
   exports: [MongooseModule],
 })
-export class EmpresaModule {} 
+export class EmpresaModule {}

@@ -27,4 +27,4 @@ export class Empresa {
   nombre_contacto: string;
 }
 
-export const EmpresaSchema = SchemaFactory.createForClass(Empresa); 
+export const EmpresaSchema = SchemaFactory.createForClass(Empresa);

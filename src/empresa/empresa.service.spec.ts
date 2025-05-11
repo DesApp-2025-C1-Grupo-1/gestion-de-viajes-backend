@@ -36,4 +36,4 @@ describe('EmpresaService', () => {
   it('findAll should return array', async () => {
     expect(await service.findAll()).toEqual([]);
   });
-}); 
+});

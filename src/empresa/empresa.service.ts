@@ -23,11 +23,13 @@ export class EmpresaService {
   }
 
   async update(id: string, empresa: Empresa): Promise<Empresa | null> {
-    return this.empresaModel.findByIdAndUpdate(id, empresa, { new: true }).exec();
+    return this.empresaModel
+      .findByIdAndUpdate(id, empresa, { new: true })
+      .exec();
   }
 
   async delete(id: string): Promise<boolean> {
     const res = await this.empresaModel.findByIdAndDelete(id).exec();
     return !!res;
   }
-} 
+}

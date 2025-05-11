@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { EmpresaService } from './empresa.service';
 import { Empresa } from './schemas/empresa.schema';
 
@@ -24,7 +33,10 @@ export class EmpresaController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() empresa: Empresa): Promise<Empresa> {
+  async update(
+    @Param('id') id: string,
+    @Body() empresa: Empresa,
+  ): Promise<Empresa> {
     const updated = await this.empresaService.update(id, empresa);
     if (!updated) throw new NotFoundException('Empresa not found');
     return updated;
@@ -36,4 +48,4 @@ export class EmpresaController {
     if (!deleted) throw new NotFoundException('Empresa not found');
     return { deleted };
   }
-} 
+}

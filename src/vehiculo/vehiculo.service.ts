@@ -18,13 +18,11 @@ export class VehiculoService {
   }
 
   async findAll(): Promise<Vehiculo[]> {
-    return (
-      this.vehiculoModel
-        .find()
-        .populate('tipo')
-        .populate('empresa')
-        .exec()
-    );
+    return this.vehiculoModel
+      .find()
+      .populate('tipo')
+      .populate('empresa')
+      .exec();
   }
 
   async findOne(id: string): Promise<Vehiculo> {
