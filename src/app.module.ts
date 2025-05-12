@@ -1,31 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TipoVehiculoModule } from './tipo_vehiculo/tipo_vehiculo.module';
 import { VehiculoModule } from './vehiculo/vehiculo.module';
+import { EmpresaModule } from './empresa/empresa.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
-  imports: [
-    TipoVehiculoModule,
-    ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRootAsync({
-      useFactory: () => {
-        const user = encodeURIComponent(
-          process.env.MONGO_USER || 'UsuarioQueVaAFallar',
-        );
-        const pass = encodeURIComponent(
-          process.env.MONGO_PASS || 'ContraseñaQueVaAFallar',
-        );
-
-        const uri = `mongodb+srv://${user}:${pass}@gestion-viajes.n4d4ucz.mongodb.net/entidades?retryWrites=true&w=majority&appName=gestion-viajes`;
-
-        return { uri };
-      },
-    }),
-    VehiculoModule,
-  ],
+  imports: [TipoVehiculoModule, DatabaseModule, VehiculoModule, EmpresaModule],
   controllers: [AppController],
   providers: [AppService],
 })

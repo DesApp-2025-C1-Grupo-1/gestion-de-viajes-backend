@@ -18,20 +18,18 @@ export class VehiculoService {
   }
 
   async findAll(): Promise<Vehiculo[]> {
-    return (
-      this.vehiculoModel
-        .find()
-        .populate('tipo')
-        //.populate('empresa') Cuando empresa esté implementada descomentar
-        .exec()
-    );
+    return this.vehiculoModel
+      .find()
+      .populate('tipo')
+      .populate('empresa')
+      .exec();
   }
 
   async findOne(id: string): Promise<Vehiculo> {
     const vehiculo = await this.vehiculoModel
       .findById(id)
       .populate('tipo')
-      //.populate('empresa') Cuando empresa esté implementada descomentar
+      .populate('empresa')
       .exec();
     if (!vehiculo) {
       throw new NotFoundException(`Vehiculo with id ${id} not found`);
