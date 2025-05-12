@@ -6,6 +6,7 @@ import { VehiculoService } from './vehiculo.service';
 import { VehiculoController } from './vehiculo.controller';
 import { ValidateTipoVehiculoExistsPipe } from 'src/common/pipes/validate_TipoVehiculo_exists.pipe';
 import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
+import { EmpresaModule } from 'src/empresa/empresa.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
       { name: Vehiculo.name, schema: VehiculoSchema },
     ]),
     TipoVehiculoModule,
+    EmpresaModule,
   ],
   controllers: [VehiculoController],
   providers: [VehiculoService, ValidateTipoVehiculoExistsPipe],
