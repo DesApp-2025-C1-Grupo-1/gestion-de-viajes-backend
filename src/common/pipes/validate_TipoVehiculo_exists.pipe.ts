@@ -5,16 +5,16 @@ import {
   TipoVehiculo,
   TipoVehiculoDocument,
 } from '../../tipo_vehiculo/schemas/tipo_vehiculo.schema';
+import { Empresa, EmpresaDocument } from 'src/empresa/schemas/empresa.schema';
 
-//Este pipe se utiliza para validar si el tipo de vehículo y la empresa existen en la base de datos,
-// pero es necesario que empresa esté implementada para pode validar que existe
+//Este pipe se utiliza para validar si el tipo de vehículo y la empresa existen en la base de datos
 
 @Injectable()
 export class ValidateTipoVehiculoExistsPipe implements PipeTransform {
   constructor(
     @InjectModel(TipoVehiculo.name)
     private tipoModel: Model<TipoVehiculoDocument>,
-    // @InjectModel(Empresa.name) private empresaModel: Model<EmpresaDocument>,
+    @InjectModel(Empresa.name) private empresaModel: Model<EmpresaDocument>,
   ) {}
 
   async transform(value: { tipo: any; empresa: any }) {
@@ -28,14 +28,13 @@ export class ValidateTipoVehiculoExistsPipe implements PipeTransform {
       );
     }
 
-    // Decomentar cuando el modelo empresa esté implementado
-    // const empresaExists = await this.empresaModel.exists({
-    //   _id: value.empresa,
-    // });
+    const empresaExists = await this.empresaModel.exists({
+      _id: value.empresa,
+    });
 
-    // if (!empresaExists) {
-    //   throw new BadRequestException('Empresa no existente en la base de datos');
-    // }
+    if (!empresaExists) {
+      throw new BadRequestException('Empresa no existente en la base de datos');
+    }
 
     return value;
   }
