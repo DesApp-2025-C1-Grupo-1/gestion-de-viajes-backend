@@ -5,9 +5,10 @@ import { TipoVehiculoModule } from './tipo_vehiculo/tipo_vehiculo.module';
 import { VehiculoModule } from './vehiculo/vehiculo.module';
 import { EmpresaModule } from './empresa/empresa.module';
 import { DatabaseModule } from './database/database.module';
+import { ChoferModule } from './chofer/chofer.module';
 
 @Module({
-  imports: [TipoVehiculoModule, DatabaseModule, VehiculoModule, EmpresaModule],
+  imports: [TipoVehiculoModule, DatabaseModule, VehiculoModule, EmpresaModule, ChoferModule],
   controllers: [AppController],
   providers: [AppService],
 })
