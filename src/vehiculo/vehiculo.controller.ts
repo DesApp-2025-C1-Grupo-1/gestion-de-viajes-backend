@@ -13,6 +13,8 @@ import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 import { ValidateTipoVehiculoExistsPipe } from 'src/common/pipes/validate_TipoVehiculo_exists.pipe';
+import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
+import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
 
 @Controller('vehiculo')
 export class VehiculoController {
@@ -20,7 +22,12 @@ export class VehiculoController {
 
   @Post()
   async create(
-    @Body(ValidateTipoVehiculoExistsPipe) createVehiculoDto: CreateVehiculoDto,
+    @Body(
+      ValidateTipoVehiculoExistsPipe,
+      ValidateEmpresaExistsPipe,
+      new TransformObjectIdFieldsPipe(['tipo', 'empresa']),
+    )
+    createVehiculoDto: CreateVehiculoDto,
   ) {
     return this.vehiculoService.create(createVehiculoDto);
   }
@@ -38,7 +45,12 @@ export class VehiculoController {
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: string,
-    @Body(EmptyObjectPipe, ValidateTipoVehiculoExistsPipe)
+    @Body(
+      EmptyObjectPipe,
+      ValidateTipoVehiculoExistsPipe,
+      ValidateEmpresaExistsPipe,
+      new TransformObjectIdFieldsPipe(['tipo', 'empresa']),
+    )
     updateVehiculoDto: UpdateVehiculoDto,
   ) {
     return this.vehiculoService.update(id, updateVehiculoDto);

@@ -1,5 +1,7 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 
+//Este pipe se usa para vereficiar que no se mande una petición patch vacía
+
 @Injectable()
 export class EmptyObjectPipe implements PipeTransform {
   transform(value: Record<string, any>): Record<string, any> {
