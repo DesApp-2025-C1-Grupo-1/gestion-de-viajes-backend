@@ -3,7 +3,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type ChoferDocument = Chofer & Document;
 
-@Schema()
+@Schema({ collection: 'chofer' })
 export class Chofer {
   @Prop({ required: true })
   nombre: string;
@@ -12,7 +12,7 @@ export class Chofer {
   apellido: string;
 
   @Prop({ required: true })
-  dni: string;
+  dni: number;
 
   @Prop({ type: Date, required: true })
   fecha_nacimiento: Date;

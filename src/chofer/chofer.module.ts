@@ -3,12 +3,22 @@ import { ChoferService } from './chofer.service';
 import { ChoferController } from './chofer.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Chofer, ChoferSchema } from './schemas/chofer.schema';
+import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
+import { EmpresaModule } from 'src/empresa/empresa.module';
+import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
+import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Chofer.name, schema: ChoferSchema }]),
+    VehiculoModule,
+    EmpresaModule,
   ],
   controllers: [ChoferController],
-  providers: [ChoferService],
+  providers: [
+    ChoferService,
+    ValidateVehiculoExistsPipe,
+    ValidateEmpresaExistsPipe,
+  ],
 })
 export class ChoferModule {}

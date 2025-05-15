@@ -2,48 +2,80 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Delete,
   Body,
   Param,
   NotFoundException,
+  Patch,
 } from '@nestjs/common';
 import { EmpresaService } from './empresa.service';
 import { Empresa } from './schemas/empresa.schema';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 
 @Controller('empresa')
 export class EmpresaController {
   constructor(private readonly empresaService: EmpresaService) {}
 
+  @ApiOperation({ summary: 'Obtener todas las empresas' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de empresas obtenida correctamente',
+  })
+  @ApiResponse({ status: 404, description: 'No se encontraron empresas' })
   @Get()
   async findAll(): Promise<Empresa[]> {
     return this.empresaService.findAll();
   }
 
+  @ApiOperation({ summary: 'Obtener una empresa por ID' })
+  @ApiResponse({ status: 200, description: 'Empresa obtenida correctamente' })
+  @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Empresa> {
+  async findOne(@Param('id', ParseObjectIdPipe) id: string): Promise<Empresa> {
     const empresa = await this.empresaService.findOne(id);
     if (!empresa) throw new NotFoundException('Empresa not found');
     return empresa;
   }
 
+  @ApiOperation({ summary: 'Crear una empresa' })
+  @ApiResponse({ status: 201, description: 'Empresa creada correctamente' })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos para crear una empresa',
+  })
   @Post()
-  async create(@Body() empresa: Empresa): Promise<Empresa> {
+  async create(@Body(EmptyObjectPipe) empresa: Empresa): Promise<Empresa> {
     return this.empresaService.create(empresa);
   }
 
-  @Put(':id')
+  @ApiOperation({ summary: 'Actualizar una empresa' })
+  @ApiResponse({
+    status: 200,
+    description: 'Empresa actualizada correctamente',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos para actualizar una empresa',
+  })
+  @Patch(':id')
   async update(
-    @Param('id') id: string,
-    @Body() empresa: Empresa,
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body(EmptyObjectPipe) empresa: Empresa,
   ): Promise<Empresa> {
     const updated = await this.empresaService.update(id, empresa);
     if (!updated) throw new NotFoundException('Empresa not found');
     return updated;
   }
 
+  @ApiOperation({ summary: 'Eliminar una empresa por ID' })
+  @ApiResponse({ status: 200, description: 'Empresa eliminada correctamente' })
+  @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<{ deleted: boolean }> {
+  async delete(
+    @Param('id', ParseObjectIdPipe) id: string,
+  ): Promise<{ deleted: boolean }> {
     const deleted = await this.empresaService.delete(id);
     if (!deleted) throw new NotFoundException('Empresa not found');
     return { deleted };

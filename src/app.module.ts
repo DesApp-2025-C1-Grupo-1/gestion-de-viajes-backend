@@ -8,7 +8,13 @@ import { DatabaseModule } from './database/database.module';
 import { ChoferModule } from './chofer/chofer.module';
 
 @Module({
-  imports: [TipoVehiculoModule, DatabaseModule, VehiculoModule, EmpresaModule, ChoferModule],
+  imports: [
+    TipoVehiculoModule,
+    DatabaseModule,
+    VehiculoModule,
+    EmpresaModule,
+    ChoferModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
