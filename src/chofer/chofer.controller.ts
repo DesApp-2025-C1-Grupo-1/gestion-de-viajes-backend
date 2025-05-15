@@ -21,6 +21,7 @@ import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId
 export class ChoferController {
   constructor(private readonly choferService: ChoferService) {}
 
+
   @ApiOperation({ summary: 'Crear un chofer' })
   @ApiResponse({ status: 201, description: 'Chofer creado correctamente' })
   @ApiResponse({
