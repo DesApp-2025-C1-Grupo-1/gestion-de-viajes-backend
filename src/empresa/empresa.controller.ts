@@ -13,6 +13,8 @@ import { Empresa } from './schemas/empresa.schema';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
+import { CreateEmpresaDto } from './dto/create-empresa.dto';
+import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 
 @Controller('empresa')
 export class EmpresaController {
@@ -46,8 +48,10 @@ export class EmpresaController {
     description: 'Datos inválidos para crear una empresa',
   })
   @Post()
-  async create(@Body(EmptyObjectPipe) empresa: Empresa): Promise<Empresa> {
-    return this.empresaService.create(empresa);
+  async create(
+    @Body(EmptyObjectPipe) createEmpresaDto: CreateEmpresaDto,
+  ): Promise<Empresa> {
+    return this.empresaService.create(createEmpresaDto);
   }
 
   @ApiOperation({ summary: 'Actualizar una empresa' })
@@ -59,13 +63,14 @@ export class EmpresaController {
     status: 400,
     description: 'Datos inválidos para actualizar una empresa',
   })
+  @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
   @Patch(':id')
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
-    @Body(EmptyObjectPipe) empresa: Empresa,
+    @Body(EmptyObjectPipe) updateEmpresaDto: UpdateEmpresaDto,
   ): Promise<Empresa> {
-    const updated = await this.empresaService.update(id, empresa);
-    if (!updated) throw new NotFoundException('Empresa not found');
+    const updated = await this.empresaService.update(id, updateEmpresaDto);
+    if (!updated) throw new NotFoundException('Empresa no encontrada');
     return updated;
   }
 
@@ -77,7 +82,7 @@ export class EmpresaController {
     @Param('id', ParseObjectIdPipe) id: string,
   ): Promise<{ deleted: boolean }> {
     const deleted = await this.empresaService.delete(id);
-    if (!deleted) throw new NotFoundException('Empresa not found');
+    if (!deleted) throw new NotFoundException('Empresa no encontrada');
     return { deleted };
   }
 }

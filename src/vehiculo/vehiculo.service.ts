@@ -32,7 +32,7 @@ export class VehiculoService {
       .populate('empresa')
       .exec();
     if (!vehiculo) {
-      throw new NotFoundException(`Vehiculo with id ${id} not found`);
+      throw new NotFoundException(`Vehiculo no encontrado`);
     }
     return vehiculo;
   }
@@ -46,7 +46,7 @@ export class VehiculoService {
       .exec();
 
     if (!updatedVehiculo) {
-      throw new NotFoundException(`Vehiculo with id ${id} not found`);
+      throw new NotFoundException(`Vehiculo no encontrado`);
     }
 
     return updatedVehiculo;
@@ -58,7 +58,7 @@ export class VehiculoService {
       .exec();
 
     if (!deletedVehiculo) {
-      throw new NotFoundException(`Vehiculo with id ${id} not found`);
+      throw new NotFoundException(`Vehiculo no encontrado`);
     }
 
     return deletedVehiculo;
