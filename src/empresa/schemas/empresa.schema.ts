@@ -12,13 +12,21 @@ export class Empresa {
   nombre_comercial: string;
 
   @Prop({ required: true, unique: true })
-  cuit: number;
+  cuit: string;
 
   @Prop({ required: true })
   domicilio_fiscal: string;
 
+  //calle
+  //numero
+  //ciudad
+  //provincia
+  //pais
+  //codigo_postal
+  //faltan agregar estos atributos dentro del subdocumento dirección, y también en la entidad Depositos, hay que avisarle a Ariel
+
   @Prop({ required: true })
-  telefono: number;
+  telefono: string;
 
   @Prop({ required: true })
   mail: string;

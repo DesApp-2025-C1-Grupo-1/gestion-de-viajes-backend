@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
 
 export type ChoferDocument = Chofer & Document;
 
@@ -17,15 +17,27 @@ export class Chofer {
   @Prop({ type: Date, required: true })
   fecha_nacimiento: Date;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Empresa', required: true })
-  empresa: string;
+  @Prop({ required: true })
+  licencia: string;
+
+  @Prop({ required: true })
+  tipo_licencia: string;
+
+  @Prop({ required: true })
+  telefono: string;
+
+  @Prop({ required: true })
+  email: string;
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
     ref: 'Vehiculo',
     required: true,
   })
-  vehiculo: string;
+  vehiculo: ObjectId;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Empresa', required: true })
+  empresa: ObjectId;
 }
 
 export const ChoferSchema = SchemaFactory.createForClass(Chofer);

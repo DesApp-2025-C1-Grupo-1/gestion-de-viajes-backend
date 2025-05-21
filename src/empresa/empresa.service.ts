@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Empresa, EmpresaDocument } from './schemas/empresa.schema';
+import { CreateEmpresaDto } from './dto/create-empresa.dto';
+import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 
 @Injectable()
 export class EmpresaService {
@@ -17,14 +19,24 @@ export class EmpresaService {
     return this.empresaModel.findById(id).exec();
   }
 
-  async create(empresa: Empresa): Promise<Empresa> {
-    const created = new this.empresaModel(empresa);
+  async create(createEmpresaDto: CreateEmpresaDto): Promise<Empresa> {
+    const { cuit } = createEmpresaDto;
+
+    const empresaExistente = await this.empresaModel.findOne({ cuit });
+    if (empresaExistente) {
+      throw new BadRequestException('Ya existe una empresa con ese CUIT');
+    }
+
+    const created = new this.empresaModel(createEmpresaDto);
     return created.save();
   }
 
-  async update(id: string, empresa: Empresa): Promise<Empresa | null> {
+  async update(
+    id: string,
+    updateEmpresaDto: UpdateEmpresaDto,
+  ): Promise<Empresa | null> {
     return this.empresaModel
-      .findByIdAndUpdate(id, empresa, { new: true })
+      .findByIdAndUpdate(id, updateEmpresaDto, { new: true })
       .exec();
   }
 
