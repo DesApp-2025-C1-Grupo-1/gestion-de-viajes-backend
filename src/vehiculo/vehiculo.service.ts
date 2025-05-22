@@ -4,16 +4,17 @@ import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Vehiculo, VehiculoDocument } from './schemas/vehiculo.schema';
+import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
 import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class VehiculoService {
   constructor(
     @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
+    @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
   ) {}
 
   async create(createVehiculoDto: CreateVehiculoDto): Promise<Vehiculo> {
-    const createdVehiculo = new this.vehiculoModel(createVehiculoDto);
     const { patente } = createVehiculoDto;
 
     const vehiculoExistente = await this.vehiculoModel.findOne({ patente });
@@ -21,6 +22,7 @@ export class VehiculoService {
       throw new ConflictException('Ya existe una Vehículo con esa patente');
     }
 
+    const createdVehiculo = new this.vehiculoModel(createVehiculoDto);
     return createdVehiculo.save();
   }
 
@@ -69,6 +71,16 @@ export class VehiculoService {
   }
 
   async remove(id: string): Promise<Vehiculo> {
+    const vehiculoEnUsoPorChofer = await this.choferModel.exists({
+      vehiculo: id,
+    });
+
+    if (vehiculoEnUsoPorChofer) {
+      throw new ConflictException(
+        'No se puede eliminar: hay choferes que usan este vehículo',
+      );
+    }
+
     const deletedVehiculo = await this.vehiculoModel
       .findByIdAndDelete(id)
       .exec();

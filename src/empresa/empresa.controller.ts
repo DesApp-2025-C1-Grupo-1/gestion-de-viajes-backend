@@ -78,6 +78,10 @@ export class EmpresaController {
     description: 'Datos inválidos para actualizar una empresa',
   })
   @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una empresa con ese CUIT',
+  })
   @Patch(':id')
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
