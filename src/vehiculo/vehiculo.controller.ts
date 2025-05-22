@@ -22,7 +22,11 @@ export class VehiculoController {
   constructor(private readonly vehiculoService: VehiculoService) {}
 
   @ApiOperation({ summary: 'Crear un vehículo' })
-  @ApiResponse({ status: 201, description: 'Vehículo creado correctamente' })
+  @ApiResponse({
+    status: 201,
+    description: 'Vehículo creado correctamente',
+    type: CreateVehiculoDto,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para crear un vehículo',
@@ -47,6 +51,7 @@ export class VehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Lista de vehículos obtenida correctamente',
+    type: [CreateVehiculoDto],
   })
   @ApiResponse({ status: 404, description: 'No se encontraron vehículos' })
   @Get()
@@ -55,7 +60,11 @@ export class VehiculoController {
   }
 
   @ApiOperation({ summary: 'Obtener un vehículo por ID' })
-  @ApiResponse({ status: 200, description: 'Vehículo obtenido correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Vehículo obtenido correctamente',
+    type: CreateVehiculoDto,
+  })
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: string) {
@@ -66,6 +75,7 @@ export class VehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Vehículo actualizado correctamente',
+    type: UpdateVehiculoDto,
   })
   @ApiResponse({
     status: 400,

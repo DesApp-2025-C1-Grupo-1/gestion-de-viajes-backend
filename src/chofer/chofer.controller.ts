@@ -22,7 +22,11 @@ export class ChoferController {
   constructor(private readonly choferService: ChoferService) {}
 
   @ApiOperation({ summary: 'Crear un chofer' })
-  @ApiResponse({ status: 201, description: 'Chofer creado correctamente' })
+  @ApiResponse({
+    status: 201,
+    description: 'Chofer creado correctamente',
+    type: CreateChoferDto,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para crear un chofer',
@@ -43,6 +47,7 @@ export class ChoferController {
   @ApiResponse({
     status: 200,
     description: 'Lista de choferes obtenida correctamente',
+    type: [CreateChoferDto],
   })
   @ApiResponse({
     status: 400,
@@ -54,7 +59,11 @@ export class ChoferController {
   }
 
   @ApiOperation({ summary: 'Obtener un chofer por ID' })
-  @ApiResponse({ status: 200, description: 'Chofer obtenido correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Chofer obtenido correctamente',
+    type: CreateChoferDto,
+  })
   @ApiResponse({ status: 404, description: 'Chofer no encontrado' })
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: string) {
@@ -62,7 +71,11 @@ export class ChoferController {
   }
 
   @ApiOperation({ summary: 'Actualizar un chofer' })
-  @ApiResponse({ status: 200, description: 'Chofer actualizado correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Chofer actualizado correctamente',
+    type: CreateChoferDto,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para actualizar un chofer',

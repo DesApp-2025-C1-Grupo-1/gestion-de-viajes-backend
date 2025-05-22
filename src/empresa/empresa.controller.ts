@@ -24,6 +24,7 @@ export class EmpresaController {
   @ApiResponse({
     status: 200,
     description: 'Lista de empresas obtenida correctamente',
+    type: [Empresa],
   })
   @ApiResponse({ status: 404, description: 'No se encontraron empresas' })
   @Get()
@@ -32,7 +33,11 @@ export class EmpresaController {
   }
 
   @ApiOperation({ summary: 'Obtener una empresa por ID' })
-  @ApiResponse({ status: 200, description: 'Empresa obtenida correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Empresa obtenida correctamente',
+    type: Empresa,
+  })
   @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
   @Get(':id')
   async findOne(@Param('id', ParseObjectIdPipe) id: string): Promise<Empresa> {
@@ -42,7 +47,11 @@ export class EmpresaController {
   }
 
   @ApiOperation({ summary: 'Crear una empresa' })
-  @ApiResponse({ status: 201, description: 'Empresa creada correctamente' })
+  @ApiResponse({
+    status: 201,
+    description: 'Empresa creada correctamente',
+    type: Empresa,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para crear una empresa',
@@ -62,6 +71,7 @@ export class EmpresaController {
   @ApiResponse({
     status: 200,
     description: 'Empresa actualizada correctamente',
+    type: Empresa,
   })
   @ApiResponse({
     status: 400,

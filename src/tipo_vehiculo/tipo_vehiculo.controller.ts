@@ -23,6 +23,7 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 201,
     description: 'Tipo de vehículo creado correctamente',
+    type: TipoVehiculo,
   })
   @ApiResponse({
     status: 400,
@@ -43,6 +44,7 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Lista de tipos de vehículo obtenida correctamente',
+    type: [TipoVehiculo],
   })
   @ApiResponse({
     status: 404,
@@ -57,6 +59,7 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Tipo de vehículo obtenido correctamente',
+    type: TipoVehiculo,
   })
   @ApiResponse({ status: 404, description: 'Tipo de vehículo no encontrado' })
   @Get(':id')
@@ -68,6 +71,7 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Tipo de vehículo actualizado correctamente',
+    type: TipoVehiculo,
   })
   @ApiResponse({
     status: 400,

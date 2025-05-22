@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -23,6 +24,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
+  app.getHttpAdapter().get('/api-json', (req: Request, res: Response) => {
+    res.json(document);
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
