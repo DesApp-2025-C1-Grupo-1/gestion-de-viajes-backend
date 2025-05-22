@@ -107,11 +107,17 @@ export class CreateChoferDto {
 
   @IsMongoId()
   @IsNotEmpty()
-  @ApiProperty({ description: 'ID de la empresa transportista' })
+  @ApiProperty({
+    example: '665f0f02fe1846d5a9f3baf3',
+    description: 'ID de la empresa transportista asignada al chofer',
+  })
   empresa: string;
 
   @IsMongoId()
   @IsNotEmpty()
-  @ApiProperty({ description: 'ID del vehículo asignado al chofer' })
+  @ApiProperty({
+    example: '665f0f02fe1846d5a9f3baf3',
+    description: 'ID del vehículo asignado al chofer',
+  })
   vehiculo: string;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateVehiculoDto } from './dto/create-vehiculo.dto';
 import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,6 +14,13 @@ export class VehiculoService {
 
   async create(createVehiculoDto: CreateVehiculoDto): Promise<Vehiculo> {
     const createdVehiculo = new this.vehiculoModel(createVehiculoDto);
+    const { patente } = createVehiculoDto;
+
+    const vehiculoExistente = await this.vehiculoModel.findOne({ patente });
+    if (vehiculoExistente) {
+      throw new ConflictException('Ya existe una Vehículo con esa patente');
+    }
+
     return createdVehiculo.save();
   }
 
@@ -41,6 +48,15 @@ export class VehiculoService {
     id: string,
     updateVehiculoDto: UpdateVehiculoDto,
   ): Promise<Vehiculo> {
+    const { patente } = updateVehiculoDto;
+
+    const vehiculoExistente = await this.vehiculoModel.findOne({ patente });
+
+    if (vehiculoExistente && vehiculoExistente.id !== id.toString()) {
+      //importante pasar el id a string (id.toString()), es un ObjectId por defecto, sinó siempre da true
+      throw new ConflictException('Ya existe un vehículo con esa patente');
+    }
+
     const updatedVehiculo = await this.vehiculoModel
       .findByIdAndUpdate(id, updateVehiculoDto, { new: true })
       .exec();

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ChoferService } from './chofer.service';
 import { ChoferController } from './chofer.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,8 +11,8 @@ import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exi
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Chofer.name, schema: ChoferSchema }]),
-    VehiculoModule,
-    EmpresaModule,
+    forwardRef(() => VehiculoModule),
+    forwardRef(() => EmpresaModule),
   ],
   controllers: [ChoferController],
   providers: [
@@ -20,5 +20,6 @@ import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exi
     ValidateVehiculoExistsPipe,
     ValidateEmpresaExistsPipe,
   ],
+  exports: [MongooseModule],
 })
 export class ChoferModule {}

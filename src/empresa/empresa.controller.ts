@@ -47,6 +47,10 @@ export class EmpresaController {
     status: 400,
     description: 'Datos inválidos para crear una empresa',
   })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una empresa con ese CUIT',
+  })
   @Post()
   async create(
     @Body(EmptyObjectPipe) createEmpresaDto: CreateEmpresaDto,
@@ -77,6 +81,10 @@ export class EmpresaController {
   @ApiOperation({ summary: 'Eliminar una empresa por ID' })
   @ApiResponse({ status: 200, description: 'Empresa eliminada correctamente' })
   @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
+  @ApiResponse({
+    status: 409,
+    description: 'La empresa está en uso y no puede ser eliminada', //Falta agregar todavía en todas las entidades
+  })
   @Delete(':id')
   async delete(
     @Param('id', ParseObjectIdPipe) id: string,
