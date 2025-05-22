@@ -28,6 +28,10 @@ export class TipoVehiculoController {
     status: 400,
     description: 'Datos inválidos para crear un tipo de vehículo',
   })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe un tipo de vehiculo con ese nombre',
+  })
   @Post()
   create(
     @Body() createTipoVehiculoDto: CreateTipoVehiculoDto,
@@ -69,6 +73,10 @@ export class TipoVehiculoController {
     status: 400,
     description: 'Datos inválidos para actualizar un tipo de vehículo',
   })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe un tipo de vehiculo con ese nombre',
+  })
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: string,
@@ -84,6 +92,10 @@ export class TipoVehiculoController {
     description: 'Tipo de vehículo eliminado correctamente',
   })
   @ApiResponse({ status: 404, description: 'Tipo de vehículo no encontrado' })
+  @ApiResponse({
+    status: 409,
+    description: 'El tipo de vehiculo está en uso y no puede ser eliminado',
+  })
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.tipoVehiculoService.remove(id);

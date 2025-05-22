@@ -13,7 +13,7 @@ import { EmpresaModule } from 'src/empresa/empresa.module';
     MongooseModule.forFeature([
       { name: Vehiculo.name, schema: VehiculoSchema },
     ]),
-    TipoVehiculoModule,
+    forwardRef(() => TipoVehiculoModule),
     forwardRef(() => EmpresaModule),
   ],
   controllers: [VehiculoController],

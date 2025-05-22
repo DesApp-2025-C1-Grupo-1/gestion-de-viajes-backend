@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTipoVehiculoDto } from './dto/create-tipo_vehiculo.dto';
 import { UpdateTipoVehiculoDto } from './dto/update-tipo_vehiculo.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,17 +11,32 @@ import {
   TipoVehiculo,
   TipoVehiculoDocument,
 } from './schemas/tipo_vehiculo.schema';
+import {
+  Vehiculo,
+  VehiculoDocument,
+} from 'src/vehiculo/schemas/vehiculo.schema';
 
 @Injectable()
 export class TipoVehiculoService {
   constructor(
     @InjectModel(TipoVehiculo.name)
     private readonly tipoVehiculoModel: Model<TipoVehiculoDocument>,
+    @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
   ) {}
 
   async create(
     createTipoVehiculoDto: CreateTipoVehiculoDto,
   ): Promise<TipoVehiculo> {
+    const { nombre } = createTipoVehiculoDto;
+
+    const tipoExistente = await this.tipoVehiculoModel.findOne({ nombre });
+    if (tipoExistente) {
+      // importante pasar el id a string (id.toString()), es un ObjectId por defecto, sinó siempre da true
+      throw new ConflictException(
+        'Ya existe un tipo de vehiculo con ese nombre',
+      );
+    }
+
     const createdTipoVehiculo = new this.tipoVehiculoModel(
       createTipoVehiculoDto,
     );
@@ -31,7 +50,7 @@ export class TipoVehiculoService {
   async findOne(id: string): Promise<TipoVehiculo> {
     const tipoVehiculo = await this.tipoVehiculoModel.findById(id).exec();
     if (!tipoVehiculo) {
-      throw new NotFoundException(`TipoVehiculo with id ${id} not found`);
+      throw new NotFoundException(`TipoVehiculo no encontrado`);
     }
     return tipoVehiculo;
   }
@@ -40,6 +59,16 @@ export class TipoVehiculoService {
     id: string,
     updateTipoVehiculoDto: UpdateTipoVehiculoDto,
   ): Promise<TipoVehiculo> {
+    const { nombre } = updateTipoVehiculoDto;
+
+    const tipoExistente = await this.tipoVehiculoModel.findOne({ nombre });
+    if (tipoExistente && tipoExistente.id !== id.toString()) {
+      // importante pasar el id a string (id.toString()), es un ObjectId por defecto, sinó siempre da true
+      throw new ConflictException(
+        'Ya existe un tipo de vehiculo con ese nombre',
+      );
+    }
+
     const updatedTipoVehiculo = await this.tipoVehiculoModel
       .findByIdAndUpdate(id, updateTipoVehiculoDto, { new: true })
       .exec();
@@ -52,6 +81,16 @@ export class TipoVehiculoService {
   }
 
   async remove(id: string): Promise<TipoVehiculo> {
+    const tipoVehiculoEnUsoPorVehiculo = await this.vehiculoModel.exists({
+      tipo: id,
+    });
+
+    if (tipoVehiculoEnUsoPorVehiculo) {
+      throw new ConflictException(
+        'No se puede eliminar: hay vehículos que usan este tipo de vehículo',
+      );
+    }
+
     const deletedTipoVehiculo = await this.tipoVehiculoModel
       .findByIdAndDelete(id)
       .exec();
