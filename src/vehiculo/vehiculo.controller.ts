@@ -27,6 +27,10 @@ export class VehiculoController {
     status: 400,
     description: 'Datos inválidos para crear un vehículo',
   })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una Vehículo con esa patente',
+  })
   @Post()
   async create(
     @Body(
@@ -67,6 +71,10 @@ export class VehiculoController {
     status: 400,
     description: 'Datos inválidos para actualizar un vehículo',
   })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una Vehículo con esa patente',
+  })
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: string,
@@ -84,6 +92,10 @@ export class VehiculoController {
   @ApiOperation({ summary: 'Eliminar un vehículo por ID' })
   @ApiResponse({ status: 200, description: 'Vehículo eliminado correctamente' })
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
+  @ApiResponse({
+    status: 409,
+    description: 'El vehículo está en uso y no puede ser eliminado', //Falta agregar todavía en todas las entidades
+  })
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.vehiculoService.remove(id);

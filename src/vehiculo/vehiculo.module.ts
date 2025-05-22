@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Vehiculo, VehiculoSchema } from './schemas/vehiculo.schema';
 import { VehiculoService } from './vehiculo.service';
@@ -14,7 +14,7 @@ import { EmpresaModule } from 'src/empresa/empresa.module';
       { name: Vehiculo.name, schema: VehiculoSchema },
     ]),
     TipoVehiculoModule,
-    EmpresaModule,
+    forwardRef(() => EmpresaModule),
   ],
   controllers: [VehiculoController],
   providers: [
