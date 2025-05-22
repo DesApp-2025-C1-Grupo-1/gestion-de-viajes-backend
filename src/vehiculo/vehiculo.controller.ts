@@ -72,6 +72,10 @@ export class VehiculoController {
     description: 'Datos inválidos para actualizar un vehículo',
   })
   @ApiResponse({
+    status: 404,
+    description: 'Vehículo no encontrado',
+  })
+  @ApiResponse({
     status: 409,
     description: 'Ya existe una Vehículo con esa patente',
   })

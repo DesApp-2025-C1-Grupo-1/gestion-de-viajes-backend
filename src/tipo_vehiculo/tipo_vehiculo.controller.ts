@@ -74,8 +74,12 @@ export class TipoVehiculoController {
     description: 'Datos inválidos para actualizar un tipo de vehículo',
   })
   @ApiResponse({
+    status: 404,
+    description: 'Tipo de vehículo no encontrado',
+  })
+  @ApiResponse({
     status: 409,
-    description: 'Ya existe un tipo de vehiculo con ese nombre',
+    description: 'Ya existe un tipo de vehículo con ese nombre',
   })
   @Patch(':id')
   update(
