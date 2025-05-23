@@ -8,7 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { VehiculoService } from './vehiculo.service';
-import { CreateVehiculoDto } from './dto/create-vehiculo.dto';
 import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
@@ -16,6 +15,8 @@ import { ValidateTipoVehiculoExistsPipe } from 'src/common/pipes/validate_TipoVe
 import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { VehiculoDto } from './dto/vehiculo.dto';
+import { CreateVehiculoDto } from './dto/create-vehiculo.dto';
 
 @Controller('vehiculo')
 export class VehiculoController {
@@ -25,7 +26,7 @@ export class VehiculoController {
   @ApiResponse({
     status: 201,
     description: 'Vehículo creado correctamente',
-    type: CreateVehiculoDto,
+    type: VehiculoDto,
   })
   @ApiResponse({
     status: 400,
@@ -51,7 +52,7 @@ export class VehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Lista de vehículos obtenida correctamente',
-    type: [CreateVehiculoDto],
+    type: [VehiculoDto],
   })
   @ApiResponse({ status: 404, description: 'No se encontraron vehículos' })
   @Get()
@@ -63,7 +64,7 @@ export class VehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Vehículo obtenido correctamente',
-    type: CreateVehiculoDto,
+    type: VehiculoDto,
   })
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
   @Get(':id')
@@ -75,7 +76,7 @@ export class VehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Vehículo actualizado correctamente',
-    type: UpdateVehiculoDto,
+    type: VehiculoDto,
   })
   @ApiResponse({
     status: 400,

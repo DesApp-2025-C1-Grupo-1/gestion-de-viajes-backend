@@ -16,6 +16,7 @@ import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
 import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
+import { ChoferDto } from './dto/chofer.dto';
 
 @Controller('chofer')
 export class ChoferController {
@@ -25,7 +26,7 @@ export class ChoferController {
   @ApiResponse({
     status: 201,
     description: 'Chofer creado correctamente',
-    type: CreateChoferDto,
+    type: ChoferDto,
   })
   @ApiResponse({
     status: 400,
@@ -47,7 +48,7 @@ export class ChoferController {
   @ApiResponse({
     status: 200,
     description: 'Lista de choferes obtenida correctamente',
-    type: [CreateChoferDto],
+    type: [ChoferDto],
   })
   @ApiResponse({
     status: 400,
@@ -62,7 +63,7 @@ export class ChoferController {
   @ApiResponse({
     status: 200,
     description: 'Chofer obtenido correctamente',
-    type: CreateChoferDto,
+    type: ChoferDto,
   })
   @ApiResponse({ status: 404, description: 'Chofer no encontrado' })
   @Get(':id')
@@ -74,7 +75,7 @@ export class ChoferController {
   @ApiResponse({
     status: 200,
     description: 'Chofer actualizado correctamente',
-    type: CreateChoferDto,
+    type: ChoferDto,
   })
   @ApiResponse({
     status: 400,
