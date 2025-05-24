@@ -4,8 +4,11 @@ import {
   IsEmail,
   IsPhoneNumber,
   Length,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { CreateDireccionDto } from 'src/direccion/dto/create-direccion.dto';
 
 export class CreateEmpresaDto {
   @IsString()
@@ -35,14 +38,6 @@ export class CreateEmpresaDto {
   })
   cuit: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'Domicilio fiscal',
-    example: 'Av. Siempre Viva 123',
-  })
-  domicilio_fiscal: string;
-
   @IsPhoneNumber(undefined, { message: 'El teléfono no es válido' })
   @IsString()
   @IsNotEmpty()
@@ -67,4 +62,9 @@ export class CreateEmpresaDto {
     example: 'Juan Pérez',
   })
   nombre_contacto: string;
+
+  @ValidateNested()
+  @Type(() => CreateDireccionDto)
+  @ApiProperty({ type: CreateDireccionDto })
+  direccion: CreateDireccionDto;
 }

@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import {
+  Direccion,
+  DireccionSchema,
+} from 'src/direccion/Schemas/direccion.schema';
 
 export type EmpresaDocument = Empresa & Document;
 
@@ -15,17 +19,6 @@ export class Empresa {
   cuit: string;
 
   @Prop({ required: true })
-  domicilio_fiscal: string;
-
-  //calle
-  //numero
-  //ciudad
-  //provincia
-  //pais
-  //codigo_postal
-  //faltan agregar estos atributos dentro del subdocumento dirección, y también en la entidad Depositos, hay que avisarle a Ariel
-
-  @Prop({ required: true })
   telefono: string;
 
   @Prop({ required: true })
@@ -33,6 +26,9 @@ export class Empresa {
 
   @Prop({ required: true })
   nombre_contacto: string;
+
+  @Prop({ type: DireccionSchema, required: true })
+  direccion: Direccion;
 }
 
 export const EmpresaSchema = SchemaFactory.createForClass(Empresa);
