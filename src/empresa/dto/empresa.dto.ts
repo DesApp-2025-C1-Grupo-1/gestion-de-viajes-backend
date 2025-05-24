@@ -7,7 +7,7 @@ export class EmpresaDto {
     description: 'ID de la empresa',
     example: 1,
   })
-  id: number;
+  _id: string;
 
   @ApiProperty({
     description: 'Razón social de la empresa',
