@@ -15,6 +15,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
+import { EmpresaDto } from './dto/empresa.dto';
 
 @Controller('empresa')
 export class EmpresaController {
@@ -24,7 +25,7 @@ export class EmpresaController {
   @ApiResponse({
     status: 200,
     description: 'Lista de empresas obtenida correctamente',
-    type: [Empresa],
+    type: [EmpresaDto],
   })
   @ApiResponse({ status: 404, description: 'No se encontraron empresas' })
   @Get()
@@ -36,7 +37,7 @@ export class EmpresaController {
   @ApiResponse({
     status: 200,
     description: 'Empresa obtenida correctamente',
-    type: Empresa,
+    type: EmpresaDto,
   })
   @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
   @Get(':id')
@@ -50,7 +51,7 @@ export class EmpresaController {
   @ApiResponse({
     status: 201,
     description: 'Empresa creada correctamente',
-    type: Empresa,
+    type: EmpresaDto,
   })
   @ApiResponse({
     status: 400,
@@ -71,7 +72,7 @@ export class EmpresaController {
   @ApiResponse({
     status: 200,
     description: 'Empresa actualizada correctamente',
-    type: Empresa,
+    type: EmpresaDto,
   })
   @ApiResponse({
     status: 400,

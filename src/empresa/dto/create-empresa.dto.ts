@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsEmail,
-  IsPhoneNumber,
-  Length,
-} from 'class-validator';
+import { IsString, IsNotEmpty, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEmpresaDto {
@@ -38,33 +32,16 @@ export class CreateEmpresaDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'Domicilio fiscal',
-    example: 'Av. Siempre Viva 123',
+    example: '665f0ec9fe1846d5a9f3baf2',
+    description: 'ID de la direccion',
   })
-  domicilio_fiscal: string;
-
-  @IsPhoneNumber(undefined, { message: 'El teléfono no es válido' })
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'Teléfono de contacto',
-    example: '+541234567890',
-  })
-  telefono: string;
-
-  @IsEmail({}, { message: 'El email no es válido' })
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'Correo electrónico',
-    example: 'info@empresa.com',
-  })
-  mail: string;
+  direccion: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'Nombre del contacto de la empresa',
-    example: 'Juan Pérez',
+    example: '665f0f02fe1846d5a9f3baf3',
+    description: 'ID del contacto',
   })
-  nombre_contacto: string;
+  contacto: string;
 }
