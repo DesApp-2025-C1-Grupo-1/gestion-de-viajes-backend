@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateEmpresaDto } from 'src/empresa/dto/create-empresa.dto';
+import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
 import { TipoVehiculoDto } from 'src/tipo_vehiculo/dto/tipo-vehiculo.dto';
 
 export class VehiculoDto {
@@ -59,7 +59,7 @@ export class VehiculoDto {
   @ApiProperty({
     example: '665f0f02fe1846d5a9f3baf3',
     description: 'ID de la empresa a la que pertenece el vehículo',
-    type: CreateEmpresaDto,
+    type: EmpresaDto,
   })
-  readonly empresa: CreateEmpresaDto;
+  readonly empresa: EmpresaDto;
 }
