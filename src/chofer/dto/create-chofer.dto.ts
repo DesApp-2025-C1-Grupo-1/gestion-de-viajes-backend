@@ -8,10 +8,12 @@ import {
   Max,
   IsIn,
   IsEmail,
-  IsPhoneNumber,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsAdult } from '../../common/validators/isAdult.validator';
+import { Type } from 'class-transformer';
+import { CreateTelefonoDto } from 'src/telefono/dto/create-telefono.dto';
 
 export class CreateChoferDto {
   @IsString()
@@ -82,19 +84,32 @@ export class CreateChoferDto {
   @ApiProperty({
     description: 'Tipo de licencia según clasificación nacional',
     example: 'C1',
+    enum: [
+      'A1.1',
+      'A1.2',
+      'A1.3',
+      'A1.4',
+      'A2.1',
+      'A2.2',
+      'A3',
+      'B1',
+      'B2',
+      'C1',
+      'C2',
+      'C3',
+      'D1',
+      'D2',
+      'D3',
+      'D4',
+      'E1',
+      'E2',
+      'F',
+      'G1',
+      'G2',
+      'G3',
+    ],
   })
   tipo_licencia: string;
-
-  @IsString()
-  @IsPhoneNumber(undefined, {
-    message: 'El número de teléfono no es válido',
-  })
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'Número de teléfono del chofer',
-    example: '+5491123456789',
-  })
-  telefono: string;
 
   @IsString()
   @IsEmail({}, { message: 'El email no es válido' })
@@ -120,4 +135,13 @@ export class CreateChoferDto {
     description: 'ID del vehículo asignado al chofer',
   })
   vehiculo: string;
+
+  @ValidateNested()
+  @Type(() => CreateTelefonoDto)
+  @IsNotEmpty()
+  @ApiProperty({
+    type: CreateTelefonoDto,
+    description: 'Teléfono del chofer',
+  })
+  telefono: CreateTelefonoDto;
 }

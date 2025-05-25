@@ -16,16 +16,25 @@ import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
 import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
+import { ChoferDto } from './dto/chofer.dto';
 
 @Controller('chofer')
 export class ChoferController {
   constructor(private readonly choferService: ChoferService) {}
 
   @ApiOperation({ summary: 'Crear un chofer' })
-  @ApiResponse({ status: 201, description: 'Chofer creado correctamente' })
+  @ApiResponse({
+    status: 201,
+    description: 'Chofer creado correctamente',
+    type: ChoferDto,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para crear un chofer',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe un chofer con ese DNI',
   })
   @Post()
   create(
@@ -43,10 +52,11 @@ export class ChoferController {
   @ApiResponse({
     status: 200,
     description: 'Lista de choferes obtenida correctamente',
+    type: [ChoferDto],
   })
   @ApiResponse({
-    status: 400,
-    description: 'Error al obtener la lista de choferes',
+    status: 404,
+    description: 'No se encontraron choferes',
   })
   @Get()
   findAll() {
@@ -54,7 +64,11 @@ export class ChoferController {
   }
 
   @ApiOperation({ summary: 'Obtener un chofer por ID' })
-  @ApiResponse({ status: 200, description: 'Chofer obtenido correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Chofer obtenido correctamente',
+    type: ChoferDto,
+  })
   @ApiResponse({ status: 404, description: 'Chofer no encontrado' })
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: string) {
@@ -62,10 +76,18 @@ export class ChoferController {
   }
 
   @ApiOperation({ summary: 'Actualizar un chofer' })
-  @ApiResponse({ status: 200, description: 'Chofer actualizado correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Chofer actualizado correctamente',
+    type: ChoferDto,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para actualizar un chofer',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Chofer no encontrado',
   })
   @Patch(':id')
   update(
@@ -84,6 +106,10 @@ export class ChoferController {
   @ApiOperation({ summary: 'Eliminar un chofer por ID' })
   @ApiResponse({ status: 200, description: 'Chofer eliminado correctamente' })
   @ApiResponse({ status: 404, description: 'Chofer no encontrado' })
+  @ApiResponse({
+    status: 409,
+    description: 'El chofer está en uso y no puede ser eliminado',
+  })
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.choferService.remove(id);
