@@ -8,7 +8,7 @@ export class Telefono {
   @Prop({ required: true })
   codigo_pais: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   codigo_area: string;
 
   @Prop({ required: true })
