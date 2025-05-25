@@ -15,7 +15,6 @@ export class CreateTelefonoDto {
 
   @ValidateIf((o: CreateTelefonoDto) => o.codigo_pais === '54')
   @IsString()
-  @IsNotEmpty()
   @Matches(/^\d+$/, {
     message: 'El código de área debe contener solo números',
   })

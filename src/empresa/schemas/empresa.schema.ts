@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { Contacto, ContactoSchema } from 'src/contacto/schemas/contacto.schema';
 import {
   Direccion,
   DireccionSchema,
@@ -18,17 +19,11 @@ export class Empresa {
   @Prop({ required: true, unique: true })
   cuit: string;
 
-  @Prop({ required: true })
-  telefono: string;
-
-  @Prop({ required: true })
-  mail: string;
-
-  @Prop({ required: true })
-  nombre_contacto: string;
-
   @Prop({ type: DireccionSchema, required: true })
   direccion: Direccion;
+
+  @Prop({ type: ContactoSchema, required: true })
+  contacto: Contacto;
 }
 
 export const EmpresaSchema = SchemaFactory.createForClass(Empresa);
