@@ -14,6 +14,7 @@ import { TipoVehiculo } from './schemas/tipo_vehiculo.schema';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { TipoVehiculoDto } from './dto/tipo-vehiculo.dto';
 
 @Controller('tipo_vehiculo')
 export class TipoVehiculoController {
@@ -23,6 +24,7 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 201,
     description: 'Tipo de vehículo creado correctamente',
+    type: TipoVehiculoDto,
   })
   @ApiResponse({
     status: 400,
@@ -43,6 +45,7 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Lista de tipos de vehículo obtenida correctamente',
+    type: [TipoVehiculoDto],
   })
   @ApiResponse({
     status: 404,
@@ -57,6 +60,7 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Tipo de vehículo obtenido correctamente',
+    type: TipoVehiculoDto,
   })
   @ApiResponse({ status: 404, description: 'Tipo de vehículo no encontrado' })
   @Get(':id')
@@ -68,14 +72,19 @@ export class TipoVehiculoController {
   @ApiResponse({
     status: 200,
     description: 'Tipo de vehículo actualizado correctamente',
+    type: TipoVehiculoDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para actualizar un tipo de vehículo',
   })
   @ApiResponse({
+    status: 404,
+    description: 'Tipo de vehículo no encontrado',
+  })
+  @ApiResponse({
     status: 409,
-    description: 'Ya existe un tipo de vehiculo con ese nombre',
+    description: 'Ya existe un tipo de vehículo con ese nombre',
   })
   @Patch(':id')
   update(

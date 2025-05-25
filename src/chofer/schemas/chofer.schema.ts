@@ -11,7 +11,7 @@ export class Chofer {
   @Prop({ required: true })
   apellido: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   dni: number;
 
   @Prop({ type: Date, required: true })

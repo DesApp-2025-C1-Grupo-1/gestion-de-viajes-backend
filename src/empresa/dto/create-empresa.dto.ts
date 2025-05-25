@@ -38,12 +38,13 @@ export class CreateEmpresaDto {
   })
   cuit: string;
 
+
   @IsPhoneNumber(undefined, { message: 'El teléfono no es válido' })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'Teléfono de contacto',
-    example: '+541234567890',
+    example: '665f0f02fe1846d5a9f3baf3',
+    description: 'ID del contacto',
   })
   telefono: string;
 

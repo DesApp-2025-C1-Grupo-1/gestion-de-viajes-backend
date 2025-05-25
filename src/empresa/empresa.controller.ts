@@ -15,6 +15,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
+import { EmpresaDto } from './dto/empresa.dto';
 
 @Controller('empresa')
 export class EmpresaController {
@@ -24,6 +25,7 @@ export class EmpresaController {
   @ApiResponse({
     status: 200,
     description: 'Lista de empresas obtenida correctamente',
+    type: [EmpresaDto],
   })
   @ApiResponse({ status: 404, description: 'No se encontraron empresas' })
   @Get()
@@ -32,7 +34,11 @@ export class EmpresaController {
   }
 
   @ApiOperation({ summary: 'Obtener una empresa por ID' })
-  @ApiResponse({ status: 200, description: 'Empresa obtenida correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Empresa obtenida correctamente',
+    type: EmpresaDto,
+  })
   @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
   @Get(':id')
   async findOne(@Param('id', ParseObjectIdPipe) id: string): Promise<Empresa> {
@@ -42,7 +48,11 @@ export class EmpresaController {
   }
 
   @ApiOperation({ summary: 'Crear una empresa' })
-  @ApiResponse({ status: 201, description: 'Empresa creada correctamente' })
+  @ApiResponse({
+    status: 201,
+    description: 'Empresa creada correctamente',
+    type: EmpresaDto,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para crear una empresa',
@@ -62,12 +72,17 @@ export class EmpresaController {
   @ApiResponse({
     status: 200,
     description: 'Empresa actualizada correctamente',
+    type: EmpresaDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para actualizar una empresa',
   })
   @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una empresa con ese CUIT',
+  })
   @Patch(':id')
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
