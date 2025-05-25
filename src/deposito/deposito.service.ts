@@ -41,7 +41,7 @@ export class DepositoService {
   async findOne(id: string): Promise<Deposito> {
     const deposito = await this.DepositoModel.findById(id).exec();
     if (!deposito) {
-      throw new NotFoundException(`Deposito with id ${id} not found`);
+      throw new NotFoundException(`Deposito no encontrado`);
     }
     return deposito;
   }
@@ -95,7 +95,7 @@ export class DepositoService {
   async remove(id: string): Promise<Deposito> {
     const deposito = await this.DepositoModel.findByIdAndDelete(id).exec();
     if (!deposito) {
-      throw new NotFoundException(`Deposito with id ${id} not found`);
+      throw new NotFoundException(`Deposito no encontrado`);
     }
     return deposito;
   }
