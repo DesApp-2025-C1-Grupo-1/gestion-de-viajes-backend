@@ -11,6 +11,7 @@ import { DepositoService } from './deposito.service';
 import { CreateDepositoDto } from './dto/create-deposito.dto';
 import { UpdateDepositoDto } from './dto/update-deposito.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { DepositoDto } from './dto/deposito.dto';
 
 @Controller('deposito')
 export class DepositoController {
@@ -18,7 +19,11 @@ export class DepositoController {
 
   @Post()
   @ApiOperation({ summary: 'Crear un deposito' })
-  @ApiResponse({ status: 201, description: 'Deposito creado correctamente' })
+  @ApiResponse({
+    status: 201,
+    description: 'Deposito creado correctamente',
+    type: DepositoDto,
+  })
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos para crear un deposito',
@@ -36,6 +41,7 @@ export class DepositoController {
   @ApiResponse({
     status: 200,
     description: 'Lista de deposito obtenida correctamente',
+    type: [DepositoDto],
   })
   @ApiResponse({
     status: 400,
@@ -47,7 +53,11 @@ export class DepositoController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un deposito por ID' })
-  @ApiResponse({ status: 200, description: 'Deposito obtenido correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Deposito obtenido correctamente',
+    type: DepositoDto,
+  })
   @ApiResponse({ status: 404, description: 'Deposito no encontrado' })
   findOne(@Param('id') id: string) {
     return this.depositoService.findOne(id);
@@ -58,6 +68,7 @@ export class DepositoController {
   @ApiResponse({
     status: 200,
     description: 'Deposito actualizado correctamente',
+    type: DepositoDto,
   })
   @ApiResponse({
     status: 400,

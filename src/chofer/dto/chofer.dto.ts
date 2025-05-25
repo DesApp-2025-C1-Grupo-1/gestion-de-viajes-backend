@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateEmpresaDto } from 'src/empresa/dto/create-empresa.dto';
-import { CreateVehiculoDto } from 'src/vehiculo/dto/create-vehiculo.dto';
+import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
+import { VehiculoDto } from 'src/vehiculo/dto/vehiculo.dto';
 
 export class ChoferDto {
   @ApiProperty({
@@ -45,9 +45,9 @@ export class ChoferDto {
   })
   email: string;
 
-  @ApiProperty({ type: CreateEmpresaDto })
-  empresa: CreateEmpresaDto;
+  @ApiProperty({ type: EmpresaDto })
+  empresa: EmpresaDto;
 
-  @ApiProperty({ type: CreateVehiculoDto })
-  vehiculo: CreateVehiculoDto;
+  @ApiProperty({ type: VehiculoDto })
+  vehiculo: VehiculoDto;
 }
