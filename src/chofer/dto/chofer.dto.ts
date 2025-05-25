@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TelefonoDto } from 'src/common/dto/telefono.dto';
 import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
 import { VehiculoDto } from 'src/vehiculo/dto/vehiculo.dto';
 
@@ -34,16 +35,13 @@ export class ChoferDto {
   tipo_licencia: string;
 
   @ApiProperty({
-    description: 'Número de teléfono del chofer',
-    example: '+5491123456789',
-  })
-  telefono: string;
-
-  @ApiProperty({
     description: 'Correo electrónico del chofer',
     example: 'juan.perez@mail.com',
   })
   email: string;
+
+  @ApiProperty({ type: TelefonoDto })
+  telefono: TelefonoDto;
 
   @ApiProperty({ type: EmpresaDto })
   empresa: EmpresaDto;

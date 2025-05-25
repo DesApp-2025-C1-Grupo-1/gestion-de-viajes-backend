@@ -27,27 +27,9 @@ export class EmpresaDto {
   })
   cuit: string;
 
-  @ApiProperty({
-    description: 'Id de la dirección',
-    example: '665f0ec9fe1846d5a9f3baf2',
-  })
-  domicilio_fiscal: DireccionDto;
+  @ApiProperty({ type: DireccionDto })
+  direccion: DireccionDto;
 
-  @ApiProperty({
-    description: 'Teléfono de contacto',
-    example: '+541234567890',
-  })
-  telefono: string;
-
-  @ApiProperty({
-    description: 'Correo electrónico',
-    example: 'info@empresa.com',
-  })
-  mail: string;
-
-  @ApiProperty({
-    description: 'ID del contacto',
-    example: '665f0ec9fe1846d5a9f3baf2',
-  })
-  nombre_contacto: ContactoDto;
+  @ApiProperty({ type: ContactoDto })
+  contacto: ContactoDto;
 }
