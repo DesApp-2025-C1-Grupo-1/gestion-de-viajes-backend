@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 
 export type VehiculoDocument = Vehiculo & Document;
 
-@Schema({ collection: 'vehiculo' })
+@Schema({ collection: 'vehiculo', versionKey: false })
 export class Vehiculo {
   @Prop({ required: true, unique: true, trim: true, uppercase: true })
   patente: string;

@@ -8,7 +8,7 @@ import {
 
 export type EmpresaDocument = Empresa & Document;
 
-@Schema({ collection: 'empresa' })
+@Schema({ collection: 'empresa', versionKey: false })
 export class Empresa {
   @Prop({ required: true })
   razon_social: string;

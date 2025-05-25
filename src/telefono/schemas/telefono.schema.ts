@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 export type TelefonoDocument = Telefono & Document;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Telefono {
   @Prop({ required: true })
   codigo_pais: string;

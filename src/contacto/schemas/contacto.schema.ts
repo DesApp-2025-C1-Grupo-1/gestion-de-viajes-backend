@@ -4,7 +4,7 @@ import { Telefono, TelefonoSchema } from 'src/telefono/schemas/telefono.schema';
 
 export type ContactoDocument = Contacto & Document;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Contacto {
   @Prop({ required: true })
   nombre: string;

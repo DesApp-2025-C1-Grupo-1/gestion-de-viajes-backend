@@ -31,5 +31,5 @@ export class ContactoDto {
     example: 'test@mail.com',
     description: 'Correo electrónico del contacto',
   })
-  mail: string;
+  email: string;
 }

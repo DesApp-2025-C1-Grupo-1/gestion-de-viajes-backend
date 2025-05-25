@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ContactoDto } from 'src/common/dto/contacto.dto';
 import { DireccionDto } from 'src/common/dto/direccion.dto';
 
 export class DepositoDto {
@@ -47,6 +48,6 @@ export class DepositoDto {
   @ApiProperty({ type: DireccionDto })
   direccion: DireccionDto;
 
-  @ApiProperty({ type: DireccionDto })
-  contacto: DireccionDto;
+  @ApiProperty({ type: ContactoDto })
+  contacto: ContactoDto;
 }

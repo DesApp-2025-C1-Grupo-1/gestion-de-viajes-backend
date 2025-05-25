@@ -4,7 +4,7 @@ import { Telefono, TelefonoSchema } from 'src/telefono/schemas/telefono.schema';
 
 export type ChoferDocument = Chofer & Document;
 
-@Schema({ collection: 'chofer' })
+@Schema({ collection: 'chofer', versionKey: false })
 export class Chofer {
   @Prop({ required: true })
   nombre: string;

@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 export type DireccionDocument = Direccion & Document;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Direccion {
   @Prop({ required: true })
   calle: string;

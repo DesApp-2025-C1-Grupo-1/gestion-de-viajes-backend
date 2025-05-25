@@ -8,7 +8,7 @@ import {
 
 export type DepositoDocument = Deposito & Document;
 
-@Schema({ collection: 'deposito' })
+@Schema({ collection: 'deposito', versionKey: false })
 export class Deposito {
   @Prop({ required: true })
   nombre: string;
