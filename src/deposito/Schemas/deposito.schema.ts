@@ -1,9 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
+import { Document } from 'mongoose';
+import { Contacto, ContactoSchema } from 'src/contacto/schemas/contacto.schema';
+import {
+  Direccion,
+  DireccionSchema,
+} from 'src/direccion/Schemas/direccion.schema';
 
 export type DepositoDocument = Deposito & Document;
 
-@Schema()
+@Schema({ collection: 'deposito' })
 export class Deposito {
   @Prop({ required: true })
   nombre: string;
@@ -26,19 +31,11 @@ export class Deposito {
   @Prop({ required: true })
   restricciones: string;
 
-  @Prop({
-    type: MongooseSchema.Types.ObjectId,
-    ref: 'Contacto',
-    required: true,
-  })
-  contacto: ObjectId;
+  @Prop({ type: DireccionSchema, required: true })
+  direccion: Direccion;
 
-  @Prop({
-    type: MongooseSchema.Types.ObjectId,
-    ref: 'Direccion',
-    required: true,
-  })
-  direccion: ObjectId;
+  @Prop({ type: ContactoSchema, required: true })
+  contacto: Contacto;
 }
 
 export const DepositoSchema = SchemaFactory.createForClass(Deposito);

@@ -6,7 +6,7 @@ import {
 import { CreateDepositoDto } from './dto/create-deposito.dto';
 import { UpdateDepositoDto } from './dto/update-deposito.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Deposito, DepositoDocument } from './Schemas/deposito.schema';
 
 @Injectable()
@@ -16,16 +16,16 @@ export class DepositoService {
     private DepositoModel: Model<DepositoDocument>,
   ) {}
 
-  async create(createDepositoDto: CreateDepositoDto) {
+  async create(createDepositoDto: CreateDepositoDto): Promise<Deposito> {
     const { lat, long } = createDepositoDto;
     const depositoExistente = await this.DepositoModel.findOne({
       lat,
       long,
     }).exec();
 
-    if (!depositoExistente) {
+    if (depositoExistente) {
       throw new ConflictException(
-        'Ya existe un Deposito con esa Longitud y Latitud',
+        'Ya existe un depósito con esa latitud y longitud.',
       );
     }
 
@@ -50,43 +50,41 @@ export class DepositoService {
     id: string,
     updateDepositoDto: UpdateDepositoDto,
   ): Promise<Deposito> {
-    const objectId = new Types.ObjectId(id);
-
-    // Verifica que el depósito exista por ID
-    const depositoExistente =
-      await this.DepositoModel.findById(objectId).exec();
+    const depositoExistente = await this.DepositoModel.findById(id).exec();
     if (!depositoExistente) {
-      throw new NotFoundException(`Deposito no encontrado`);
+      throw new NotFoundException(`Depósito no encontrado`);
     }
 
     const { lat, long } = updateDepositoDto;
 
-    // Si están cambiando las coordenadas, verifica duplicados
+    const newLat = lat !== undefined ? lat : depositoExistente.lat;
+    const newLong = long !== undefined ? long : depositoExistente.long;
+
     if (
-      (lat !== undefined && lat !== depositoExistente.lat) ||
-      (long !== undefined && long !== depositoExistente.long)
+      newLat !== depositoExistente.lat ||
+      newLong !== depositoExistente.long
     ) {
       const coordenadasDuplicadas = await this.DepositoModel.findOne({
-        lat,
-        long,
-        _id: { $ne: objectId },
+        lat: newLat,
+        long: newLong,
+        _id: { $ne: depositoExistente._id },
       }).exec();
 
       if (coordenadasDuplicadas) {
         throw new ConflictException(
-          'Ya existe un deposito con estas coordenadas.',
+          'Ya existe un depósito con estas coordenadas.',
         );
       }
     }
 
     const depositoActualizado = await this.DepositoModel.findByIdAndUpdate(
-      objectId,
-      updateDepositoDto,
-      { new: true },
+      id,
+      { ...updateDepositoDto, lat: newLat, long: newLong },
+      { new: true, runValidators: true },
     ).exec();
 
     if (!depositoActualizado) {
-      throw new NotFoundException(`Deposito no encontrado tras actualizar`);
+      throw new NotFoundException(`Depósito no encontrado tras actualizar`);
     }
 
     return depositoActualizado;

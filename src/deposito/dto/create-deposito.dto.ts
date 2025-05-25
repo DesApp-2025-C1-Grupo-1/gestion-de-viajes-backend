@@ -2,14 +2,16 @@ import {
   IsString,
   IsNumber,
   IsNotEmpty,
-  IsMongoId,
   Min,
   Max,
   IsIn,
   Matches,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { CreateDireccionDto } from 'src/direccion/dto/create-direccion.dto';
+import { CreateContactoDto } from 'src/contacto/dto/create-contacto.dto';
 
 export class CreateDepositoDto {
   @IsString()
@@ -76,19 +78,13 @@ export class CreateDepositoDto {
   })
   restricciones: string;
 
-  @IsMongoId()
-  @IsNotEmpty()
-  @ApiProperty({
-    example: '665f0f02fe1846d5a9f3baf3',
-    description: 'ID del contacto',
-  })
-  contacto: string;
+  @ValidateNested()
+  @Type(() => CreateDireccionDto)
+  @ApiProperty({ type: CreateDireccionDto })
+  direccion: CreateDireccionDto;
 
-  @IsMongoId()
-  @IsNotEmpty()
-  @ApiProperty({
-    example: '665f0f02fe1846d5a9f3baf3',
-    description: 'ID de dirreccion',
-  })
-  direccion: string;
+  @ValidateNested()
+  @Type(() => CreateContactoDto)
+  @ApiProperty({ type: CreateContactoDto })
+  contacto: CreateContactoDto;
 }
