@@ -12,5 +12,6 @@ import { Deposito, DepositoSchema } from './Schemas/deposito.schema';
   ],
   controllers: [DepositoController],
   providers: [DepositoService],
+  exports: [MongooseModule],
 })
 export class DepositoModule {}
