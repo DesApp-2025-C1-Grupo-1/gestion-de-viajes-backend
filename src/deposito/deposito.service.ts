@@ -8,12 +8,14 @@ import { UpdateDepositoDto } from './dto/update-deposito.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Deposito, DepositoDocument } from './Schemas/deposito.schema';
+import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
 
 @Injectable()
 export class DepositoService {
   constructor(
     @InjectModel(Deposito.name)
     private DepositoModel: Model<DepositoDocument>,
+    @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
   ) {}
 
   async create(createDepositoDto: CreateDepositoDto): Promise<Deposito> {
@@ -95,6 +97,17 @@ export class DepositoService {
     if (!deposito) {
       throw new NotFoundException(`Deposito no encontrado`);
     }
+
+    const depositoEnUsoPorViaje = await this.viajeModel.exists({
+      deposito: id,
+    });
+
+    if (depositoEnUsoPorViaje) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes que usan este deposito',
+      );
+    }
+
     return deposito;
   }
 }

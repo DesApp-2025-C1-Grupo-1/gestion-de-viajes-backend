@@ -8,6 +8,7 @@ import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exi
 import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
 import { EmpresaModule } from 'src/empresa/empresa.module';
 import { ChoferModule } from 'src/chofer/chofer.module';
+import { ViajeModule } from 'src/viaje/viaje.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChoferModule } from 'src/chofer/chofer.module';
     forwardRef(() => TipoVehiculoModule),
     forwardRef(() => EmpresaModule),
     forwardRef(() => ChoferModule),
+    forwardRef(() => ViajeModule),
   ],
   controllers: [VehiculoController],
   providers: [

@@ -7,12 +7,14 @@ import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
 import { EmpresaModule } from 'src/empresa/empresa.module';
 import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
+import { ViajeModule } from 'src/viaje/viaje.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Chofer.name, schema: ChoferSchema }]),
     forwardRef(() => VehiculoModule),
     forwardRef(() => EmpresaModule),
+    forwardRef(() => ViajeModule),
   ],
   controllers: [ChoferController],
   providers: [

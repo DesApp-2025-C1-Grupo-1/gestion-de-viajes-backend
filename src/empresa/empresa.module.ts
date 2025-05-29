@@ -5,12 +5,14 @@ import { EmpresaController } from './empresa.controller';
 import { EmpresaService } from './empresa.service';
 import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
 import { ChoferModule } from 'src/chofer/chofer.module';
+import { ViajeModule } from 'src/viaje/viaje.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Empresa.name, schema: EmpresaSchema }]),
     forwardRef(() => VehiculoModule),
     forwardRef(() => ChoferModule),
+    forwardRef(() => ViajeModule),
   ],
   controllers: [EmpresaController],
   providers: [EmpresaService],

@@ -109,7 +109,7 @@ export class VehiculoController {
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
   @ApiResponse({
     status: 409,
-    description: 'El vehículo está en uso y no puede ser eliminado', //Falta agregar todavía en todas las entidades
+    description: 'El vehículo está en uso y no puede ser eliminado',
   })
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: string) {
