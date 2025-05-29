@@ -26,7 +26,7 @@ export class Viaje {
   @Prop({ type: Types.ObjectId, ref: 'Chofer', required: true })
   chofer: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Empresa', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Vehiculo', required: true })
   vehiculo: Types.ObjectId;
 }
 

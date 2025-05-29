@@ -55,23 +55,58 @@ export class ViajeController {
     return this.viajeService.create(createViajeDto);
   }
 
+  @ApiOperation({ summary: 'Obtener todos los viajes' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de viajes obtenida correctamente',
+    type: [ViajeDto],
+  })
+  @ApiResponse({ status: 404, description: 'No se encontraron viajes' })
   @Get()
   findAll() {
     return this.viajeService.findAll();
   }
 
+  @ApiOperation({ summary: 'Obtener un viaje por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Viaje obtenido correctamente',
+    type: ViajeDto,
+  })
+  @ApiResponse({ status: 404, description: 'Viaje no encontrado' })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.viajeService.findOne(+id);
+    return this.viajeService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Actualizar un viaje' })
+  @ApiResponse({
+    status: 200,
+    description: 'Viaje actualizado correctamente',
+    type: ViajeDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos para actualizar un viaje',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Viaje no encontrado',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una viaje con esa patente',
+  })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateViajeDto: UpdateViajeDto) {
-    return this.viajeService.update(+id, updateViajeDto);
+    return this.viajeService.update(id, updateViajeDto);
   }
 
+  @ApiOperation({ summary: 'Eliminar un viaje por ID' })
+  @ApiResponse({ status: 200, description: 'Viaje eliminado correctamente' })
+  @ApiResponse({ status: 404, description: 'Viaje no encontrado' })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.viajeService.remove(+id);
+    return this.viajeService.remove(id);
   }
 }

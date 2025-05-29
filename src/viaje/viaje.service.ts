@@ -74,19 +74,99 @@ export class ViajeService {
     return createdViaje.save();
   }
 
-  findAll() {
-    return `This action returns all viaje`;
+  async findAll(): Promise<Viaje[]> {
+    return this.viajeModel
+      .find()
+      .populate('deposito_origen')
+      .populate('deposito_destino')
+      .populate('empresa')
+      .populate('chofer')
+      .populate('vehiculo')
+      .exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} viaje`;
+  async findOne(id: string): Promise<Viaje> {
+    const viaje = await this.viajeModel
+      .findById(id)
+      .populate('deposito_origen')
+      .populate('deposito_destino')
+      .populate('empresa')
+      .populate('chofer')
+      .populate('vehiculo')
+      .exec();
+    if (!viaje) {
+      throw new NotFoundException(`Viaje no encontrado`);
+    }
+    return viaje;
   }
 
-  update(id: number, updateViajeDto: UpdateViajeDto) {
-    return `This action updates a #${id} viaje`;
+  async update(id: string, updateViajeDto: UpdateViajeDto): Promise<Viaje> {
+    const { deposito_origen, fecha_inicio, chofer, vehiculo, empresa } =
+      updateViajeDto;
+
+    const viajeExistente = await this.viajeModel.findOne({
+      _id: { $ne: id },
+      deposito_origen,
+      fecha_inicio,
+      chofer,
+    });
+
+    if (viajeExistente) {
+      throw new ConflictException('Ya existe un Viaje con esos datos');
+    }
+
+    // Validar existencia de entidades
+    const vehiculoEncontrado = await this.vehiculoModel.findById(vehiculo);
+    const choferEncontrado = await this.choferModel.findById(chofer);
+    const empresaEncontrada = await this.empresaModel.findById(empresa);
+
+    if (!vehiculoEncontrado) {
+      throw new NotFoundException('El vehículo no existe');
+    } else if (!choferEncontrado) {
+      throw new NotFoundException('El chofer no existe');
+    } else if (!empresaEncontrada) {
+      throw new NotFoundException('La empresa no existe');
+    }
+
+    if (
+      !empresa ||
+      vehiculoEncontrado.empresa.toString() !== empresa.toString()
+    ) {
+      throw new ConflictException(
+        'El vehículo no pertenece a la misma empresa que el viaje',
+      );
+    }
+
+    if (
+      !empresa ||
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      choferEncontrado.empresa.toString() !== empresa.toString()
+    ) {
+      throw new ConflictException(
+        'El chofer no pertenece a la misma empresa que el viaje',
+      );
+    }
+
+    const viajeActualizado = await this.viajeModel.findByIdAndUpdate(
+      id,
+      { $set: updateViajeDto },
+      { new: true },
+    );
+
+    if (!viajeActualizado) {
+      throw new NotFoundException('Viaje no encontrado');
+    }
+
+    return viajeActualizado;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} viaje`;
+  async remove(id: string): Promise<Viaje> {
+    const viajeEliminado = await this.viajeModel.findByIdAndDelete(id);
+
+    if (!viajeEliminado) {
+      throw new NotFoundException('Viaje no encontrado');
+    }
+
+    return viajeEliminado;
   }
 }
