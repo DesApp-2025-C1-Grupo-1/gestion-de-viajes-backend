@@ -12,6 +12,7 @@ import {
   Vehiculo,
   VehiculoDocument,
 } from 'src/vehiculo/schemas/vehiculo.schema';
+import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
 
 @Injectable()
 export class ChoferService {
@@ -20,6 +21,7 @@ export class ChoferService {
     private choferModel: mongoose.Model<ChoferDocument>,
     @InjectModel(Vehiculo.name)
     private vehiculoModel: mongoose.Model<VehiculoDocument>,
+    @InjectModel(Viaje.name) private viajeModel: mongoose.Model<ViajeDocument>,
   ) {}
 
   async create(createChoferDto: CreateChoferDto) {
@@ -101,6 +103,16 @@ export class ChoferService {
   }
 
   async remove(id: string): Promise<Chofer> {
+    const depositoEnUsoPorViaje = await this.viajeModel.exists({
+      empresa: id,
+    });
+
+    if (depositoEnUsoPorViaje) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes que usan este deposito',
+      );
+    }
+
     const chofer = await this.choferModel.findByIdAndDelete(id).exec();
     if (!chofer) {
       throw new NotFoundException(`Chofer no encontrado`);

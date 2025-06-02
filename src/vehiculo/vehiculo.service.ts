@@ -6,12 +6,14 @@ import { Model } from 'mongoose';
 import { Vehiculo, VehiculoDocument } from './schemas/vehiculo.schema';
 import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
 import { NotFoundException } from '@nestjs/common';
+import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
 
 @Injectable()
 export class VehiculoService {
   constructor(
     @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
+    @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
   ) {}
 
   async create(createVehiculoDto: CreateVehiculoDto): Promise<Vehiculo> {
@@ -75,9 +77,19 @@ export class VehiculoService {
       vehiculo: id,
     });
 
+    const vehiculoEnUsoPorViaje = await this.viajeModel.exists({
+      vehiculo: id,
+    });
+
     if (vehiculoEnUsoPorChofer) {
       throw new ConflictException(
         'No se puede eliminar: hay choferes que usan este vehículo',
+      );
+    }
+
+    if (vehiculoEnUsoPorViaje) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes que usan este vehículo',
       );
     }
 

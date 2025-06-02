@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, Matches, ValidateIf } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  Matches,
+  ValidateIf,
+  Length,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTelefonoDto {
@@ -28,6 +34,9 @@ export class CreateTelefonoDto {
   @IsNotEmpty()
   @Matches(/^\d+$/, {
     message: 'El número debe contener solo números',
+  })
+  @Length(6, 20, {
+    message: 'El número debe tener al menos 6 digitos',
   })
   @ApiProperty({
     example: '12345678',

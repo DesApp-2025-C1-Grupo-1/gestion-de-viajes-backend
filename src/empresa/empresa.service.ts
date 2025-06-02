@@ -9,6 +9,7 @@ import {
   VehiculoDocument,
 } from 'src/vehiculo/schemas/vehiculo.schema';
 import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
+import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
 
 @Injectable()
 export class EmpresaService {
@@ -16,7 +17,7 @@ export class EmpresaService {
     @InjectModel(Empresa.name) private empresaModel: Model<EmpresaDocument>,
     @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
-    // @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>, descomentar cuando esté implementada la entidad viajes
+    @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
   ) {}
 
   async findAll(): Promise<Empresa[]> {
@@ -65,10 +66,9 @@ export class EmpresaService {
       empresa: id,
     });
 
-    //Falta validar que no haya empresas en viajes cuando esté implementada su entidad
-    // const empresaEnUsoPorViaje = await this.viajeModel.exists({
-    //   empresa: id,
-    // });
+    const empresaEnUsoPorViaje = await this.viajeModel.exists({
+      empresa: id,
+    });
 
     if (empresaEnUsoPorVehiculo) {
       throw new ConflictException(
@@ -82,11 +82,11 @@ export class EmpresaService {
       );
     }
 
-    // if (empresaEnUsoPorViaje) {
-    //   throw new ConflictException(
-    //     'No se puede eliminar: hay viajes que usan esta empresa',
-    //   );
-    // }
+    if (empresaEnUsoPorViaje) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes que usan esta empresa',
+      );
+    }
 
     const res = await this.empresaModel.findByIdAndDelete(id).exec();
     return !!res;

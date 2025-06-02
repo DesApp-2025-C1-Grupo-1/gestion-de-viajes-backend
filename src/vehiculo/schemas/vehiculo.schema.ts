@@ -36,7 +36,7 @@ export class Vehiculo {
   })
   tipo: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Empresa', required: true, trim: true })
+  @Prop({ type: Types.ObjectId, ref: 'Empresa', required: true })
   empresa: Types.ObjectId;
 }
 
