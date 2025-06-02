@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateViajeDto } from './dto/create-viaje.dto';
 import { UpdateViajeDto } from './dto/update-viaje.dto';
@@ -30,8 +31,37 @@ export class ViajeService {
   ) {}
 
   async create(createViajeDto: CreateViajeDto): Promise<Viaje> {
-    const { deposito_origen, fecha_inicio, chofer, vehiculo, empresa } =
-      createViajeDto;
+    const {
+      deposito_origen,
+      fecha_inicio,
+      fecha_llegada,
+      chofer,
+      vehiculo,
+      empresa,
+    } = createViajeDto;
+
+    // Validar que el chofer no tenga un viaje asignado en el mismo rango horario
+    const viajeSolapado = await this.viajeModel.findOne({
+      chofer: createViajeDto.chofer,
+      fecha_inicio: { $lt: createViajeDto.fecha_llegada },
+      fecha_llegada: { $gt: createViajeDto.fecha_inicio },
+    });
+
+    if (viajeSolapado) {
+      throw new ConflictException(
+        'El chofer ya tiene asignado un viaje en ese rango horario',
+      );
+    }
+
+    //valida que la fecha de inicio sea anterior a la fecha de llegada
+    const inicio = new Date(fecha_inicio);
+    const llegada = new Date(fecha_llegada);
+
+    if (inicio >= llegada) {
+      throw new BadRequestException(
+        'La fecha de inicio debe ser anterior a la fecha de llegada',
+      );
+    }
 
     //Validar que no exista un viaje con los mismos datos
     const viajeExistente = await this.viajeModel.findOne({
@@ -101,8 +131,14 @@ export class ViajeService {
   }
 
   async update(id: string, updateViajeDto: UpdateViajeDto): Promise<Viaje> {
-    const { deposito_origen, fecha_inicio, chofer, vehiculo, empresa } =
-      updateViajeDto;
+    const {
+      deposito_origen,
+      fecha_inicio,
+      fecha_llegada,
+      chofer,
+      vehiculo,
+      empresa,
+    } = updateViajeDto;
 
     const viajeExistente = await this.viajeModel.findOne({
       _id: { $ne: id },
@@ -113,6 +149,36 @@ export class ViajeService {
 
     if (viajeExistente) {
       throw new ConflictException('Ya existe un Viaje con esos datos');
+    }
+
+    // Validar que la fecha de inicio sea anterior a la fecha de llegada
+    const viajeActual = await this.viajeModel.findById(id);
+
+    if (!viajeActual) {
+      throw new NotFoundException('Viaje no encontrado');
+    }
+
+    const inicio = new Date(fecha_inicio ?? viajeActual.fecha_inicio);
+    const llegada = new Date(fecha_llegada ?? viajeActual.fecha_llegada);
+
+    if (inicio >= llegada) {
+      throw new BadRequestException(
+        'La fecha de inicio debe ser anterior a la fecha de llegada',
+      );
+    }
+
+    // Validar que el chofer no tenga un viaje asignado en el mismo rango horario
+    const viajeSolapado = await this.viajeModel.findOne({
+      _id: { $ne: id },
+      chofer: updateViajeDto.chofer,
+      fecha_inicio: { $lt: fecha_llegada ?? viajeActual.fecha_llegada },
+      fecha_llegada: { $gt: fecha_inicio ?? viajeActual.fecha_inicio },
+    });
+
+    if (viajeSolapado) {
+      throw new ConflictException(
+        'El chofer ya tiene asignado un viaje en ese rango horario',
+      );
     }
 
     // Validar existencia de entidades
