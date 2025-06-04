@@ -37,12 +37,12 @@ export class CreateChoferDto {
   @ApiProperty({ description: 'DNI del chofer', example: 12345678 })
   dni: number;
 
-  @IsString()
   @IsDateString()
   @IsNotEmpty()
   @IsAdult()
+  @Type(() => Date)
   @ApiProperty({ description: 'Fecha de nacimiento', example: '1980-05-12' })
-  fecha_nacimiento: string;
+  fecha_nacimiento: Date;
 
   @IsString()
   @IsNotEmpty()

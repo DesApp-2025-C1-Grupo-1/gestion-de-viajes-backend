@@ -20,7 +20,7 @@ export class ChoferDto {
   dni: number;
 
   @ApiProperty({ description: 'Fecha de nacimiento', example: '1980-05-12' })
-  fecha_nacimiento: string;
+  fecha_nacimiento: Date;
 
   @ApiProperty({
     description: 'Número de licencia del conductor',
