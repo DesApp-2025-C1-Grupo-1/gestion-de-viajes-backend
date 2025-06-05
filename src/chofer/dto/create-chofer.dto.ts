@@ -40,7 +40,6 @@ export class CreateChoferDto {
   @IsDateString()
   @IsNotEmpty()
   @IsAdult()
-  @Type(() => Date)
   @ApiProperty({ description: 'Fecha de nacimiento', example: '1980-05-12' })
   fecha_nacimiento: Date;
 
