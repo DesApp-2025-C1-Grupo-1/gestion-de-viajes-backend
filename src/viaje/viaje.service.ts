@@ -19,6 +19,7 @@ import {
   Deposito,
   DepositoDocument,
 } from 'src/deposito/Schemas/deposito.schema';
+import { PaginacionDto } from 'src/common/dto/paginacion.dto';
 
 @Injectable()
 export class ViajeService {
@@ -104,9 +105,12 @@ export class ViajeService {
     return createdViaje.save();
   }
 
-  async findAll(): Promise<Viaje[]> {
+  async findAll(paginacionDto: PaginacionDto): Promise<Viaje[]> {
     return this.viajeModel
-      .find()
+      .find({
+        skip: paginacionDto.skip || 0,
+        take: paginacionDto.limit || 10,
+      })
       .populate('deposito_origen')
       .populate('deposito_destino')
       .populate('empresa')
