@@ -105,18 +105,30 @@ export class ViajeService {
     return createdViaje.save();
   }
 
-  async findAll(paginacionDto: PaginacionDto): Promise<Viaje[]> {
-    return this.viajeModel
-      .find({
-        skip: paginacionDto.skip || 0,
-        take: paginacionDto.limit || 10,
-      })
-      .populate('deposito_origen')
-      .populate('deposito_destino')
-      .populate('empresa')
-      .populate('chofer')
-      .populate('vehiculo')
-      .exec();
+  async findAll(paginacionDto: PaginacionDto): Promise<{
+    data: Viaje[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const { page = 1, limit = 10 } = paginacionDto;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.viajeModel
+        .find()
+        .skip(skip)
+        .limit(limit)
+        .populate('deposito_origen')
+        .populate('deposito_destino')
+        .populate('empresa')
+        .populate('chofer')
+        .populate('vehiculo')
+        .exec(),
+      this.viajeModel.countDocuments(),
+    ]);
+
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<Viaje> {
