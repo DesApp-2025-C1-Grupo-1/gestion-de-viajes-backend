@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDateString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsOptional, IsString, IsDateString, IsIn } from 'class-validator';
 
 export class BuscarViajeDto {
   @ApiProperty({
@@ -38,4 +39,36 @@ export class BuscarViajeDto {
   @IsOptional()
   @IsString()
   empresa?: string;
+
+  @ApiProperty({
+    description: 'Id del chofer | Nombre del chofer',
+    example: 'Juan Perez',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  chofer?: string;
+
+  @ApiProperty({
+    description: 'Id del vehiculo | Patente del vehiculo',
+    example: 'AB123CD',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  vehiculo?: string;
+
+  @ApiProperty({
+    description: 'Tipo de viaje',
+    example: 'nacional',
+    enum: ['nacional', 'internacional'],
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.toLowerCase() : undefined,
+  )
+  @IsIn(['nacional', 'internacional'])
+  tipo?: string;
 }

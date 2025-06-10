@@ -238,7 +238,15 @@ export class ViajeService {
   }
 
   async buscar(filtros: BuscarViajeDto): Promise<Viaje[]> {
-    const { fecha_inicio, fecha_llegada, _id, empresa } = filtros;
+    const {
+      fecha_inicio,
+      fecha_llegada,
+      _id,
+      empresa,
+      chofer,
+      vehiculo,
+      tipo,
+    } = filtros;
     const query: RootFilterQuery<BuscarViajeDto> = {};
 
     if (fecha_inicio) {
@@ -269,6 +277,40 @@ export class ViajeService {
           return [];
         }
       }
+    }
+
+    if (chofer) {
+      if (Types.ObjectId.isValid(chofer)) {
+        query.chofer = new Types.ObjectId(chofer);
+      } else {
+        const choferDoc = await this.choferModel.findOne({
+          nombre: { $regex: chofer, $options: 'i' },
+        });
+        if (choferDoc) {
+          query.chofer = choferDoc._id;
+        } else {
+          return [];
+        }
+      }
+    }
+
+    if (vehiculo) {
+      if (Types.ObjectId.isValid(vehiculo)) {
+        query.vehiculo = new Types.ObjectId(vehiculo);
+      } else {
+        const vehiculoDoc = await this.vehiculoModel.findOne({
+          patente: { $regex: vehiculo, $options: 'i' },
+        });
+        if (vehiculoDoc) {
+          query.vehiculo = vehiculoDoc._id;
+        } else {
+          return [];
+        }
+      }
+    }
+
+    if (tipo) {
+      query.tipo_viaje = tipo;
     }
 
     return this.viajeModel
