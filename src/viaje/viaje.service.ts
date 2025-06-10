@@ -9,7 +9,7 @@ import { UpdateViajeDto } from './dto/update-viaje.dto';
 import { Viaje, ViajeDocument } from './schemas/viaje.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
-import { Model } from 'mongoose';
+import { Model, RootFilterQuery, Types } from 'mongoose';
 import { Empresa, EmpresaDocument } from 'src/empresa/schemas/empresa.schema';
 import {
   Vehiculo,
@@ -19,6 +19,7 @@ import {
   Deposito,
   DepositoDocument,
 } from 'src/deposito/Schemas/deposito.schema';
+import { BuscarViajeDto } from './dto/buscar-viaje.dto';
 
 @Injectable()
 export class ViajeService {
@@ -234,5 +235,49 @@ export class ViajeService {
     }
 
     return viajeEliminado;
+  }
+
+  async buscar(filtros: BuscarViajeDto): Promise<Viaje[]> {
+    const { fecha_inicio, fecha_llegada, _id, empresa } = filtros;
+    const query: RootFilterQuery<BuscarViajeDto> = {};
+
+    if (fecha_inicio) {
+      query.fecha_inicio = { $gte: new Date(fecha_inicio) };
+    }
+
+    if (fecha_llegada) {
+      query.fecha_llegada = { $lte: new Date(fecha_llegada) };
+    }
+
+    if (_id) {
+      query._id = _id;
+    }
+
+    if (empresa) {
+      if (Types.ObjectId.isValid(empresa)) {
+        query.empresa = new Types.ObjectId(empresa);
+      } else {
+        const empresaDoc = await this.empresaModel.findOne({
+          $or: [
+            { razon_social: { $regex: empresa, $options: 'i' } },
+            { nombre_comercial: { $regex: empresa, $options: 'i' } },
+          ],
+        });
+        if (empresaDoc) {
+          query.empresa = empresaDoc._id;
+        } else {
+          return [];
+        }
+      }
+    }
+
+    return this.viajeModel
+      .find(query)
+      .populate('deposito_origen')
+      .populate('deposito_destino')
+      .populate('empresa')
+      .populate('chofer')
+      .populate('vehiculo')
+      .exec();
   }
 }

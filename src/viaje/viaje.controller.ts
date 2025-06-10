@@ -17,6 +17,7 @@ import { ValidateDepositoExistsPipe } from 'src/common/pipes/validate_Deposito_e
 import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
 import { ValidateChoferExistsPipe } from 'src/common/pipes/validate_Chofer_exists.pipe';
+import { BuscarViajeDto } from './dto/buscar-viaje.dto';
 
 @Controller('viaje')
 export class ViajeController {
@@ -108,5 +109,16 @@ export class ViajeController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.viajeService.remove(id);
+  }
+
+  @ApiOperation({ summary: 'Buscar viajes por filtros' })
+  @ApiResponse({
+    status: 200,
+    description: 'Viajes filtrados correctamente',
+    type: [ViajeDto],
+  })
+  @Post('buscar')
+  buscar(@Body() filtros: BuscarViajeDto) {
+    return this.viajeService.buscar(filtros);
   }
 }
