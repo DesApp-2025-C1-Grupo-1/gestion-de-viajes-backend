@@ -5,16 +5,23 @@ export type VehiculoDocument = Vehiculo & Document;
 
 @Schema({ collection: 'vehiculo', versionKey: false })
 export class Vehiculo {
-  @Prop({ required: true, unique: true, trim: true, uppercase: true })
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    uppercase: true,
+  })
   patente: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   marca: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   modelo: string;
 
   @Prop({
+    type: Number,
     required: true,
     trim: true,
     min: 1900,
@@ -22,10 +29,10 @@ export class Vehiculo {
   })
   año: number;
 
-  @Prop({ required: true, min: 0, trim: true })
+  @Prop({ type: Number, required: true, min: 0, trim: true })
   volumen_carga: number;
 
-  @Prop({ required: true, min: 0, trim: true })
+  @Prop({ type: Number, required: true, min: 0, trim: true })
   peso_carga: number;
 
   @Prop({

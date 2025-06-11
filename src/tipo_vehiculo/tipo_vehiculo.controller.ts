@@ -16,7 +16,7 @@ import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TipoVehiculoDto } from './dto/tipo-vehiculo.dto';
 
-@Controller('tipo_vehiculo')
+@Controller('tipo-vehiculo')
 export class TipoVehiculoController {
   constructor(private readonly tipoVehiculoService: TipoVehiculoService) {}
 
