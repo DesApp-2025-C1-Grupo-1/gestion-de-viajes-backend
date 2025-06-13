@@ -10,25 +10,25 @@ export type DepositoDocument = Deposito & Document;
 
 @Schema({ collection: 'deposito', versionKey: false })
 export class Deposito {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   nombre: string;
 
-  @Prop({ required: true })
+  @Prop({ type: Number, required: true })
   lat: number;
 
-  @Prop({ required: true })
+  @Prop({ type: Number, required: true })
   long: number;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   tipo: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   horario_entrada: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   horario_salida: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   restricciones: string;
 
   @Prop({ type: DireccionSchema, required: true })

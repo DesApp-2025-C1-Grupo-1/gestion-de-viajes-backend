@@ -6,10 +6,10 @@ export type ContactoDocument = Contacto & Document;
 
 @Schema({ versionKey: false })
 export class Contacto {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   nombre: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   email: string;
 
   @Prop({ type: TelefonoSchema, required: true })

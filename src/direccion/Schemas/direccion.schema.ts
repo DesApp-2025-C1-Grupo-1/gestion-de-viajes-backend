@@ -5,22 +5,22 @@ export type DireccionDocument = Direccion & Document;
 
 @Schema({ versionKey: false })
 export class Direccion {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   calle: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   numero: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   ciudad: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   estado_provincia: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   pais: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   tipo: string;
 }
 export const DireccionSchema = SchemaFactory.createForClass(Direccion);

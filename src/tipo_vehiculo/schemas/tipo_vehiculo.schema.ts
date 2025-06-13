@@ -5,10 +5,10 @@ export type TipoVehiculoDocument = TipoVehiculo & Document;
 
 @Schema({ collection: 'tipo_vehiculo', versionKey: false })
 export class TipoVehiculo {
-  @Prop({ required: true, unique: true, trim: true })
+  @Prop({ type: String, required: true, unique: true, trim: true })
   nombre: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   descripcion: string;
 }
 
