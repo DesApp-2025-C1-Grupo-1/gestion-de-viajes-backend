@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ViajeService } from './viaje.service';
 import { CreateViajeDto } from './dto/create-viaje.dto';
@@ -17,7 +18,11 @@ import { ValidateDepositoExistsPipe } from 'src/common/pipes/validate_Deposito_e
 import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
 import { ValidateChoferExistsPipe } from 'src/common/pipes/validate_Chofer_exists.pipe';
+<<<<<<< paginacion
+import { PaginacionDto } from 'src/common/dto/paginacion.dto';
+=======
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
+>>>>>>> dev
 
 @Controller('viaje')
 export class ViajeController {
@@ -64,8 +69,8 @@ export class ViajeController {
   })
   @ApiResponse({ status: 404, description: 'No se encontraron viajes' })
   @Get()
-  findAll() {
-    return this.viajeService.findAll();
+  findAll(@Query() paginacionDto: PaginacionDto) {
+    return this.viajeService.findAll(paginacionDto);
   }
 
   @ApiOperation({ summary: 'Obtener un viaje por ID' })
