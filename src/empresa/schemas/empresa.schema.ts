@@ -10,13 +10,13 @@ export type EmpresaDocument = Empresa & Document;
 
 @Schema({ collection: 'empresa', versionKey: false })
 export class Empresa {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   razon_social: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   nombre_comercial: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ type: String, required: true, unique: true })
   cuit: string;
 
   @Prop({ type: DireccionSchema, required: true })
