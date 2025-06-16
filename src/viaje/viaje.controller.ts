@@ -63,7 +63,7 @@ export class ViajeController {
   @ApiResponse({
     status: 200,
     description: 'Lista de viajes obtenida correctamente',
-    type: [PaginacionDto],
+    type: PaginacionDto,
   })
   @ApiResponse({ status: 404, description: 'No se encontraron viajes' })
   @Get()
