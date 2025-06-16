@@ -22,7 +22,6 @@ import {
 import { PaginacionDto } from 'src/common/dto/paginacion.dto';
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
 
-
 @Injectable()
 export class ViajeService {
   constructor(

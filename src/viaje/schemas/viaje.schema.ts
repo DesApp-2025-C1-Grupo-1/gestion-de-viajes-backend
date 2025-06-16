@@ -9,6 +9,9 @@ export class Viaje {
   fecha_inicio: Date;
 
   @Prop({ type: Date, required: true })
+  fecha_llegada_estimada: Date;
+
+  @Prop({ type: Date })
   fecha_llegada: Date;
 
   @Prop({ type: String, required: true })
