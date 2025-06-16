@@ -19,7 +19,7 @@ import {
   Deposito,
   DepositoDocument,
 } from 'src/deposito/Schemas/deposito.schema';
-import { PaginacionDto } from 'src/common/dto/paginacion.dto';
+import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
 
 @Injectable()
@@ -106,13 +106,13 @@ export class ViajeService {
     return createdViaje.save();
   }
 
-  async findAll(paginacionDto: PaginacionDto): Promise<{
+  async findAll(queryPaginacionDto: QueryPaginacionDto): Promise<{
     data: Viaje[];
     total: number;
     page: number;
     limit: number;
   }> {
-    const { page = 1, limit = 10 } = paginacionDto;
+    const { page = 1, limit = 10 } = queryPaginacionDto;
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
