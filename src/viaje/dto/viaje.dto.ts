@@ -18,12 +18,6 @@ export class ViajeDto {
   readonly fecha_inicio: Date;
 
   @ApiProperty({
-    description: 'Fecha y hora estimada de llegada',
-    example: '2025-06-01T18:00:00Z',
-  })
-  readonly fecha_llegada_estimada: Date;
-
-  @ApiProperty({
     description: 'Fecha y hora de llegada',
     example: '2025-06-01T18:00:00Z',
   })

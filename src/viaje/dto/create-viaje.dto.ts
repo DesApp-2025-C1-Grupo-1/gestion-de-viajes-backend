@@ -18,14 +18,6 @@ export class CreateViajeDto {
   fecha_inicio: Date;
 
   @IsDateString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'Fecha y hora estimada de llegada',
-    example: '2025-06-01T18:00:00Z',
-  })
-  fecha_llegada_estimada: Date;
-
-  @IsDateString()
   @IsOptional()
   @ApiProperty({
     description: 'Fecha y hora estimada de llegada',

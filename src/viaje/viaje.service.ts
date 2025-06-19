@@ -266,11 +266,15 @@ export class ViajeService {
     const query: RootFilterQuery<BuscarViajeDto> = {};
 
     if (fecha_inicio) {
-      query.fecha_inicio = { $gte: new Date(fecha_inicio) };
+      const fechaInicio = new Date(fecha_inicio);
+      fechaInicio.setHours(0, 0, 0, 0); // 00:00:00.000
+      query.fecha_inicio = { $gte: fechaInicio };
     }
 
     if (fecha_llegada) {
-      query.fecha_llegada = { $lte: new Date(fecha_llegada) };
+      const fechaLlegada = new Date(fecha_llegada);
+      fechaLlegada.setHours(23, 59, 59, 999); // 23:59:59.999
+      query.fecha_llegada = { $lte: fechaLlegada };
     }
 
     if (_id) {
