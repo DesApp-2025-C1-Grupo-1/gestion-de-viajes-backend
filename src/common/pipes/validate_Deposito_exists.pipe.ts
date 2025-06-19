@@ -6,7 +6,7 @@ import {
   DepositoDocument,
 } from 'src/deposito/Schemas/deposito.schema';
 
-//Este pipe se utiliza para validar si un deposito existe en la base de datos
+//Este pipe se utiliza para validar si los depositos de un viaje existen en la base de datos, y que no sean iguales
 
 @Injectable()
 export class ValidateDepositoExistsPipe implements PipeTransform {
@@ -16,19 +16,41 @@ export class ValidateDepositoExistsPipe implements PipeTransform {
   ) {}
 
   async transform(value: Record<string, any>) {
-    if (value.deposito === undefined) {
-      return value;
-    }
+    const camposAValidar = ['deposito_origen', 'deposito_destino'];
 
-    if (!Types.ObjectId.isValid(String(value.deposito))) {
-      throw new BadRequestException('Deposito debe ser un ObjectId válido');
-    }
+    // Extraemos los ids para la comparación
+    const idOrigen =
+      typeof value['deposito_origen'] === 'string'
+        ? value['deposito_origen']
+        : undefined;
+    const idDestino =
+      typeof value['deposito_destino'] === 'string'
+        ? value['deposito_destino']
+        : undefined;
 
-    const exists = await this.depositoModel.exists({ _id: value.deposito });
-    if (!exists) {
+    // Validación que no sean iguales
+    if (idOrigen && idDestino && idOrigen === idDestino) {
       throw new BadRequestException(
-        'Deposito no existente en la base de datos',
+        'El depósito de origen y destino no pueden ser el mismo',
       );
+    }
+
+    // Validamos existencia y formato para cada campo
+    for (const campo of camposAValidar) {
+      const id: string | undefined =
+        typeof value[campo] === 'string' ? value[campo] : undefined;
+      if (id === undefined) continue;
+
+      if (!Types.ObjectId.isValid(String(id))) {
+        throw new BadRequestException(`${campo} debe ser un ObjectId válido`);
+      }
+
+      const exists = await this.depositoModel.exists({ _id: id });
+      if (!exists) {
+        throw new BadRequestException(
+          `${campo} no existente en la base de datos`,
+        );
+      }
     }
 
     return value;

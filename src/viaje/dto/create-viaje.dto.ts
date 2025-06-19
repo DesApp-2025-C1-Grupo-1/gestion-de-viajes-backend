@@ -3,7 +3,6 @@ import {
   IsIn,
   IsMongoId,
   IsNotEmpty,
-  IsOptional,
   IsString,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -18,9 +17,9 @@ export class CreateViajeDto {
   fecha_inicio: Date;
 
   @IsDateString()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({
-    description: 'Fecha y hora estimada de llegada',
+    description: 'Fecha y hora de llegada',
     example: '2025-06-01T18:00:00Z',
   })
   fecha_llegada: Date;

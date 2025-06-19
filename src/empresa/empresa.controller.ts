@@ -98,7 +98,7 @@ export class EmpresaController {
   @ApiResponse({ status: 404, description: 'Empresa no encontrada' })
   @ApiResponse({
     status: 409,
-    description: 'La empresa está en uso y no puede ser eliminada', //Falta agregar todavía en todas las entidades
+    description: 'La empresa está en uso y no puede ser eliminada',
   })
   @Delete(':id')
   async delete(

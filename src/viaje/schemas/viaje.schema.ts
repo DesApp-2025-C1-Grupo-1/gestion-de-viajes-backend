@@ -8,7 +8,7 @@ export class Viaje {
   @Prop({ type: Date, required: true })
   fecha_inicio: Date;
 
-  @Prop({ type: Date })
+  @Prop({ type: Date, required: true })
   fecha_llegada: Date;
 
   @Prop({ type: String, required: true })

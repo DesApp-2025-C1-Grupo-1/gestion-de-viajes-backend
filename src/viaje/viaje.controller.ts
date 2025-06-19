@@ -43,16 +43,16 @@ export class ViajeController {
   @Post()
   create(
     @Body(
-      ValidateVehiculoExistsPipe,
-      ValidateEmpresaExistsPipe,
-      ValidateDepositoExistsPipe,
-      ValidateChoferExistsPipe,
       new TransformObjectIdFieldsPipe([
         'deposito',
         'empresa',
         'vehiculo',
         'chofer',
       ]),
+      ValidateVehiculoExistsPipe,
+      ValidateEmpresaExistsPipe,
+      ValidateDepositoExistsPipe,
+      ValidateChoferExistsPipe,
     )
     createViajeDto: CreateViajeDto,
   ) {
