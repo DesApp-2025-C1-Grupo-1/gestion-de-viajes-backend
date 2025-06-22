@@ -6,25 +6,25 @@ export type ChoferDocument = Chofer & Document;
 
 @Schema({ collection: 'chofer', versionKey: false })
 export class Chofer {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   nombre: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   apellido: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ type: Number, required: true, unique: true })
   dni: number;
 
   @Prop({ type: Date, required: true })
   fecha_nacimiento: Date;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   licencia: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   tipo_licencia: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   email: string;
 
   @Prop({

@@ -5,13 +5,13 @@ export type TelefonoDocument = Telefono & Document;
 
 @Schema({ versionKey: false })
 export class Telefono {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   codigo_pais: string;
 
-  @Prop({ required: false })
+  @Prop({ type: String, required: false })
   codigo_area: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   numero: string;
 }
 

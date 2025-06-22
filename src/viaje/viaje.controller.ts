@@ -18,8 +18,9 @@ import { ValidateDepositoExistsPipe } from 'src/common/pipes/validate_Deposito_e
 import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
 import { ValidateChoferExistsPipe } from 'src/common/pipes/validate_Chofer_exists.pipe';
-import { PaginacionDto } from 'src/common/dto/paginacion.dto';
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
+import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
+import { PaginacionDto } from 'src/common/dto/paginacion.dto';
 
 @Controller('viaje')
 export class ViajeController {
@@ -62,12 +63,12 @@ export class ViajeController {
   @ApiResponse({
     status: 200,
     description: 'Lista de viajes obtenida correctamente',
-    type: [ViajeDto],
+    type: PaginacionDto,
   })
   @ApiResponse({ status: 404, description: 'No se encontraron viajes' })
   @Get()
-  findAll(@Query() paginacionDto: PaginacionDto) {
-    return this.viajeService.findAll(paginacionDto);
+  findAll(@Query() queryPaginacionDto: QueryPaginacionDto) {
+    return this.viajeService.findAll(queryPaginacionDto);
   }
 
   @ApiOperation({ summary: 'Obtener un viaje por ID' })

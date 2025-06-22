@@ -5,13 +5,13 @@ export type ViajeDocument = Viaje & Document;
 
 @Schema({ collection: 'viaje', versionKey: false })
 export class Viaje {
-  @Prop({ required: true })
+  @Prop({ type: Date, required: true })
   fecha_inicio: Date;
 
-  @Prop({ required: true })
+  @Prop({ type: Date })
   fecha_llegada: Date;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   tipo_viaje: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Deposito', required: true })
