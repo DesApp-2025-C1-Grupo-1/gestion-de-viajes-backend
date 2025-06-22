@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import {
   Deposito,
   DepositoDocument,
-} from 'src/deposito/Schemas/deposito.schema';
+} from 'src/deposito/schemas/deposito.schema';
 
 //Este pipe se utiliza para validar si un deposito existe en la base de datos
 

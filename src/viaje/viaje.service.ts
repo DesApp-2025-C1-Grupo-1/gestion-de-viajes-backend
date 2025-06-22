@@ -18,7 +18,7 @@ import {
 import {
   Deposito,
   DepositoDocument,
-} from 'src/deposito/Schemas/deposito.schema';
+} from 'src/deposito/schemas/deposito.schema';
 import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
 
@@ -262,6 +262,8 @@ export class ViajeService {
       chofer,
       vehiculo,
       tipo,
+      origen,
+      destino,
     } = filtros;
     const query: RootFilterQuery<BuscarViajeDto> = {};
 
@@ -331,6 +333,29 @@ export class ViajeService {
 
     if (tipo) {
       query.tipo_viaje = tipo;
+    }
+    if (origen) {
+      const depositosOrigen = await this.depositoModel.find({
+        'direccion.estado_provincia': { $regex: origen, $options: 'i' },
+      });
+
+      const idsOrigen = depositosOrigen.map(
+        (d: { _id: any }) => new Types.ObjectId(d._id),
+      );
+
+      query.deposito_origen = { $in: idsOrigen };
+    }
+
+    if (destino) {
+      const depositosDestino = await this.depositoModel.find({
+        'direccion.estado_provincia': { $regex: destino, $options: 'i' },
+      });
+
+      const idsDestino = depositosDestino.map(
+        (d: { _id: any }) => new Types.ObjectId(d._id),
+      );
+
+      query.deposito_destino = { $in: idsDestino };
     }
 
     return this.viajeModel
