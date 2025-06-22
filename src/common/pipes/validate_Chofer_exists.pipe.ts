@@ -21,7 +21,10 @@ export class ValidateChoferExistsPipe implements PipeTransform {
       throw new BadRequestException('Chofer debe ser un ObjectId válido');
     }
 
-    const exists = await this.choferModel.exists({ _id: value.chofer });
+    const exists = await this.choferModel.exists({
+      _id: value.chofer,
+      deletedAt: null,
+    });
     if (!exists) {
       throw new BadRequestException('Chofer no existente en la base de datos');
     }

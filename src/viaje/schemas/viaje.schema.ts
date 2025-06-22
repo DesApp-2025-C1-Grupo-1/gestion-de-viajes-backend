@@ -25,9 +25,11 @@ export class Viaje {
 
   @Prop({ type: Types.ObjectId, ref: 'Chofer', required: true })
   chofer: Types.ObjectId;
-
   @Prop({ type: Types.ObjectId, ref: 'Vehiculo', required: true })
   vehiculo: Types.ObjectId;
+
+  @Prop({ type: Date, default: null })
+  deletedAt: Date;
 }
 
 export const ViajeSchema = SchemaFactory.createForClass(Viaje);

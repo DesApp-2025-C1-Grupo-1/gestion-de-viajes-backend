@@ -21,9 +21,11 @@ export class Empresa {
 
   @Prop({ type: DireccionSchema, required: true })
   direccion: Direccion;
-
   @Prop({ type: ContactoSchema, required: true })
   contacto: Contacto;
+
+  @Prop({ type: Date, default: null })
+  deletedAt: Date;
 }
 
 export const EmpresaSchema = SchemaFactory.createForClass(Empresa);

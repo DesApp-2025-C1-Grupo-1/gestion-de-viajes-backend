@@ -21,7 +21,10 @@ export class ValidateEmpresaExistsPipe implements PipeTransform {
       throw new BadRequestException('empresa debe ser un ObjectId válido');
     }
 
-    const exists = await this.empresaModel.exists({ _id: value.empresa });
+    const exists = await this.empresaModel.exists({
+      _id: value.empresa,
+      deletedAt: null,
+    });
     if (!exists) {
       throw new BadRequestException('Empresa no existente en la base de datos');
     }

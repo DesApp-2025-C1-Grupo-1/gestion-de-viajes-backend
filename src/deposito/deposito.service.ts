@@ -17,12 +17,12 @@ export class DepositoService {
     private DepositoModel: Model<DepositoDocument>,
     @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
   ) {}
-
   async create(createDepositoDto: CreateDepositoDto): Promise<Deposito> {
     const { lat, long } = createDepositoDto;
     const depositoExistente = await this.DepositoModel.findOne({
       lat,
       long,
+      deletedAt: null,
     }).exec();
 
     if (depositoExistente) {
@@ -36,23 +36,27 @@ export class DepositoService {
   }
 
   async findAll(): Promise<Deposito[]> {
-    const depositos = await this.DepositoModel.find();
+    const depositos = await this.DepositoModel.find({ deletedAt: null });
     return depositos;
   }
-
   async findOne(id: string): Promise<Deposito> {
-    const deposito = await this.DepositoModel.findById(id).exec();
+    const deposito = await this.DepositoModel.findOne({
+      _id: id,
+      deletedAt: null,
+    }).exec();
     if (!deposito) {
       throw new NotFoundException(`Deposito no encontrado`);
     }
     return deposito;
   }
-
   async update(
     id: string,
     updateDepositoDto: UpdateDepositoDto,
   ): Promise<Deposito> {
-    const depositoExistente = await this.DepositoModel.findById(id).exec();
+    const depositoExistente = await this.DepositoModel.findOne({
+      _id: id,
+      deletedAt: null,
+    }).exec();
     if (!depositoExistente) {
       throw new NotFoundException(`Depósito no encontrado`);
     }
@@ -69,6 +73,7 @@ export class DepositoService {
       const coordenadasDuplicadas = await this.DepositoModel.findOne({
         lat: newLat,
         long: newLong,
+        deletedAt: null,
         _id: { $ne: depositoExistente._id },
       }).exec();
 
@@ -79,8 +84,8 @@ export class DepositoService {
       }
     }
 
-    const depositoActualizado = await this.DepositoModel.findByIdAndUpdate(
-      id,
+    const depositoActualizado = await this.DepositoModel.findOneAndUpdate(
+      { _id: id, deletedAt: null },
       { ...updateDepositoDto, lat: newLat, long: newLong },
       { new: true, runValidators: true },
     ).exec();
@@ -91,21 +96,26 @@ export class DepositoService {
 
     return depositoActualizado;
   }
-
   async remove(id: string): Promise<Deposito> {
-    const deposito = await this.DepositoModel.findByIdAndDelete(id).exec();
-    if (!deposito) {
-      throw new NotFoundException(`Deposito no encontrado`);
-    }
-
     const depositoEnUsoPorViaje = await this.viajeModel.exists({
-      deposito: id,
+      $or: [{ deposito_origen: id }, { deposito_destino: id }],
+      deletedAt: null,
     });
 
     if (depositoEnUsoPorViaje) {
       throw new ConflictException(
         'No se puede eliminar: hay viajes que usan este deposito',
       );
+    }
+
+    const deposito = await this.DepositoModel.findOneAndUpdate(
+      { _id: id, deletedAt: null },
+      { deletedAt: new Date() },
+      { new: true },
+    ).exec();
+
+    if (!deposito) {
+      throw new NotFoundException(`Deposito no encontrado`);
     }
 
     return deposito;

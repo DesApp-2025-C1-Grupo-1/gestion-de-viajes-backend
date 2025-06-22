@@ -36,9 +36,11 @@ export class Chofer {
 
   @Prop({ type: Types.ObjectId, ref: 'Empresa', required: true })
   empresa: ObjectId;
-
   @Prop({ type: TelefonoSchema, required: true })
   telefono: Telefono;
+
+  @Prop({ type: Date, default: null })
+  deletedAt: Date;
 }
 
 export const ChoferSchema = SchemaFactory.createForClass(Chofer);
