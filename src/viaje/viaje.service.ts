@@ -19,7 +19,6 @@ import {
   Deposito,
   DepositoDocument,
 } from 'src/deposito/schemas/deposito.schema';
-import { PaginacionDto } from 'src/common/dto/paginacion.dto';
 import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
 
