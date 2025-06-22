@@ -14,17 +14,19 @@ export class ValidateVehiculoExistsPipe implements PipeTransform {
     @InjectModel(Vehiculo.name)
     private vehiculoModel: Model<VehiculoDocument>,
   ) {}
-
   async transform(value: Record<string, any>) {
-    if (value.tipo === undefined) {
+    if (value.vehiculo === undefined) {
       return value;
     }
 
-    if (!Types.ObjectId.isValid(String(value.tipo))) {
+    if (!Types.ObjectId.isValid(String(value.vehiculo))) {
       throw new BadRequestException('Vehiculo debe ser un ObjectId válido');
     }
 
-    const exists = await this.vehiculoModel.exists({ _id: value.tipo });
+    const exists = await this.vehiculoModel.exists({
+      _id: value.vehiculo,
+      deletedAt: null,
+    });
     if (!exists) {
       throw new BadRequestException(
         'Vehículo no existente en la base de datos',

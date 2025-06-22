@@ -70,15 +70,25 @@ export class ViajeService {
       deposito_origen,
       fecha_inicio,
       chofer,
+      deletedAt: null,
     });
     if (viajeExistente) {
       throw new ConflictException('Ya existe un Viaje con esos datos');
     }
 
     //Validar que chofer y vehiculo tengan el mismo id de empresa
-    const vehiculoEncontrado = await this.vehiculoModel.findById(vehiculo);
-    const choferEncontrado = await this.choferModel.findById(chofer);
-    const empresaEncontrada = await this.empresaModel.findById(empresa);
+    const vehiculoEncontrado = await this.vehiculoModel.findOne({
+      _id: vehiculo,
+      deletedAt: null,
+    });
+    const choferEncontrado = await this.choferModel.findOne({
+      _id: chofer,
+      deletedAt: null,
+    });
+    const empresaEncontrada = await this.empresaModel.findOne({
+      _id: empresa,
+      deletedAt: null,
+    });
 
     if (!vehiculoEncontrado) {
       throw new NotFoundException('El vehículo no existe');
@@ -105,7 +115,6 @@ export class ViajeService {
     const createdViaje = new this.viajeModel(createViajeDto);
     return createdViaje.save();
   }
-
   async findAll(queryPaginacionDto: QueryPaginacionDto): Promise<{
     data: Viaje[];
     total: number;
@@ -117,7 +126,7 @@ export class ViajeService {
 
     const [data, total] = await Promise.all([
       this.viajeModel
-        .find()
+        .find({ deletedAt: null })
         .skip(skip)
         .limit(limit)
         .populate('deposito_origen')
@@ -126,7 +135,7 @@ export class ViajeService {
         .populate('chofer')
         .populate('vehiculo')
         .exec(),
-      this.viajeModel.countDocuments(),
+      this.viajeModel.countDocuments({ deletedAt: null }),
     ]);
 
     return { data, total, page, limit };
@@ -134,7 +143,7 @@ export class ViajeService {
 
   async findOne(id: string): Promise<Viaje> {
     const viaje = await this.viajeModel
-      .findById(id)
+      .findOne({ _id: id, deletedAt: null })
       .populate('deposito_origen')
       .populate('deposito_destino')
       .populate('empresa')
@@ -169,7 +178,10 @@ export class ViajeService {
     }
 
     // Validar que la fecha de inicio sea anterior a la fecha de llegada
-    const viajeActual = await this.viajeModel.findById(id);
+    const viajeActual = await this.viajeModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
 
     if (!viajeActual) {
       throw new NotFoundException('Viaje no encontrado');
@@ -188,6 +200,7 @@ export class ViajeService {
     const viajeSolapado = await this.viajeModel.findOne({
       _id: { $ne: id },
       chofer: updateViajeDto.chofer,
+      deletedAt: null,
       fecha_inicio: { $lt: fecha_llegada ?? viajeActual.fecha_llegada },
       fecha_llegada: { $gt: fecha_inicio ?? viajeActual.fecha_inicio },
     });
@@ -199,9 +212,18 @@ export class ViajeService {
     }
 
     // Validar existencia de entidades
-    const vehiculoEncontrado = await this.vehiculoModel.findById(vehiculo);
-    const choferEncontrado = await this.choferModel.findById(chofer);
-    const empresaEncontrada = await this.empresaModel.findById(empresa);
+    const vehiculoEncontrado = await this.vehiculoModel.findOne({
+      _id: vehiculo,
+      deletedAt: null,
+    });
+    const choferEncontrado = await this.choferModel.findOne({
+      _id: chofer,
+      deletedAt: null,
+    });
+    const empresaEncontrada = await this.empresaModel.findOne({
+      _id: empresa,
+      deletedAt: null,
+    });
 
     if (!vehiculoEncontrado) {
       throw new NotFoundException('El vehículo no existe');
@@ -230,8 +252,8 @@ export class ViajeService {
       );
     }
 
-    const viajeActualizado = await this.viajeModel.findByIdAndUpdate(
-      id,
+    const viajeActualizado = await this.viajeModel.findOneAndUpdate(
+      { _id: id, deletedAt: null },
       { $set: updateViajeDto },
       { new: true },
     );
@@ -244,7 +266,11 @@ export class ViajeService {
   }
 
   async remove(id: string): Promise<Viaje> {
-    const viajeEliminado = await this.viajeModel.findByIdAndDelete(id);
+    const viajeEliminado = await this.viajeModel.findOneAndUpdate(
+      { _id: id, deletedAt: null },
+      { deletedAt: new Date() },
+      { new: true },
+    );
 
     if (!viajeEliminado) {
       throw new NotFoundException('Viaje no encontrado');
@@ -252,7 +278,6 @@ export class ViajeService {
 
     return viajeEliminado;
   }
-
   async buscar(filtros: BuscarViajeDto): Promise<Viaje[]> {
     const {
       fecha_inicio,
@@ -265,7 +290,7 @@ export class ViajeService {
       origen,
       destino,
     } = filtros;
-    const query: RootFilterQuery<BuscarViajeDto> = {};
+    const query: RootFilterQuery<BuscarViajeDto> = { deletedAt: null };
 
     if (fecha_inicio) {
       const fechaInicio = new Date(fecha_inicio);
@@ -292,6 +317,7 @@ export class ViajeService {
             { razon_social: { $regex: empresa, $options: 'i' } },
             { nombre_comercial: { $regex: empresa, $options: 'i' } },
           ],
+          deletedAt: null,
         });
         if (empresaDoc) {
           query.empresa = empresaDoc._id;
@@ -307,6 +333,7 @@ export class ViajeService {
       } else {
         const choferDoc = await this.choferModel.findOne({
           nombre: { $regex: chofer, $options: 'i' },
+          deletedAt: null,
         });
         if (choferDoc) {
           query.chofer = choferDoc._id;
@@ -322,6 +349,7 @@ export class ViajeService {
       } else {
         const vehiculoDoc = await this.vehiculoModel.findOne({
           patente: { $regex: vehiculo, $options: 'i' },
+          deletedAt: null,
         });
         if (vehiculoDoc) {
           query.vehiculo = vehiculoDoc._id;

@@ -29,7 +29,10 @@ export class TipoVehiculoService {
   ): Promise<TipoVehiculo> {
     const { nombre } = createTipoVehiculoDto;
 
-    const tipoExistente = await this.tipoVehiculoModel.findOne({ nombre });
+    const tipoExistente = await this.tipoVehiculoModel.findOne({
+      nombre,
+      deletedAt: null,
+    });
     if (tipoExistente) {
       // importante pasar el id a string (id.toString()), es un ObjectId por defecto, sinó siempre da true
       throw new ConflictException(
@@ -44,24 +47,28 @@ export class TipoVehiculoService {
   }
 
   async findAll(): Promise<TipoVehiculo[]> {
-    return this.tipoVehiculoModel.find().exec();
+    return this.tipoVehiculoModel.find({ deletedAt: null }).exec();
   }
 
   async findOne(id: string): Promise<TipoVehiculo> {
-    const tipoVehiculo = await this.tipoVehiculoModel.findById(id).exec();
+    const tipoVehiculo = await this.tipoVehiculoModel
+      .findOne({ _id: id, deletedAt: null })
+      .exec();
     if (!tipoVehiculo) {
       throw new NotFoundException(`TipoVehiculo no encontrado`);
     }
     return tipoVehiculo;
   }
-
   async update(
     id: string,
     updateTipoVehiculoDto: UpdateTipoVehiculoDto,
   ): Promise<TipoVehiculo> {
     const { nombre } = updateTipoVehiculoDto;
 
-    const tipoExistente = await this.tipoVehiculoModel.findOne({ nombre });
+    const tipoExistente = await this.tipoVehiculoModel.findOne({
+      nombre,
+      deletedAt: null,
+    });
     if (tipoExistente && tipoExistente.id !== id.toString()) {
       // importante pasar el id a string (id.toString()), es un ObjectId por defecto, sinó siempre da true
       throw new ConflictException(
@@ -70,7 +77,9 @@ export class TipoVehiculoService {
     }
 
     const updatedTipoVehiculo = await this.tipoVehiculoModel
-      .findByIdAndUpdate(id, updateTipoVehiculoDto, { new: true })
+      .findOneAndUpdate({ _id: id, deletedAt: null }, updateTipoVehiculoDto, {
+        new: true,
+      })
       .exec();
 
     if (!updatedTipoVehiculo) {
@@ -79,10 +88,10 @@ export class TipoVehiculoService {
 
     return updatedTipoVehiculo;
   }
-
   async remove(id: string): Promise<TipoVehiculo> {
     const tipoVehiculoEnUsoPorVehiculo = await this.vehiculoModel.exists({
       tipo: id,
+      deletedAt: null,
     });
 
     if (tipoVehiculoEnUsoPorVehiculo) {
@@ -92,7 +101,11 @@ export class TipoVehiculoService {
     }
 
     const deletedTipoVehiculo = await this.tipoVehiculoModel
-      .findByIdAndDelete(id)
+      .findOneAndUpdate(
+        { _id: id, deletedAt: null },
+        { deletedAt: new Date() },
+        { new: true },
+      )
       .exec();
 
     if (!deletedTipoVehiculo) {

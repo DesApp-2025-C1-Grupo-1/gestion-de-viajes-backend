@@ -24,7 +24,10 @@ export class ValidateDepositoExistsPipe implements PipeTransform {
       throw new BadRequestException('Deposito debe ser un ObjectId válido');
     }
 
-    const exists = await this.depositoModel.exists({ _id: value.deposito });
+    const exists = await this.depositoModel.exists({
+      _id: value.deposito,
+      deletedAt: null,
+    });
     if (!exists) {
       throw new BadRequestException(
         'Deposito no existente en la base de datos',

@@ -15,11 +15,13 @@ export class VehiculoService {
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
     @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
   ) {}
-
   async create(createVehiculoDto: CreateVehiculoDto): Promise<Vehiculo> {
     const { patente } = createVehiculoDto;
 
-    const vehiculoExistente = await this.vehiculoModel.findOne({ patente });
+    const vehiculoExistente = await this.vehiculoModel.findOne({
+      patente,
+      deletedAt: null,
+    });
     if (vehiculoExistente) {
       throw new ConflictException('Ya existe una Vehículo con esa patente');
     }
@@ -30,7 +32,7 @@ export class VehiculoService {
 
   async findAll(): Promise<Vehiculo[]> {
     return this.vehiculoModel
-      .find()
+      .find({ deletedAt: null })
       .populate('tipo')
       .populate('empresa')
       .exec();
@@ -38,7 +40,7 @@ export class VehiculoService {
 
   async findOne(id: string): Promise<Vehiculo> {
     const vehiculo = await this.vehiculoModel
-      .findById(id)
+      .findOne({ _id: id, deletedAt: null })
       .populate('tipo')
       .populate('empresa')
       .exec();
@@ -47,14 +49,16 @@ export class VehiculoService {
     }
     return vehiculo;
   }
-
   async update(
     id: string,
     updateVehiculoDto: UpdateVehiculoDto,
   ): Promise<Vehiculo> {
     const { patente } = updateVehiculoDto;
 
-    const vehiculoExistente = await this.vehiculoModel.findOne({ patente });
+    const vehiculoExistente = await this.vehiculoModel.findOne({
+      patente,
+      deletedAt: null,
+    });
 
     if (vehiculoExistente && vehiculoExistente.id !== id.toString()) {
       //importante pasar el id a string (id.toString()), es un ObjectId por defecto, sinó siempre da true
@@ -62,7 +66,9 @@ export class VehiculoService {
     }
 
     const updatedVehiculo = await this.vehiculoModel
-      .findByIdAndUpdate(id, updateVehiculoDto, { new: true })
+      .findOneAndUpdate({ _id: id, deletedAt: null }, updateVehiculoDto, {
+        new: true,
+      })
       .exec();
 
     if (!updatedVehiculo) {
@@ -71,14 +77,15 @@ export class VehiculoService {
 
     return updatedVehiculo;
   }
-
   async remove(id: string): Promise<Vehiculo> {
     const vehiculoEnUsoPorChofer = await this.choferModel.exists({
       vehiculo: id,
+      deletedAt: null,
     });
 
     const vehiculoEnUsoPorViaje = await this.viajeModel.exists({
       vehiculo: id,
+      deletedAt: null,
     });
 
     if (vehiculoEnUsoPorChofer) {
@@ -94,7 +101,11 @@ export class VehiculoService {
     }
 
     const deletedVehiculo = await this.vehiculoModel
-      .findByIdAndDelete(id)
+      .findOneAndUpdate(
+        { _id: id, deletedAt: null },
+        { deletedAt: new Date() },
+        { new: true },
+      )
       .exec();
 
     if (!deletedVehiculo) {

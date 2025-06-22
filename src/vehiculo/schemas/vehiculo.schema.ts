@@ -42,9 +42,11 @@ export class Vehiculo {
     trim: true,
   })
   tipo: Types.ObjectId;
-
   @Prop({ type: Types.ObjectId, ref: 'Empresa', required: true })
   empresa: Types.ObjectId;
+
+  @Prop({ type: Date, default: null })
+  deletedAt: Date;
 }
 
 export const VehiculoSchema = SchemaFactory.createForClass(Vehiculo);

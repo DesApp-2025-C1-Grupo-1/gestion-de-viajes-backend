@@ -19,19 +19,20 @@ export class EmpresaService {
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
     @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
   ) {}
-
   async findAll(): Promise<Empresa[]> {
-    return this.empresaModel.find().exec();
+    return this.empresaModel.find({ deletedAt: null }).exec();
   }
 
   async findOne(id: string): Promise<Empresa | null> {
-    return this.empresaModel.findById(id).exec();
+    return this.empresaModel.findOne({ _id: id, deletedAt: null }).exec();
   }
-
   async create(createEmpresaDto: CreateEmpresaDto): Promise<Empresa> {
     const { cuit } = createEmpresaDto;
 
-    const empresaExistente = await this.empresaModel.findOne({ cuit });
+    const empresaExistente = await this.empresaModel.findOne({
+      cuit,
+      deletedAt: null,
+    });
     if (empresaExistente) {
       throw new ConflictException('Ya existe una empresa con ese CUIT');
     }
@@ -39,35 +40,41 @@ export class EmpresaService {
     const created = new this.empresaModel(createEmpresaDto);
     return created.save();
   }
-
   async update(
     id: string,
     updateEmpresaDto: UpdateEmpresaDto,
   ): Promise<Empresa | null> {
     const { cuit } = updateEmpresaDto;
 
-    const empresaExistente = await this.empresaModel.findOne({ cuit });
+    const empresaExistente = await this.empresaModel.findOne({
+      cuit,
+      deletedAt: null,
+    });
     if (empresaExistente && empresaExistente.id !== id.toString()) {
       // importante pasar el id a string (id.toString()), es un ObjectId por defecto, sinó siempre da true
       throw new ConflictException('Ya existe una empresa con ese CUIT');
     }
 
     return this.empresaModel
-      .findByIdAndUpdate(id, updateEmpresaDto, { new: true })
+      .findOneAndUpdate({ _id: id, deletedAt: null }, updateEmpresaDto, {
+        new: true,
+      })
       .exec();
   }
-
   async delete(id: string): Promise<boolean> {
     const empresaEnUsoPorVehiculo = await this.vehiculoModel.exists({
       empresa: id,
+      deletedAt: null,
     });
 
     const empresaEnUsoPorChofer = await this.choferModel.exists({
       empresa: id,
+      deletedAt: null,
     });
 
     const empresaEnUsoPorViaje = await this.viajeModel.exists({
       empresa: id,
+      deletedAt: null,
     });
 
     if (empresaEnUsoPorVehiculo) {
@@ -88,7 +95,13 @@ export class EmpresaService {
       );
     }
 
-    const res = await this.empresaModel.findByIdAndDelete(id).exec();
+    const res = await this.empresaModel
+      .findOneAndUpdate(
+        { _id: id, deletedAt: null },
+        { deletedAt: new Date() },
+        { new: true },
+      )
+      .exec();
     return !!res;
   }
 }

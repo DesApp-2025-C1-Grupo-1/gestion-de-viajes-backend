@@ -24,7 +24,10 @@ export class ValidateTipoVehiculoExistsPipe implements PipeTransform {
       throw new BadRequestException('tipo debe ser un ObjectId válido');
     }
 
-    const exists = await this.tipoVehiculoModel.exists({ _id: value.tipo });
+    const exists = await this.tipoVehiculoModel.exists({
+      _id: value.tipo,
+      deletedAt: null,
+    });
     if (!exists) {
       throw new BadRequestException(
         'Tipo de vehículo no existente en la base de datos',
