@@ -71,4 +71,12 @@ export class BuscarViajeDto {
   )
   @IsIn(['nacional', 'internacional'])
   tipo?: string;
+
+  @IsOptional()
+  @IsString()
+  origen?: string;
+
+  @IsOptional()
+  @IsString()
+  destino?: string;
 }
