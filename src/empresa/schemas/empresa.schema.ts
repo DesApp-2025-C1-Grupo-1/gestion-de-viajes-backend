@@ -4,7 +4,7 @@ import { Contacto, ContactoSchema } from 'src/contacto/schemas/contacto.schema';
 import {
   Direccion,
   DireccionSchema,
-} from 'src/direccion/Schemas/direccion.schema';
+} from 'src/direccion/schemas/direccion.schema';
 
 export type EmpresaDocument = Empresa & Document;
 
