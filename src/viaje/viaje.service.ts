@@ -278,6 +278,7 @@ export class ViajeService {
 
     return viajeEliminado;
   }
+
   async buscar(filtros: BuscarViajeDto): Promise<Viaje[]> {
     const {
       fecha_inicio,
@@ -362,28 +363,39 @@ export class ViajeService {
     if (tipo) {
       query.tipo_viaje = tipo;
     }
+
     if (origen) {
-      const depositosOrigen = await this.depositoModel.find({
-        'direccion.estado_provincia': { $regex: origen, $options: 'i' },
-      });
-
-      const idsOrigen = depositosOrigen.map(
-        (d: { _id: any }) => new Types.ObjectId(d._id),
-      );
-
-      query.deposito_origen = { $in: idsOrigen };
+      if (Types.ObjectId.isValid(origen)) {
+        query.deposito_origen = new Types.ObjectId(origen);
+      } else {
+        const origenDoc = await this.depositoModel.findOne({
+          lat: { $regex: origen, $options: 'i' },
+          long: { $regex: origen, $options: 'i' },
+          deletedAt: null,
+        });
+        if (origenDoc) {
+          query.origen = origenDoc._id;
+        } else {
+          return [];
+        }
+      }
     }
 
     if (destino) {
-      const depositosDestino = await this.depositoModel.find({
-        'direccion.estado_provincia': { $regex: destino, $options: 'i' },
-      });
-
-      const idsDestino = depositosDestino.map(
-        (d: { _id: any }) => new Types.ObjectId(d._id),
-      );
-
-      query.deposito_destino = { $in: idsDestino };
+      if (Types.ObjectId.isValid(destino)) {
+        query.deposito_destino = new Types.ObjectId(destino);
+      } else {
+        const destinoDoc = await this.depositoModel.findOne({
+          lat: { $regex: destino, $options: 'i' },
+          long: { $regex: destino, $options: 'i' },
+          deletedAt: null,
+        });
+        if (destinoDoc) {
+          query.destino = destinoDoc._id;
+        } else {
+          return [];
+        }
+      }
     }
 
     return this.viajeModel
