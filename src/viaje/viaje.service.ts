@@ -35,12 +35,22 @@ export class ViajeService {
   async create(createViajeDto: CreateViajeDto): Promise<Viaje> {
     const {
       deposito_origen,
+      deposito_destino,
       fecha_inicio,
       fecha_llegada,
       chofer,
       vehiculo,
       empresa,
     } = createViajeDto;
+
+    //Validar que deposito de origen y destino no sean el mismo
+    if (
+      deposito_origen.toString().trim() === deposito_destino.toString().trim()
+    ) {
+      throw new ConflictException(
+        'Los depósitos de origen y destino no pueden ser el mismo',
+      );
+    }
 
     // Validar que el chofer no tenga un viaje asignado en el mismo rango horario
     const viajeSolapado = await this.viajeModel.findOne({
@@ -279,7 +289,18 @@ export class ViajeService {
     return viajeEliminado;
   }
 
-  async buscar(filtros: BuscarViajeDto): Promise<Viaje[]> {
+  async buscar(
+    filtros: BuscarViajeDto,
+    queryPaginacionDto: QueryPaginacionDto,
+  ): Promise<{
+    data: Viaje[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const { page = 1, limit = 10 } = queryPaginacionDto;
+    const skip = (page - 1) * limit;
+
     const {
       fecha_inicio,
       fecha_llegada,
@@ -323,7 +344,7 @@ export class ViajeService {
         if (empresaDoc) {
           query.empresa = empresaDoc._id;
         } else {
-          return [];
+          return { data: [], total: 0, page, limit };
         }
       }
     }
@@ -339,7 +360,7 @@ export class ViajeService {
         if (choferDoc) {
           query.chofer = choferDoc._id;
         } else {
-          return [];
+          return { data: [], total: 0, page, limit };
         }
       }
     }
@@ -355,7 +376,7 @@ export class ViajeService {
         if (vehiculoDoc) {
           query.vehiculo = vehiculoDoc._id;
         } else {
-          return [];
+          return { data: [], total: 0, page, limit };
         }
       }
     }
@@ -376,7 +397,7 @@ export class ViajeService {
         if (origenDoc) {
           query.origen = origenDoc._id;
         } else {
-          return [];
+          return { data: [], total: 0, page, limit };
         }
       }
     }
@@ -393,18 +414,25 @@ export class ViajeService {
         if (destinoDoc) {
           query.destino = destinoDoc._id;
         } else {
-          return [];
+          return { data: [], total: 0, page, limit };
         }
       }
     }
 
-    return this.viajeModel
-      .find(query)
-      .populate('deposito_origen')
-      .populate('deposito_destino')
-      .populate('empresa')
-      .populate('chofer')
-      .populate('vehiculo')
-      .exec();
+    const [data, total] = await Promise.all([
+      this.viajeModel
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .populate('deposito_origen')
+        .populate('deposito_destino')
+        .populate('empresa')
+        .populate('chofer')
+        .populate('vehiculo')
+        .exec(),
+      this.viajeModel.countDocuments(query),
+    ]);
+
+    return { data, total, page, limit };
   }
 }
