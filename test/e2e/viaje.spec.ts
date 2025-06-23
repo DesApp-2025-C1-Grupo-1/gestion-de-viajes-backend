@@ -8,7 +8,6 @@ import { CreateViajeDto } from '../../src/viaje/dto/create-viaje.dto';
 import { UpdateViajeDto } from '../../src/viaje/dto/update-viaje.dto';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { BuscarViajeDto } from 'src/viaje/dto/buscar-viaje.dto';
-import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 
 describe('ViajeController (e2e)', () => {
   let app: INestApplication;
@@ -203,6 +202,15 @@ describe('ViajeController (e2e)', () => {
       .then((res) => {
         expect(res.body._id).toBe(createdViajeId);
         console.log('URL EN EL PATCJ}, ', `/viaje/${createdViajeId}`);
+      }));
+
+  it('PATCH /viaje/:id - actualizar viaje', () =>
+    request(app.getHttpServer())
+      .patch(`/viaje/${createdViajeId}`)
+      .send(updateViajeDto)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.tipo_viaje).toBe(updateViajeDto.tipo_viaje);
       }));
 
   it('POST /viaje/buscar - filtrar y paginar', async () => {

@@ -166,113 +166,102 @@ export class ViajeService {
     return viaje;
   }
 
-  async update(id: string, updateViajeDto: UpdateViajeDto): Promise<Viaje> {
-    const {
-      deposito_origen,
-      fecha_inicio,
-      fecha_llegada,
-      chofer,
-      vehiculo,
-      empresa,
-    } = updateViajeDto;
-
-    const viajeExistente = await this.viajeModel.findOne({
-      _id: { $ne: id },
-      deposito_origen,
-      fecha_inicio,
-      chofer,
-    });
-
-    if (viajeExistente) {
-      throw new ConflictException('Ya existe un Viaje con esos datos');
-    }
-
-    // Validar que la fecha de inicio sea anterior a la fecha de llegada
+  async update(id: string, updateDto: UpdateViajeDto): Promise<Viaje> {
+    // 1. Cargo el viaje actual
     const viajeActual = await this.viajeModel.findOne({
       _id: id,
       deletedAt: null,
     });
+    if (!viajeActual) throw new NotFoundException('Viaje no encontrado');
 
-    if (!viajeActual) {
-      throw new NotFoundException('Viaje no encontrado');
-    }
+    // 2. Desestructuro el DTO
+    const {
+      tipo_viaje,
+      fecha_inicio,
+      fecha_llegada,
+      chofer: choferDto,
+      vehiculo: vehiculoDto,
+      empresa: empresaDto,
+      deposito_origen: origenDto,
+      deposito_destino: destinoDto,
+    } = updateDto;
 
-    const inicio = new Date(fecha_inicio ?? viajeActual.fecha_inicio);
-    const llegada = new Date(fecha_llegada ?? viajeActual.fecha_llegada);
+    // 3. Valores finales con fallback
+    const choferId = choferDto ?? viajeActual.chofer;
+    const vehiculoId = vehiculoDto ?? viajeActual.vehiculo;
+    const empresaId = empresaDto ?? viajeActual.empresa;
+    const fechaInicio = fecha_inicio ?? viajeActual.fecha_inicio;
+    const fechaLlegada = fecha_llegada ?? viajeActual.fecha_llegada;
+    const depositoOrigen = origenDto ?? viajeActual.deposito_origen;
+    const depositoDestino = destinoDto ?? viajeActual.deposito_destino;
 
-    if (inicio >= llegada) {
+    // 4. Validaciones (rango de fechas, solapamientos, etc.)
+    if (new Date(fechaInicio) >= new Date(fechaLlegada)) {
       throw new BadRequestException(
         'La fecha de inicio debe ser anterior a la fecha de llegada',
       );
     }
-
-    // Validar que el chofer no tenga un viaje asignado en el mismo rango horario
-    const viajeSolapado = await this.viajeModel.findOne({
+    const solapado = await this.viajeModel.findOne({
       _id: { $ne: id },
-      chofer: updateViajeDto.chofer,
+      chofer: choferId,
+      fecha_inicio: { $lt: fechaLlegada },
+      fecha_llegada: { $gt: fechaInicio },
       deletedAt: null,
-      fecha_inicio: { $lt: fecha_llegada ?? viajeActual.fecha_llegada },
-      fecha_llegada: { $gt: fecha_inicio ?? viajeActual.fecha_inicio },
     });
-
-    if (viajeSolapado) {
+    if (solapado) {
       throw new ConflictException(
         'El chofer ya tiene asignado un viaje en ese rango horario',
       );
     }
 
-    // Validar existencia de entidades
-    const vehiculoEncontrado = await this.vehiculoModel.findOne({
-      _id: vehiculo,
+    // 5. Validar existencia de entidades
+    const vehObj = await this.vehiculoModel.findOne({
+      _id: vehiculoId,
       deletedAt: null,
     });
-    const choferEncontrado = await this.choferModel.findOne({
-      _id: chofer,
+    if (!vehObj) throw new NotFoundException('El vehículo no existe');
+    const choObj = await this.choferModel.findOne({
+      _id: choferId,
       deletedAt: null,
     });
-    const empresaEncontrada = await this.empresaModel.findOne({
-      _id: empresa,
+    if (!choObj) throw new NotFoundException('El chofer no existe');
+    const empObj = await this.empresaModel.findOne({
+      _id: empresaId,
       deletedAt: null,
     });
+    if (!empObj) throw new NotFoundException('La empresa no existe');
 
-    if (!vehiculoEncontrado) {
-      throw new NotFoundException('El vehículo no existe');
-    } else if (!choferEncontrado) {
-      throw new NotFoundException('El chofer no existe');
-    } else if (!empresaEncontrada) {
-      throw new NotFoundException('La empresa no existe');
-    }
-
-    if (
-      !empresa ||
-      vehiculoEncontrado.empresa.toString() !== empresa.toString()
-    ) {
+    // 6. Coherencia de empresa
+    if (vehObj.empresa.toString() !== empresaId.toString()) {
       throw new ConflictException(
         'El vehículo no pertenece a la misma empresa que el viaje',
       );
     }
-
-    if (
-      !empresa ||
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      choferEncontrado.empresa.toString() !== empresa.toString()
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    if (choObj.empresa.toString() !== empresaId.toString()) {
       throw new ConflictException(
         'El chofer no pertenece a la misma empresa que el viaje',
       );
     }
 
-    const viajeActualizado = await this.viajeModel.findOneAndUpdate(
+    // 7. Aplico sólo los cambios que vinieron
+    const updated = await this.viajeModel.findOneAndUpdate(
       { _id: id, deletedAt: null },
-      { $set: updateViajeDto },
+      {
+        ...(tipo_viaje !== undefined && { tipo_viaje }),
+        ...(fecha_inicio && { fecha_inicio: fechaInicio }),
+        ...(fecha_llegada && { fecha_llegada: fechaLlegada }),
+        ...(updateDto.chofer && { chofer: choferId }),
+        ...(updateDto.vehiculo && { vehiculo: vehiculoId }),
+        ...(updateDto.empresa && { empresa: empresaId }),
+        ...(updateDto.deposito_origen && { depositoOrigen }),
+        ...(updateDto.deposito_destino && { depositoDestino }),
+      },
       { new: true },
     );
 
-    if (!viajeActualizado) {
-      throw new NotFoundException('Viaje no encontrado');
-    }
-
-    return viajeActualizado;
+    if (!updated) throw new NotFoundException('Viaje no encontrado');
+    return updated;
   }
 
   async remove(id: string): Promise<Viaje> {
