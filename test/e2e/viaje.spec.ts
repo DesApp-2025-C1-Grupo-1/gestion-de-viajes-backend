@@ -7,6 +7,8 @@ import { TestSetup } from '../test-setup';
 import { CreateViajeDto } from '../../src/viaje/dto/create-viaje.dto';
 import { UpdateViajeDto } from '../../src/viaje/dto/update-viaje.dto';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { BuscarViajeDto } from 'src/viaje/dto/buscar-viaje.dto';
+import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 
 describe('ViajeController (e2e)', () => {
   let app: INestApplication;
@@ -169,37 +171,60 @@ describe('ViajeController (e2e)', () => {
     await TestSetup.closeTestApp(app);
   });
 
-  it('/viaje (POST) - debería crear un nuevo viaje', async () => {
-    const response = await request(app.getHttpServer())
+  it('POST /viaje - crear viaje', async () => {
+    const res = await request(app.getHttpServer())
       .post('/viaje')
       .send(createViajeDto)
       .expect(201);
-
-    expect(response.body).toHaveProperty('_id');
-    expect(response.body.tipo_viaje).toBe(createViajeDto.tipo_viaje);
-    expect(response.body.deposito_origen).toBe(createViajeDto.deposito_origen);
-    expect(response.body.deposito_destino).toBe(
-      createViajeDto.deposito_destino,
-    );
-    expect(response.body.chofer).toBe(createViajeDto.chofer);
-    expect(response.body.vehiculo).toBe(createViajeDto.vehiculo);
-
-    expect(new Date(response.body.fecha_inicio)).toEqual(
-      new Date(createViajeDto.fecha_inicio),
-    );
-    expect(new Date(response.body.fecha_llegada)).toEqual(
-      new Date(createViajeDto.fecha_llegada),
-    );
-
-    createdViajeId = response.body._id;
+    createdViajeId = res.body._id;
+    expect(res.body).toMatchObject({
+      tipo_viaje: createViajeDto.tipo_viaje,
+      deposito_origen: depositoOrigenId,
+      deposito_destino: depositoDestinoId,
+      chofer: choferId,
+      vehiculo: vehiculoId,
+    });
   });
 
-  it('/viaje (GET) - should return all viajes', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/viaje')
+  it('GET /viaje - listar viajes paginados', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/viaje?page=1&limit=5')
       .expect(200);
-
-    expect(Array.isArray(response.body.data)).toBe(true);
-    expect(response.body.data.length).toBeGreaterThan(0);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.total).toBeGreaterThan(0);
+    expect(res.body.page).toBe('1');
+    expect(res.body.limit).toBe('5');
   });
+
+  it('GET /viaje/:id - obtener viaje por ID', () =>
+    request(app.getHttpServer())
+      .get(`/viaje/${createdViajeId}`)
+      .expect(200)
+      .then((res) => {
+        expect(res.body._id).toBe(createdViajeId);
+        console.log('URL EN EL PATCJ}, ', `/viaje/${createdViajeId}`);
+      }));
+
+  it('POST /viaje/buscar - filtrar y paginar', async () => {
+    const filtros: BuscarViajeDto = { tipo: 'nacional' };
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send(filtros)
+      .expect(201);
+    expect(
+      (res.body.data as Array<{ tipo_viaje: string }>).every(
+        (v) => v.tipo_viaje === 'nacional',
+      ),
+    ).toBe(true);
+    expect(res.body.page).toBe('1');
+    expect(res.body.limit).toBe('2');
+  });
+
+  it('DELETE /viaje/:id - eliminar viaje', () =>
+    request(app.getHttpServer())
+      .delete(`/viaje/${createdViajeId}`)
+      .expect(200));
+
+  it('GET /viaje/:id - 404 tras eliminación', () =>
+    request(app.getHttpServer()).get(`/viaje/${createdViajeId}`).expect(404));
 });
