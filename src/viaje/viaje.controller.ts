@@ -48,7 +48,8 @@ export class ViajeController {
       ValidateDepositoExistsPipe,
       ValidateChoferExistsPipe,
       new TransformObjectIdFieldsPipe([
-        'deposito',
+        'deposito_origen',
+        'deposito_destino',
         'empresa',
         'vehiculo',
         'chofer',
@@ -121,7 +122,10 @@ export class ViajeController {
     type: [ViajeDto],
   })
   @Post('buscar')
-  buscar(@Body() filtros: BuscarViajeDto) {
-    return this.viajeService.buscar(filtros);
+  async buscar(
+    @Body() filtros: BuscarViajeDto,
+    @Query() queryPaginacion: QueryPaginacionDto,
+  ) {
+    return this.viajeService.buscar(filtros, queryPaginacion);
   }
 }
