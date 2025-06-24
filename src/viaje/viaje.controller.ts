@@ -119,7 +119,7 @@ export class ViajeController {
   @ApiResponse({
     status: 200,
     description: 'Viajes filtrados correctamente',
-    type: [ViajeDto],
+    type: PaginacionDto,
   })
   @Post('buscar')
   async buscar(
