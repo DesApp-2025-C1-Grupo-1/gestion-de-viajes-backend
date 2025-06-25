@@ -22,7 +22,7 @@ export class BuscarViajeDto {
   fecha_llegada?: Date;
 
   @ApiProperty({
-    description: 'ID del viaje',
+    description: 'ID del viaje | ID parcial del viaje',
     example: '665f0ec9fe1846d5a9f3baf2',
     required: false,
   })
@@ -74,7 +74,7 @@ export class BuscarViajeDto {
 
   @ApiProperty({
     description: 'Id del deposito de origen',
-    example: 'AB123CD',
+    example: '68401e9fbe131552ca804955',
     required: false,
   })
   @IsOptional()
@@ -83,7 +83,7 @@ export class BuscarViajeDto {
 
   @ApiProperty({
     description: 'Id del deposito de destino',
-    example: 'AB123CD',
+    example: '68401e9fbe131552ca804955',
     required: false,
   })
   @IsOptional()
