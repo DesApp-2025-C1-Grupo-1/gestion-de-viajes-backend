@@ -72,10 +72,20 @@ export class BuscarViajeDto {
   @IsIn(['nacional', 'internacional'])
   tipo?: string;
 
+  @ApiProperty({
+    description: 'Id del deposito de origen',
+    example: 'AB123CD',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   origen?: string;
 
+  @ApiProperty({
+    description: 'Id del deposito de destino',
+    example: 'AB123CD',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   destino?: string;

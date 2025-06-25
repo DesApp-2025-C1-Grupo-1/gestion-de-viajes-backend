@@ -305,18 +305,32 @@ export class ViajeService {
 
     if (fecha_inicio) {
       const fechaInicio = new Date(fecha_inicio);
-      fechaInicio.setHours(0, 0, 0, 0); // 00:00:00.000
+      fechaInicio.setHours(0, 0, 0, 0);
       query.fecha_inicio = { $gte: fechaInicio };
     }
 
     if (fecha_llegada) {
       const fechaLlegada = new Date(fecha_llegada);
-      fechaLlegada.setHours(23, 59, 59, 999); // 23:59:59.999
+      fechaLlegada.setHours(23, 59, 59, 999);
       query.fecha_llegada = { $lte: fechaLlegada };
     }
 
+    // Búsqueda parcial en _id (cualquier substring del hex)
     if (_id) {
-      query._id = _id;
+      query.$expr = {
+        $regexMatch: {
+          input: { $toString: '$_id' },
+          regex: _id,
+          options: 'i',
+        },
+      };
+    }
+
+    if (_id) {
+      // Si también quieres filtrar por exact match cuando viene ObjectId
+      if (Types.ObjectId.isValid(_id)) {
+        query._id = new Types.ObjectId(_id);
+      }
     }
 
     if (empresa) {
@@ -330,11 +344,8 @@ export class ViajeService {
           ],
           deletedAt: null,
         });
-        if (empresaDoc) {
-          query.empresa = empresaDoc._id;
-        } else {
-          return { data: [], total: 0, page, limit };
-        }
+        if (!empresaDoc) return { data: [], total: 0, page, limit };
+        query.empresa = empresaDoc._id;
       }
     }
 
@@ -346,11 +357,8 @@ export class ViajeService {
           nombre: { $regex: chofer, $options: 'i' },
           deletedAt: null,
         });
-        if (choferDoc) {
-          query.chofer = choferDoc._id;
-        } else {
-          return { data: [], total: 0, page, limit };
-        }
+        if (!choferDoc) return { data: [], total: 0, page, limit };
+        query.chofer = choferDoc._id;
       }
     }
 
@@ -362,11 +370,8 @@ export class ViajeService {
           patente: { $regex: vehiculo, $options: 'i' },
           deletedAt: null,
         });
-        if (vehiculoDoc) {
-          query.vehiculo = vehiculoDoc._id;
-        } else {
-          return { data: [], total: 0, page, limit };
-        }
+        if (!vehiculoDoc) return { data: [], total: 0, page, limit };
+        query.vehiculo = vehiculoDoc._id;
       }
     }
 
@@ -378,16 +383,7 @@ export class ViajeService {
       if (Types.ObjectId.isValid(origen)) {
         query.deposito_origen = new Types.ObjectId(origen);
       } else {
-        const origenDoc = await this.depositoModel.findOne({
-          lat: { $regex: origen, $options: 'i' },
-          long: { $regex: origen, $options: 'i' },
-          deletedAt: null,
-        });
-        if (origenDoc) {
-          query.origen = origenDoc._id;
-        } else {
-          return { data: [], total: 0, page, limit };
-        }
+        return { data: [], total: 0, page, limit };
       }
     }
 
@@ -395,16 +391,7 @@ export class ViajeService {
       if (Types.ObjectId.isValid(destino)) {
         query.deposito_destino = new Types.ObjectId(destino);
       } else {
-        const destinoDoc = await this.depositoModel.findOne({
-          lat: { $regex: destino, $options: 'i' },
-          long: { $regex: destino, $options: 'i' },
-          deletedAt: null,
-        });
-        if (destinoDoc) {
-          query.destino = destinoDoc._id;
-        } else {
-          return { data: [], total: 0, page, limit };
-        }
+        return { data: [], total: 0, page, limit };
       }
     }
 
