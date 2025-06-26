@@ -13,7 +13,6 @@ describe('ViajeController (e2e)', () => {
   let app: INestApplication;
   let createdViajeId: string;
 
-  // Variables para entidades relacionadas
   let vehiculoId: string;
   let choferId: string;
   let depositoOrigenId: string;
@@ -170,7 +169,7 @@ describe('ViajeController (e2e)', () => {
     await TestSetup.closeTestApp(app);
   });
 
-  it('POST /viaje - crear viaje', async () => {
+  it('POST /viaje - create a new viaje', async () => {
     const res = await request(app.getHttpServer())
       .post('/viaje')
       .send(createViajeDto)
@@ -185,7 +184,7 @@ describe('ViajeController (e2e)', () => {
     });
   });
 
-  it('GET /viaje - listar viajes paginados', async () => {
+  it('GET /viaje - list paginated viajes', async () => {
     const res = await request(app.getHttpServer())
       .get('/viaje?page=1&limit=5')
       .expect(200);
@@ -195,7 +194,7 @@ describe('ViajeController (e2e)', () => {
     expect(res.body.limit).toBe('5');
   });
 
-  it('GET /viaje/:id - obtener viaje por ID', () =>
+  it('GET /viaje/:id - get viaje by ID', () =>
     request(app.getHttpServer())
       .get(`/viaje/${createdViajeId}`)
       .expect(200)
@@ -204,7 +203,7 @@ describe('ViajeController (e2e)', () => {
         console.log('URL EN EL PATCJ}, ', `/viaje/${createdViajeId}`);
       }));
 
-  it('PATCH /viaje/:id - actualizar viaje', () =>
+  it('PATCH /viaje/:id - update Viaje', () =>
     request(app.getHttpServer())
       .patch(`/viaje/${createdViajeId}`)
       .send(updateViajeDto)
@@ -213,7 +212,7 @@ describe('ViajeController (e2e)', () => {
         expect(res.body.tipo_viaje).toBe(updateViajeDto.tipo_viaje);
       }));
 
-  it('POST /viaje/buscar - filtrar y paginar', async () => {
+  it('POST /viaje/buscar - filter by type and paginate Viajes', async () => {
     const filtros: BuscarViajeDto = { tipo: 'nacional' };
     const res = await request(app.getHttpServer())
       .post('/viaje/buscar?page=1&limit=2')
@@ -228,11 +227,81 @@ describe('ViajeController (e2e)', () => {
     expect(res.body.limit).toBe('2');
   });
 
-  it('DELETE /viaje/:id - eliminar viaje', () =>
+  it('POST /viaje/buscar - empresa string not found', async () => {
+    const filtros: BuscarViajeDto = { empresa: 'Inexistente S.A.' };
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send(filtros)
+      .expect(201);
+    expect(res.body.data).toEqual([]);
+    expect(res.body.total).toBe(0);
+  });
+
+  it('POST /viaje/buscar - chofer string not found', async () => {
+    const filtros: BuscarViajeDto = { chofer: 'NombreFalso' };
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send(filtros)
+      .expect(201);
+    expect(res.body.data).toEqual([]);
+    expect(res.body.total).toBe(0);
+  });
+
+  it('POST /viaje/buscar - vehiculo string not found', async () => {
+    const filtros: BuscarViajeDto = { vehiculo: 'ZZZ999' };
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send(filtros)
+      .expect(201);
+    expect(res.body.data).toEqual([]);
+    expect(res.body.total).toBe(0);
+  });
+
+  it('POST /viaje/buscar - origen is not a valid ObjectId', async () => {
+    const filtros: BuscarViajeDto = { origen: 'noEsUnObjectId' };
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send(filtros)
+      .expect(201);
+    expect(res.body.data).toEqual([]);
+    expect(res.body.total).toBe(0);
+  });
+
+  it('POST /viaje/buscar - destino is not a valid ObjectId', async () => {
+    const filtros: BuscarViajeDto = { destino: 'noEsUnObjectId' };
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send(filtros)
+      .expect(201);
+    expect(res.body.data).toEqual([]);
+    expect(res.body.total).toBe(0);
+  });
+
+  it('POST /viaje/buscar - partial _id string match', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send({ _id: createdViajeId.substring(0, 10) }) // parcial
+      .expect(201);
+    expect(Array.isArray(res.body.data)).toBe(true);
+  });
+
+  it('POST /viaje/buscar - exact _id as ObjectId', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/viaje/buscar?page=1&limit=2')
+      .send({ _id: createdViajeId })
+      .expect(201);
+    expect(
+      (res.body.data as Array<{ _id: string }>).some(
+        (v) => v._id === createdViajeId,
+      ),
+    ).toBe(true);
+  });
+
+  it('DELETE /viaje/:id - delete Viaje', () =>
     request(app.getHttpServer())
       .delete(`/viaje/${createdViajeId}`)
       .expect(200));
 
-  it('GET /viaje/:id - 404 tras eliminación', () =>
+  it('GET /viaje/:id - 404 after Viaje deletion', () =>
     request(app.getHttpServer()).get(`/viaje/${createdViajeId}`).expect(404));
 });
