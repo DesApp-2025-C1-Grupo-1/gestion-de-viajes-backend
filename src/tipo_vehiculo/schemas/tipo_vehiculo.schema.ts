@@ -12,6 +12,8 @@ export class TipoVehiculo {
 
   @Prop({ type: Date, default: null })
   deletedAt: Date;
+  @Prop({ type: [String], required: true }) ///
+  licencias_permitidas: string[]; ///
 }
 
 export const TipoVehiculoSchema = SchemaFactory.createForClass(TipoVehiculo);
