@@ -1,13 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  IsArray,
-  IsIn,
-  ArrayNotEmpty,
-  ArrayUnique,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, IsIn } from 'class-validator';
 
 export class CreateTipoVehiculoDto {
   @ApiProperty({
@@ -30,8 +22,9 @@ export class CreateTipoVehiculoDto {
   descripcion: string;
 
   @ApiProperty({
-    description: 'licencias permitidas según la clasificación nacional',
-    example: ['C1', 'E'],
+    description:
+      'Licencia  requerida para este tipo de vehículo según la clasificación nacional',
+    example: 'C1',
     enum: [
       'A1.1',
       'A1.2',
@@ -58,9 +51,8 @@ export class CreateTipoVehiculoDto {
     ],
     isArray: true,
   })
-  @IsArray()
-  @ArrayNotEmpty({ message: 'Debe haber al menos una licencia permitida' })
-  @ArrayUnique({ message: 'Las licencias permitidas no deben repetirse' })
+  @IsNotEmpty()
+  @IsString()
   @IsIn(
     [
       'A1.1',
@@ -87,9 +79,8 @@ export class CreateTipoVehiculoDto {
       'G3',
     ],
     {
-      each: true,
-      message: 'Licencia no es válida',
+      message: 'La Licencia requerida no es válida',
     },
   )
-  licencias_permitidas: string[];
+  licencias_permitidas: string;
 }
