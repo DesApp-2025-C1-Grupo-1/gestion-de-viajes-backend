@@ -44,7 +44,6 @@ export class TipoVehiculoService {
 
     const licenciasCompletas = getLicenciasCompatibles(licencias_permitidas);
     if (licenciasCompletas.length === 0) {
-      // Esto ocurrirá si licencias_permitidas no está en tu mapa
       throw new BadRequestException(
         `La licencia requerida '${licencias_permitidas}' no es válida o no tiene compatibilidades definidas.`,
       );
