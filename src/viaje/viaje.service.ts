@@ -21,7 +21,11 @@ import {
 } from 'src/deposito/schemas/deposito.schema';
 import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
-
+import {
+  TipoVehiculo,
+  TipoVehiculoDocument,
+} from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
+import { validateLicenseCompatibility } from '../common/function/licencias';
 @Injectable()
 export class ViajeService {
   constructor(
@@ -30,6 +34,8 @@ export class ViajeService {
     @InjectModel(Empresa.name) private empresaModel: Model<EmpresaDocument>,
     @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
+    @InjectModel(TipoVehiculo.name)
+    private tipoVehiculoModel: Model<TipoVehiculoDocument>,
   ) {}
 
   async create(createViajeDto: CreateViajeDto): Promise<Viaje> {
@@ -87,10 +93,12 @@ export class ViajeService {
     }
 
     //Validar que chofer y vehiculo tengan el mismo id de empresa
-    const vehiculoEncontrado = await this.vehiculoModel.findOne({
-      _id: vehiculo,
-      deletedAt: null,
-    });
+    const vehiculoEncontrado = await this.vehiculoModel
+      .findOne({
+        _id: vehiculo,
+        deletedAt: null,
+      })
+      .populate<{ tipo: TipoVehiculoDocument }>('tipo');
     const choferEncontrado = await this.choferModel.findOne({
       _id: chofer,
       deletedAt: null,
@@ -119,6 +127,33 @@ export class ViajeService {
     } else if (choferEncontrado.empresa.toString() !== empresa.toString()) {
       throw new ConflictException(
         'El chofer no pertenece a la misma empresa que el viaje',
+      );
+    }
+
+    // validacion de licencia
+    if (!choferEncontrado.tipo_licencia) {
+      throw new BadRequestException(
+        'El chofer seleccionado no tiene un tipo de licencia definido.',
+      );
+    }
+    const tipoVehiculoDelVehiculo = vehiculoEncontrado.tipo;
+    if (
+      !tipoVehiculoDelVehiculo ||
+      !tipoVehiculoDelVehiculo.licencias_permitidas
+    ) {
+      throw new NotFoundException(
+        'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
+      );
+    }
+
+    const esLicenciaCompatible = validateLicenseCompatibility(
+      choferEncontrado.tipo_licencia,
+      tipoVehiculoDelVehiculo.licencias_permitidas,
+    );
+
+    if (!esLicenciaCompatible) {
+      throw new BadRequestException(
+        `La licencia del chofer (${choferEncontrado.tipo_licencia}) no es compatible con las licencias requeridas por el vehículo (${tipoVehiculoDelVehiculo.licencias_permitidas.join(', ')}).`,
       );
     }
 
@@ -215,10 +250,12 @@ export class ViajeService {
     }
 
     // 5. Validar existencia de entidades
-    const vehObj = await this.vehiculoModel.findOne({
-      _id: vehiculoId,
-      deletedAt: null,
-    });
+    const vehObj = await this.vehiculoModel
+      .findOne({
+        _id: vehiculoId,
+        deletedAt: null,
+      })
+      .populate<{ tipo: TipoVehiculoDocument }>('tipo');
     if (!vehObj) throw new NotFoundException('El vehículo no existe');
     const choObj = await this.choferModel.findOne({
       _id: choferId,
@@ -244,6 +281,32 @@ export class ViajeService {
       );
     }
 
+    // Validacion de licencias
+    if (!choObj.tipo_licencia) {
+      throw new BadRequestException(
+        'El chofer seleccionado no tiene un tipo de licencia definido.',
+      );
+    }
+
+    const tipoVehiculoDelVehiculo = vehObj.tipo;
+    if (
+      !tipoVehiculoDelVehiculo ||
+      !tipoVehiculoDelVehiculo.licencias_permitidas
+    ) {
+      throw new NotFoundException(
+        'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
+      );
+    }
+
+    const esLicenciaCompatible = validateLicenseCompatibility(
+      choObj.tipo_licencia,
+      tipoVehiculoDelVehiculo.licencias_permitidas,
+    );
+    if (!esLicenciaCompatible) {
+      throw new BadRequestException(
+        `La licencia del chofer (${choObj.tipo_licencia}) no es compatible con las licencias requeridas por el vehículo (${tipoVehiculoDelVehiculo.licencias_permitidas.join(', ')}).`,
+      );
+    }
     // 7. Aplico sólo los cambios que vinieron
     const updated = await this.viajeModel.findOneAndUpdate(
       { _id: id, deletedAt: null },

@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateTipoVehiculoDto } from './dto/create-tipo_vehiculo.dto';
 import { UpdateTipoVehiculoDto } from './dto/update-tipo_vehiculo.dto';
@@ -15,6 +16,7 @@ import {
   Vehiculo,
   VehiculoDocument,
 } from 'src/vehiculo/schemas/vehiculo.schema';
+import { getLicenciasCompatibles } from '../common/function/licencias';
 
 @Injectable()
 export class TipoVehiculoService {
@@ -27,7 +29,7 @@ export class TipoVehiculoService {
   async create(
     createTipoVehiculoDto: CreateTipoVehiculoDto,
   ): Promise<TipoVehiculo> {
-    const { nombre } = createTipoVehiculoDto;
+    const { nombre, descripcion, licencias_permitidas } = createTipoVehiculoDto;
 
     const tipoExistente = await this.tipoVehiculoModel.findOne({
       nombre,
@@ -40,9 +42,18 @@ export class TipoVehiculoService {
       );
     }
 
-    const createdTipoVehiculo = new this.tipoVehiculoModel(
-      createTipoVehiculoDto,
-    );
+    const licenciasCompletas = getLicenciasCompatibles(licencias_permitidas);
+    if (licenciasCompletas.length === 0) {
+      throw new BadRequestException(
+        `La licencia requerida '${licencias_permitidas}' no es válida o no tiene compatibilidades definidas.`,
+      );
+    }
+
+    const createdTipoVehiculo = new this.tipoVehiculoModel({
+      nombre,
+      descripcion,
+      licencias_permitidas: licenciasCompletas,
+    });
     return createdTipoVehiculo.save();
   }
 
@@ -63,7 +74,17 @@ export class TipoVehiculoService {
     id: string,
     updateTipoVehiculoDto: UpdateTipoVehiculoDto,
   ): Promise<TipoVehiculo> {
-    const { nombre } = updateTipoVehiculoDto;
+    const { nombre, descripcion, licencias_permitidas } = updateTipoVehiculoDto;
+
+    const tipoVehiculoToUpdate = await this.tipoVehiculoModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
+    if (!tipoVehiculoToUpdate) {
+      throw new NotFoundException(
+        `Tipo de vehículo con ID ${id} no encontrado.`,
+      );
+    }
 
     const tipoExistente = await this.tipoVehiculoModel.findOne({
       nombre,
@@ -76,8 +97,27 @@ export class TipoVehiculoService {
       );
     }
 
+    let licenciasParaGuardar = tipoVehiculoToUpdate.licencias_permitidas;
+
+    if (licencias_permitidas !== undefined) {
+      const nuevasLicenciasCompletas =
+        getLicenciasCompatibles(licencias_permitidas);
+      if (nuevasLicenciasCompletas.length === 0) {
+        throw new BadRequestException(
+          `La licencia requerida '${licencias_permitidas}' no es válida o no tiene compatibilidades definidas.`,
+        );
+      }
+      licenciasParaGuardar = nuevasLicenciasCompletas;
+    }
+
+    const updateFields: any = {};
+    if (nombre !== undefined) updateFields.nombre = nombre;
+    if (descripcion !== undefined) updateFields.descripcion = descripcion;
+    if (licencias_permitidas !== undefined)
+      updateFields.licencias_permitidas = licenciasParaGuardar;
+
     const updatedTipoVehiculo = await this.tipoVehiculoModel
-      .findOneAndUpdate({ _id: id, deletedAt: null }, updateTipoVehiculoDto, {
+      .findOneAndUpdate({ _id: id, deletedAt: null }, updateFields, {
         new: true,
       })
       .exec();

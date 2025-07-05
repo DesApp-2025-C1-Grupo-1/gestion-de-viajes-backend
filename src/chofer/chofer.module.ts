@@ -8,6 +8,7 @@ import { EmpresaModule } from 'src/empresa/empresa.module';
 import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
 import { ViajeModule } from 'src/viaje/viaje.module';
+import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ViajeModule } from 'src/viaje/viaje.module';
     forwardRef(() => VehiculoModule),
     forwardRef(() => EmpresaModule),
     forwardRef(() => ViajeModule),
+    forwardRef(() => TipoVehiculoModule),
   ],
   controllers: [ChoferController],
   providers: [
