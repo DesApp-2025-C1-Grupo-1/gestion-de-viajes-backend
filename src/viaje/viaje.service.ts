@@ -26,6 +26,11 @@ import {
   TipoVehiculoDocument,
 } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
 import { validateLicenseCompatibility } from '../common/function/licencias';
+import { DashboardResponseDto } from './dto/dashboard.dto';
+import { ViajeDto } from './dto/viaje.dto';
+import { startOfDay } from 'date-fns';
+import { plainToInstance } from 'class-transformer';
+
 @Injectable()
 export class ViajeService {
   constructor(
@@ -473,5 +478,81 @@ export class ViajeService {
     ]);
 
     return { data, total, page, limit };
+  }
+
+  async getDashboard(): Promise<DashboardResponseDto> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    const hoy = startOfDay(new Date());
+
+    const [viajes, totalVehiculos, totalChoferes, topEmpresas] =
+      await Promise.all([
+        // Consulta de próximos viajes
+        this.viajeModel
+          .find({
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            fecha_inicio: { $gte: hoy },
+            deletedAt: null,
+          })
+          .sort({ fecha_inicio: 1 })
+          .limit(5)
+          .populate('deposito_origen')
+          .populate('deposito_destino')
+          .populate('empresa')
+          .populate('chofer')
+          .populate('vehiculo')
+          .lean()
+          .exec(),
+
+        // Total vehículos
+        this.vehiculoModel.countDocuments({ deletedAt: null }),
+
+        // Total choferes
+        this.choferModel.countDocuments({ deletedAt: null }),
+
+        // Top empresas
+        this.viajeModel
+          .aggregate([
+            {
+              $match: {
+                deletedAt: null,
+                empresa: { $exists: true, $ne: null },
+              },
+            },
+            {
+              $group: {
+                _id: '$empresa',
+                cantidadViajes: { $sum: 1 },
+              },
+            },
+            { $sort: { cantidadViajes: -1 } },
+            { $limit: 5 },
+            {
+              $lookup: {
+                from: 'empresa',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'empresaInfo',
+              },
+            },
+            { $unwind: '$empresaInfo' },
+            {
+              $project: {
+                empresaId: '$_id',
+                nombre: '$empresaInfo.nombre_comercial',
+                cantidadViajes: 1,
+                _id: 0,
+              },
+            },
+          ])
+          .exec(),
+      ]);
+
+    return {
+      proximosViajes: plainToInstance(ViajeDto, viajes),
+      totalVehiculos,
+      totalChoferes,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      topEmpresas: topEmpresas || [],
+    };
   }
 }
