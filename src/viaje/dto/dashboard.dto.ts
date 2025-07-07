@@ -21,6 +21,23 @@ export class EmpresaViajesDto {
   cantidadViajes: number;
 }
 
+export class EstadisticasRecientesDto {
+  @ApiProperty({ example: 3, description: 'Cantidad de vehículos recientes' })
+  vehiculos: number;
+
+  @ApiProperty({ example: 2, description: 'Cantidad de choferes recientes' })
+  choferes: number;
+
+  @ApiProperty({ example: 1, description: 'Cantidad de empresas recientes' })
+  empresas: number;
+
+  @ApiProperty({
+    example: '2023-05-20T00:00:00Z',
+    description: 'Fecha desde la que se cuentan las estadísticas',
+  })
+  desde: Date;
+}
+
 export class DashboardResponseDto {
   @ApiProperty({
     type: [ViajeDto],
@@ -43,8 +60,21 @@ export class DashboardResponseDto {
   totalChoferes: number;
 
   @ApiProperty({
+    type: Number,
+    description: 'Cantidad total de empresas en el sistema',
+    example: 15,
+  })
+  totalEmpresas: number;
+
+  @ApiProperty({
     type: [EmpresaViajesDto],
     description: 'Top empresas con más viajes',
   })
   topEmpresas: EmpresaViajesDto[];
+
+  @ApiProperty({
+    type: EstadisticasRecientesDto,
+    description: 'Estadísticas recientes del sistema',
+  })
+  estadisticasRecientes: EstadisticasRecientesDto;
 }
