@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Injectable,
   ConflictException,
@@ -30,6 +31,8 @@ import { DashboardResponseDto } from './dto/dashboard.dto';
 import { ViajeDto } from './dto/viaje.dto';
 import { startOfDay } from 'date-fns';
 import { plainToInstance } from 'class-transformer';
+
+const { ObjectId } = Types;
 
 @Injectable()
 export class ViajeService {
@@ -481,78 +484,89 @@ export class ViajeService {
   }
 
   async getDashboard(): Promise<DashboardResponseDto> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const hoy = startOfDay(new Date());
+    const sieteDiasAtras = new Date();
+    sieteDiasAtras.setDate(sieteDiasAtras.getDate() - 7);
 
-    const [viajes, totalVehiculos, totalChoferes, topEmpresas] =
-      await Promise.all([
-        // Consulta de próximos viajes
-        this.viajeModel
-          .find({
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            fecha_inicio: { $gte: hoy },
-            deletedAt: null,
-          })
-          .sort({ fecha_inicio: 1 })
-          .limit(5)
-          .populate('deposito_origen')
-          .populate('deposito_destino')
-          .populate('empresa')
-          .populate('chofer')
-          .populate('vehiculo')
-          .lean()
-          .exec(),
+    // Generar ObjectId mínimo para los últimos 7 días
+    const objectIdMinimo = new ObjectId(Math.floor(Date.now() / 1000 - 604800));
 
-        // Total vehículos
-        this.vehiculoModel.countDocuments({ deletedAt: null }),
+    const [
+      viajes,
+      totalVehiculos,
+      totalChoferes,
+      totalEmpresas,
+      topEmpresas,
+      vehiculosRecientes,
+      choferesRecientes,
+      empresasRecientes,
+    ] = await Promise.all([
+      // Próximos viajes
+      this.viajeModel
+        .find({
+          fecha_inicio: { $gte: hoy },
+          deletedAt: null,
+        })
+        .sort({ fecha_inicio: 1 })
+        .limit(5)
+        .populate('deposito_origen')
+        .populate('deposito_destino')
+        .populate('empresa')
+        .populate('chofer')
+        .populate('vehiculo')
+        .lean()
+        .exec(),
 
-        // Total choferes
-        this.choferModel.countDocuments({ deletedAt: null }),
+      // Totales
+      this.vehiculoModel.countDocuments({ deletedAt: null }),
+      this.choferModel.countDocuments({ deletedAt: null }),
+      this.empresaModel.countDocuments({ deletedAt: null }),
 
-        // Top empresas
-        this.viajeModel
-          .aggregate([
-            {
-              $match: {
-                deletedAt: null,
-                empresa: { $exists: true, $ne: null },
-              },
+      // Top empresas con más viajes
+      this.viajeModel
+        .aggregate([
+          { $match: { deletedAt: null } },
+          { $group: { _id: '$empresa', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 5 },
+          {
+            $lookup: {
+              from: 'empresa',
+              localField: '_id',
+              foreignField: '_id',
+              as: 'empresaData',
             },
-            {
-              $group: {
-                _id: '$empresa',
-                cantidadViajes: { $sum: 1 },
-              },
+          },
+          { $unwind: '$empresaData' },
+          {
+            $project: {
+              empresaId: '$_id',
+              nombre: '$empresaData.nombre_comercial',
+              cantidadViajes: '$count',
+              _id: 0,
             },
-            { $sort: { cantidadViajes: -1 } },
-            { $limit: 5 },
-            {
-              $lookup: {
-                from: 'empresa',
-                localField: '_id',
-                foreignField: '_id',
-                as: 'empresaInfo',
-              },
-            },
-            { $unwind: '$empresaInfo' },
-            {
-              $project: {
-                empresaId: '$_id',
-                nombre: '$empresaInfo.nombre_comercial',
-                cantidadViajes: 1,
-                _id: 0,
-              },
-            },
-          ])
-          .exec(),
-      ]);
+          },
+        ])
+        .exec(),
+
+      // Registros recientes (últimos 7 días)
+      this.vehiculoModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
+      this.choferModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
+      this.empresaModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
+    ]);
 
     return {
       proximosViajes: plainToInstance(ViajeDto, viajes),
       totalVehiculos,
       totalChoferes,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      totalEmpresas,
       topEmpresas: topEmpresas || [],
+      estadisticasRecientes: {
+        vehiculos: vehiculosRecientes,
+        choferes: choferesRecientes,
+        empresas: empresasRecientes,
+        desde: sieteDiasAtras,
+      },
     };
   }
 }
