@@ -21,6 +21,7 @@ import { ValidateChoferExistsPipe } from 'src/common/pipes/validate_Chofer_exist
 import { BuscarViajeDto } from './dto/buscar-viaje.dto';
 import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 import { PaginacionDto } from 'src/common/dto/paginacion.dto';
+import { DashboardResponseDto } from './dto/dashboard.dto';
 
 @Controller('viaje')
 export class ViajeController {
@@ -70,6 +71,17 @@ export class ViajeController {
   @Get()
   findAll(@Query() queryPaginacionDto: QueryPaginacionDto) {
     return this.viajeService.findAll(queryPaginacionDto);
+  }
+
+  @ApiOperation({ summary: 'Obtener datos del dashboard' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dashboard obtenido correctamente',
+    type: DashboardResponseDto,
+  })
+  @Get('dashboard')
+  getDashboard() {
+    return this.viajeService.getDashboard();
   }
 
   @ApiOperation({ summary: 'Obtener un viaje por ID' })
