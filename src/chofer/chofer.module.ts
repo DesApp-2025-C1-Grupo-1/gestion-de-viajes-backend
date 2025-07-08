@@ -5,8 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Chofer, ChoferSchema } from './schemas/chofer.schema';
 import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
 import { EmpresaModule } from 'src/empresa/empresa.module';
-import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
-import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
 import { ViajeModule } from 'src/viaje/viaje.module';
 import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
 
@@ -19,11 +17,7 @@ import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
     forwardRef(() => TipoVehiculoModule),
   ],
   controllers: [ChoferController],
-  providers: [
-    ChoferService,
-    ValidateVehiculoExistsPipe,
-    ValidateEmpresaExistsPipe,
-  ],
+  providers: [ChoferService],
   exports: [MongooseModule],
 })
 export class ChoferModule {}
