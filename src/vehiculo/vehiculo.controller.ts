@@ -11,12 +11,13 @@ import { VehiculoService } from './vehiculo.service';
 import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
-import { ValidateTipoVehiculoExistsPipe } from 'src/common/pipes/validate_TipoVehiculo_exists.pipe';
-import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { VehiculoDto } from './dto/vehiculo.dto';
 import { CreateVehiculoDto } from './dto/create-vehiculo.dto';
+import { ValidateEntityExistsPipe } from 'src/common/pipes/validate_entity_exists.pipe';
+import { TipoVehiculo } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
+import { Empresa } from 'src/empresa/schemas/empresa.schema';
 
 @Controller('vehiculo')
 export class VehiculoController {
@@ -39,8 +40,8 @@ export class VehiculoController {
   @Post()
   async create(
     @Body(
-      ValidateTipoVehiculoExistsPipe,
-      ValidateEmpresaExistsPipe,
+      ValidateEntityExistsPipe(TipoVehiculo, 'tipo', 'Tipo de vehiculo'),
+      ValidateEntityExistsPipe(Empresa, 'empresa', 'Empresa'),
       new TransformObjectIdFieldsPipe(['tipo', 'empresa']),
     )
     createVehiculoDto: CreateVehiculoDto,
@@ -95,8 +96,8 @@ export class VehiculoController {
     @Param('id', ParseObjectIdPipe) id: string,
     @Body(
       EmptyObjectPipe,
-      ValidateTipoVehiculoExistsPipe,
-      ValidateEmpresaExistsPipe,
+      ValidateEntityExistsPipe(TipoVehiculo, 'tipo', 'Tipo de vehiculo'),
+      ValidateEntityExistsPipe(Empresa, 'empresa', 'Empresa'),
       new TransformObjectIdFieldsPipe(['tipo', 'empresa']),
     )
     updateVehiculoDto: UpdateVehiculoDto,
