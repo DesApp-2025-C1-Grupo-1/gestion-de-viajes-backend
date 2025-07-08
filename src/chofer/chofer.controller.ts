@@ -13,10 +13,11 @@ import { UpdateChoferDto } from './dto/update-chofer.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
-import { ValidateEmpresaExistsPipe } from 'src/common/pipes/validate_Empresa_exists.pipe';
-import { ValidateVehiculoExistsPipe } from 'src/common/pipes/validate_Vehiculo_exists.pipe';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
 import { ChoferDto } from './dto/chofer.dto';
+import { ValidateEntityExistsPipe } from '../common/pipes/validate_entity_exists.pipe';
+import { Empresa } from 'src/empresa/schemas/empresa.schema';
+import { Vehiculo } from 'src/vehiculo/schemas/vehiculo.schema';
 
 @Controller('chofer')
 export class ChoferController {
@@ -39,8 +40,8 @@ export class ChoferController {
   @Post()
   create(
     @Body(
-      ValidateVehiculoExistsPipe,
-      ValidateEmpresaExistsPipe,
+      ValidateEntityExistsPipe(Vehiculo, 'vehiculo', 'Vehículo'),
+      ValidateEntityExistsPipe(Empresa, 'empresa', 'Empresa'),
       new TransformObjectIdFieldsPipe(['vehiculo', 'empresa']),
     )
     createChoferDto: CreateChoferDto,
@@ -94,8 +95,8 @@ export class ChoferController {
     @Param('id', ParseObjectIdPipe) id: string,
     @Body(
       EmptyObjectPipe,
-      ValidateVehiculoExistsPipe,
-      ValidateEmpresaExistsPipe,
+      ValidateEntityExistsPipe(Vehiculo, 'vehiculo', 'Vehículo'),
+      ValidateEntityExistsPipe(Empresa, 'empresa', 'Empresa'),
       new TransformObjectIdFieldsPipe(['vehiculo', 'empresa']),
     )
     updateChoferDto: UpdateChoferDto,
