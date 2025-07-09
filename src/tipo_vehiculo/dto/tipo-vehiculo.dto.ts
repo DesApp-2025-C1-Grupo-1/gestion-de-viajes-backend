@@ -46,7 +46,6 @@ export class TipoVehiculoDto {
       'G2',
       'G3',
     ],
-    isArray: true,
   })
   licencias_permitidas: string[];
 }
