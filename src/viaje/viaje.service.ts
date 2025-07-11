@@ -180,6 +180,7 @@ export class ViajeService {
     const [data, total] = await Promise.all([
       this.viajeModel
         .find({ deletedAt: null })
+        .sort({ fecha_inicio: 1 })
         .skip(skip)
         .limit(limit)
         .populate('deposito_origen')
@@ -469,6 +470,7 @@ export class ViajeService {
     const [data, total] = await Promise.all([
       this.viajeModel
         .find(query)
+        .sort({ fecha_inicio: 1 })
         .skip(skip)
         .limit(limit)
         .populate('deposito_origen')
