@@ -19,9 +19,10 @@ export class TipoVehiculoDto {
     description: 'Descripción del tipo de vehículo',
   })
   descripcion: string;
+
   @ApiProperty({
     description: 'licencias permitidas según la clasificación nacional',
-    example: ['C1', 'E'],
+    example: 'C1',
     enum: [
       'A1.1',
       'A1.2',
@@ -47,5 +48,5 @@ export class TipoVehiculoDto {
       'G3',
     ],
   })
-  licencias_permitidas: string[];
+  licencia_permitida: string;
 }

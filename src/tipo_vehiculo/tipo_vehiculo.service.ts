@@ -16,7 +16,6 @@ import {
   Vehiculo,
   VehiculoDocument,
 } from 'src/vehiculo/schemas/vehiculo.schema';
-import { getLicenciasCompatibles } from '../common/function/licencias';
 
 @Injectable()
 export class TipoVehiculoService {
@@ -29,7 +28,7 @@ export class TipoVehiculoService {
   async create(
     createTipoVehiculoDto: CreateTipoVehiculoDto,
   ): Promise<TipoVehiculo> {
-    const { nombre, descripcion, licencias_permitidas } = createTipoVehiculoDto;
+    const { nombre, descripcion, licencia_permitida } = createTipoVehiculoDto;
 
     const tipoExistente = await this.tipoVehiculoModel.findOne({
       nombre,
@@ -42,17 +41,10 @@ export class TipoVehiculoService {
       );
     }
 
-    const licenciasCompletas = getLicenciasCompatibles(licencias_permitidas);
-    if (licenciasCompletas.length === 0) {
-      throw new BadRequestException(
-        `La licencia requerida '${licencias_permitidas}' no es válida o no tiene compatibilidades definidas.`,
-      );
-    }
-
     const createdTipoVehiculo = new this.tipoVehiculoModel({
       nombre,
       descripcion,
-      licencias_permitidas: licenciasCompletas,
+      licencia_permitida: licencia_permitida,
     });
     return createdTipoVehiculo.save();
   }
@@ -74,7 +66,7 @@ export class TipoVehiculoService {
     id: string,
     updateTipoVehiculoDto: UpdateTipoVehiculoDto,
   ): Promise<TipoVehiculo> {
-    const { nombre, descripcion, licencias_permitidas } = updateTipoVehiculoDto;
+    const { nombre, descripcion, licencia_permitida } = updateTipoVehiculoDto;
 
     const tipoVehiculoToUpdate = await this.tipoVehiculoModel.findOne({
       _id: id,
@@ -97,24 +89,19 @@ export class TipoVehiculoService {
       );
     }
 
-    let licenciasParaGuardar = tipoVehiculoToUpdate.licencias_permitidas;
+    let licenciasParaGuardar = licencia_permitida;
 
-    if (licencias_permitidas !== undefined) {
-      const nuevasLicenciasCompletas =
-        getLicenciasCompatibles(licencias_permitidas);
-      if (nuevasLicenciasCompletas.length === 0) {
-        throw new BadRequestException(
-          `La licencia requerida '${licencias_permitidas}' no es válida o no tiene compatibilidades definidas.`,
-        );
-      }
-      licenciasParaGuardar = nuevasLicenciasCompletas;
+    if (licencia_permitida) {
+      throw new BadRequestException(
+        `La licencia requerida '${licencia_permitida}' no es válida.`,
+      );
     }
 
     const updateFields: any = {};
     if (nombre !== undefined) updateFields.nombre = nombre;
     if (descripcion !== undefined) updateFields.descripcion = descripcion;
-    if (licencias_permitidas !== undefined)
-      updateFields.licencias_permitidas = licenciasParaGuardar;
+    if (licencia_permitida !== undefined)
+      updateFields.licencia_permitida = licenciasParaGuardar;
 
     const updatedTipoVehiculo = await this.tipoVehiculoModel
       .findOneAndUpdate({ _id: id, deletedAt: null }, updateFields, {
@@ -128,6 +115,7 @@ export class TipoVehiculoService {
 
     return updatedTipoVehiculo;
   }
+
   async remove(id: string): Promise<TipoVehiculo> {
     const tipoVehiculoEnUsoPorVehiculo = await this.vehiculoModel.exists({
       tipo: id,

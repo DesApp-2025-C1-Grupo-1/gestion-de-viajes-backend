@@ -23,7 +23,7 @@ export class CreateTipoVehiculoDto {
 
   @ApiProperty({
     description:
-      'Licencia  requerida para este tipo de vehículo según la clasificación nacional',
+      'Licencia requerida para este tipo de vehículo según la clasificación nacional',
     example: 'C1',
     enum: [
       'A1.1',
@@ -49,7 +49,7 @@ export class CreateTipoVehiculoDto {
       'G2',
       'G3',
     ],
-    isArray: true,
+    isArray: false,
   })
   @IsNotEmpty()
   @IsString()
@@ -82,5 +82,5 @@ export class CreateTipoVehiculoDto {
       message: 'La Licencia requerida no es válida',
     },
   )
-  licencias_permitidas: string;
+  licencia_permitida: string;
 }

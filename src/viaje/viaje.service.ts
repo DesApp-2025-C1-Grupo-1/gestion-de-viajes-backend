@@ -147,21 +147,18 @@ export class ViajeService {
     const tipoVehiculoDelVehiculo = vehiculoEncontrado.tipo;
     if (
       !tipoVehiculoDelVehiculo ||
-      !tipoVehiculoDelVehiculo.licencias_permitidas
+      !tipoVehiculoDelVehiculo.licencia_permitida
     ) {
       throw new NotFoundException(
         'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
       );
     }
 
-    const esLicenciaCompatible = validateLicenseCompatibility(
-      choferEncontrado.tipo_licencia,
-      tipoVehiculoDelVehiculo.licencias_permitidas,
-    );
+    const esLicenciaCompatible = choferEncontrado.tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
 
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
-        `La licencia del chofer (${choferEncontrado.tipo_licencia}) no es compatible con las licencias requeridas por el vehículo (${tipoVehiculoDelVehiculo.licencias_permitidas.join(', ')}).`,
+        `La licencia del chofer no es compatible con la licencia requerida por el vehículo.`,
       );
     }
 
@@ -299,22 +296,21 @@ export class ViajeService {
     const tipoVehiculoDelVehiculo = vehObj.tipo;
     if (
       !tipoVehiculoDelVehiculo ||
-      !tipoVehiculoDelVehiculo.licencias_permitidas
+      !tipoVehiculoDelVehiculo.licencia_permitida
     ) {
       throw new NotFoundException(
         'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
       );
     }
 
-    const esLicenciaCompatible = validateLicenseCompatibility(
-      choObj.tipo_licencia,
-      tipoVehiculoDelVehiculo.licencias_permitidas,
-    );
+    const esLicenciaCompatible = choObj.tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
+
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
-        `La licencia del chofer (${choObj.tipo_licencia}) no es compatible con las licencias requeridas por el vehículo (${tipoVehiculoDelVehiculo.licencias_permitidas.join(', ')}).`,
+        `La licencia del chofer no es compatible con la licencia requerida por el vehículo.`,
       );
     }
+
     // 7. Aplico sólo los cambios que vinieron
     const updated = await this.viajeModel.findOneAndUpdate(
       { _id: id, deletedAt: null },
