@@ -70,9 +70,10 @@ export class ChoferService {
         'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
       );
     }
-
-    const esLicenciaCompatible = tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
-
+    const esLicenciaCompatible = validateLicenseCompatibility(
+      tipo_licencia,
+      tipoVehiculoDelVehiculo.licencia_permitida,
+    );
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
         `La licencia del chofer no es compatible con la licencia requerida por el vehículo.`,
@@ -158,7 +159,8 @@ export class ChoferService {
           );
         }
 
-        const esLicenciaCompatible = tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
+        const esLicenciaCompatible =
+          tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
 
         if (!esLicenciaCompatible) {
           throw new BadRequestException(

@@ -89,15 +89,15 @@ export class TipoVehiculoService {
       );
     }
 
-    let licenciasParaGuardar = licencia_permitida;
+    const licenciasParaGuardar = licencia_permitida;
 
-    if (licencia_permitida) {
+    if (!licencia_permitida) {
       throw new BadRequestException(
         `La licencia requerida '${licencia_permitida}' no es válida.`,
       );
     }
 
-    const updateFields: any = {};
+    const updateFields: UpdateTipoVehiculoDto = {};
     if (nombre !== undefined) updateFields.nombre = nombre;
     if (descripcion !== undefined) updateFields.descripcion = descripcion;
     if (licencia_permitida !== undefined)

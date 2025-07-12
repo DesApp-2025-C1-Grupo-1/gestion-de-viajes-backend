@@ -26,7 +26,6 @@ import {
   TipoVehiculo,
   TipoVehiculoDocument,
 } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
-import { validateLicenseCompatibility } from '../common/function/licencias';
 import { DashboardResponseDto } from './dto/dashboard.dto';
 import { ViajeDto } from './dto/viaje.dto';
 import { startOfDay } from 'date-fns';
@@ -154,7 +153,9 @@ export class ViajeService {
       );
     }
 
-    const esLicenciaCompatible = choferEncontrado.tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
+    const esLicenciaCompatible =
+      choferEncontrado.tipo_licencia ===
+      tipoVehiculoDelVehiculo.licencia_permitida;
 
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
@@ -303,7 +304,8 @@ export class ViajeService {
       );
     }
 
-    const esLicenciaCompatible = choObj.tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
+    const esLicenciaCompatible =
+      choObj.tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
 
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
