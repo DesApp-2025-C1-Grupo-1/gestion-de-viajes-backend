@@ -44,23 +44,16 @@ export function getLicenciasCompatibles(tipoLicencia: string): string[] {
 
 export function validateLicenseCompatibility(
   tipoLicencia: string,
-  vehicleRequiredLicenses: string[],
+  vehicleTypeRequiredLicenses: string,
 ): boolean {
-  if (
-    !tipoLicencia ||
-    !vehicleRequiredLicenses ||
-    vehicleRequiredLicenses.length === 0
-  ) {
-    if (vehicleRequiredLicenses.length === 0) return true;
+  if (!tipoLicencia || !vehicleTypeRequiredLicenses) {
     throw new BadRequestException(
       'Faltan datos de licencia para la validación.',
     );
   }
 
-  const driverCanDriveLicenses = getLicenciasCompatibles(tipoLicencia);
-  const esCompatible = driverCanDriveLicenses.some((license) =>
-    vehicleRequiredLicenses.includes(license),
-  );
+  const driverCanDriveLicenses =
+    licenciasCompatiblesMap[vehicleTypeRequiredLicenses];
 
-  return esCompatible;
+  return driverCanDriveLicenses.includes(tipoLicencia);
 }

@@ -64,27 +64,26 @@ export class ChoferService {
     const tipoVehiculoDelVehiculo = vehiculoEncontrado.tipo;
     if (
       !tipoVehiculoDelVehiculo ||
-      !tipoVehiculoDelVehiculo.licencias_permitidas
+      !tipoVehiculoDelVehiculo.licencia_permitida
     ) {
       throw new NotFoundException(
         'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
       );
     }
-
     const esLicenciaCompatible = validateLicenseCompatibility(
+      tipoVehiculoDelVehiculo.licencia_permitida,
       tipo_licencia,
-      tipoVehiculoDelVehiculo.licencias_permitidas,
     );
-
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
-        `La licencia del chofer (${tipo_licencia}) no es compatible con las licencias requeridas por el vehículo (${tipoVehiculoDelVehiculo.licencias_permitidas.join(', ')}).`,
+        `La licencia del chofer no es compatible con la licencia requerida por el vehículo.`,
       );
     }
 
     const chofer = new this.choferModel(createChoferDto);
     return chofer.save();
   }
+
   async findAll(): Promise<Chofer[]> {
     return this.choferModel
       .find({ deletedAt: null })
@@ -153,7 +152,7 @@ export class ChoferService {
 
         if (
           !tipoVehiculoDelVehiculo ||
-          !tipoVehiculoDelVehiculo.licencias_permitidas
+          !tipoVehiculoDelVehiculo.licencia_permitida
         ) {
           throw new NotFoundException(
             'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
@@ -161,13 +160,13 @@ export class ChoferService {
         }
 
         const esLicenciaCompatible = validateLicenseCompatibility(
+          tipoVehiculoDelVehiculo.licencia_permitida,
           licenciaChofer,
-          tipoVehiculoDelVehiculo.licencias_permitidas,
         );
 
         if (!esLicenciaCompatible) {
           throw new BadRequestException(
-            `La licencia del chofer (${licenciaChofer}) no es compatible con las licencias requeridas por el vehículo (${tipoVehiculoDelVehiculo.licencias_permitidas.join(', ')}).`,
+            `La licencia del chofer no es compatible con las licencia requerida por el vehículo.`,
           );
         }
       }
