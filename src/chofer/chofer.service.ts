@@ -71,8 +71,8 @@ export class ChoferService {
       );
     }
     const esLicenciaCompatible = validateLicenseCompatibility(
-      tipo_licencia,
       tipoVehiculoDelVehiculo.licencia_permitida,
+      tipo_licencia,
     );
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
@@ -159,8 +159,10 @@ export class ChoferService {
           );
         }
 
-        const esLicenciaCompatible =
-          tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
+        const esLicenciaCompatible = validateLicenseCompatibility(
+          tipoVehiculoDelVehiculo.licencia_permitida,
+          licenciaChofer,
+        );
 
         if (!esLicenciaCompatible) {
           throw new BadRequestException(
