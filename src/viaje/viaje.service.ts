@@ -526,13 +526,13 @@ export class ViajeService {
       this.choferModel.countDocuments({ deletedAt: null }),
       this.empresaModel.countDocuments({ deletedAt: null }),
 
-      // Top empresas con más viajes
+      // Top 3 empresas con más viajes
       this.viajeModel
         .aggregate([
           { $match: { deletedAt: null } },
           { $group: { _id: '$empresa', count: { $sum: 1 } } },
           { $sort: { count: -1 } },
-          { $limit: 5 },
+          { $limit: 3 },
           {
             $lookup: {
               from: 'empresa',
