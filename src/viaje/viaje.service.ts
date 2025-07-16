@@ -512,7 +512,7 @@ export class ViajeService {
           deletedAt: null,
         })
         .sort({ fecha_inicio: 1 })
-        .limit(5)
+        .limit(3)
         .populate('deposito_origen')
         .populate('deposito_destino')
         .populate('empresa')
