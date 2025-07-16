@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Deposito, DepositoDocument } from './schemas/deposito.schema';
 import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class DepositoService {
@@ -97,8 +98,12 @@ export class DepositoService {
     return depositoActualizado;
   }
   async remove(id: string): Promise<Deposito> {
+    console.log({ id });
     const depositoEnUsoPorViaje = await this.viajeModel.exists({
-      $or: [{ deposito_origen: id }, { deposito_destino: id }],
+      $or: [
+        { deposito_origen: new Types.ObjectId(id) },
+        { deposito_destino: new Types.ObjectId(id) },
+      ],
       deletedAt: null,
     });
 

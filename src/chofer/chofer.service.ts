@@ -19,6 +19,7 @@ import {
   TipoVehiculoDocument,
 } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
 import { validateLicenseCompatibility } from '../common/function/licencias';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ChoferService {
@@ -185,7 +186,7 @@ export class ChoferService {
   }
   async remove(id: string): Promise<Chofer> {
     const choferEnUsoPorViaje = await this.viajeModel.exists({
-      chofer: id,
+      chofer: new Types.ObjectId(id),
       deletedAt: null,
     });
 

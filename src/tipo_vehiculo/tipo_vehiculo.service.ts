@@ -7,7 +7,7 @@ import {
 import { CreateTipoVehiculoDto } from './dto/create-tipo_vehiculo.dto';
 import { UpdateTipoVehiculoDto } from './dto/update-tipo_vehiculo.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   TipoVehiculo,
   TipoVehiculoDocument,
@@ -118,7 +118,7 @@ export class TipoVehiculoService {
 
   async remove(id: string): Promise<TipoVehiculo> {
     const tipoVehiculoEnUsoPorVehiculo = await this.vehiculoModel.exists({
-      tipo: id,
+      tipo: new Types.ObjectId(id),
       deletedAt: null,
     });
 

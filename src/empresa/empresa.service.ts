@@ -1,6 +1,6 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Empresa, EmpresaDocument } from './schemas/empresa.schema';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
@@ -63,17 +63,17 @@ export class EmpresaService {
   }
   async delete(id: string): Promise<boolean> {
     const empresaEnUsoPorVehiculo = await this.vehiculoModel.exists({
-      empresa: id,
+      empresa: new Types.ObjectId(id),
       deletedAt: null,
     });
 
     const empresaEnUsoPorChofer = await this.choferModel.exists({
-      empresa: id,
+      empresa: new Types.ObjectId(id),
       deletedAt: null,
     });
 
     const empresaEnUsoPorViaje = await this.viajeModel.exists({
-      empresa: id,
+      empresa: new Types.ObjectId(id),
       deletedAt: null,
     });
 

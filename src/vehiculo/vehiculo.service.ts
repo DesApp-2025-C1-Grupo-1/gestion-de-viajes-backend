@@ -2,7 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateVehiculoDto } from './dto/create-vehiculo.dto';
 import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Vehiculo, VehiculoDocument } from './schemas/vehiculo.schema';
 import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
 import { NotFoundException } from '@nestjs/common';
@@ -79,12 +79,12 @@ export class VehiculoService {
   }
   async remove(id: string): Promise<Vehiculo> {
     const vehiculoEnUsoPorChofer = await this.choferModel.exists({
-      vehiculo: id,
+      vehiculo: new Types.ObjectId(id),
       deletedAt: null,
     });
 
     const vehiculoEnUsoPorViaje = await this.viajeModel.exists({
-      vehiculo: id,
+      vehiculo: new Types.ObjectId(id),
       deletedAt: null,
     });
 
