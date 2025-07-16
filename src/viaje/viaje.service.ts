@@ -30,6 +30,7 @@ import { DashboardResponseDto } from './dto/dashboard.dto';
 import { ViajeDto } from './dto/viaje.dto';
 import { startOfDay } from 'date-fns';
 import { plainToInstance } from 'class-transformer';
+import { validateLicenseCompatibility } from 'src/common/function/licencias';
 
 const { ObjectId } = Types;
 
@@ -153,9 +154,10 @@ export class ViajeService {
       );
     }
 
-    const esLicenciaCompatible =
-      choferEncontrado.tipo_licencia ===
-      tipoVehiculoDelVehiculo.licencia_permitida;
+    const esLicenciaCompatible = validateLicenseCompatibility(
+      tipoVehiculoDelVehiculo.licencia_permitida,
+      choferEncontrado.tipo_licencia,
+    );
 
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
@@ -305,8 +307,10 @@ export class ViajeService {
       );
     }
 
-    const esLicenciaCompatible =
-      choObj.tipo_licencia === tipoVehiculoDelVehiculo.licencia_permitida;
+    const esLicenciaCompatible = validateLicenseCompatibility(
+      tipoVehiculoDelVehiculo.licencia_permitida,
+      choObj.tipo_licencia,
+    );
 
     if (!esLicenciaCompatible) {
       throw new BadRequestException(
