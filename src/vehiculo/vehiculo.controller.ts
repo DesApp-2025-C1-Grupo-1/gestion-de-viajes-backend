@@ -1,0 +1,119 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import { VehiculoService } from './vehiculo.service';
+import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { EmptyObjectPipe } from 'src/common/pipes/empty_object.pipe';
+import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { VehiculoDto } from './dto/vehiculo.dto';
+import { CreateVehiculoDto } from './dto/create-vehiculo.dto';
+import { ValidateEntityExistsPipe } from 'src/common/pipes/validate_entity_exists.pipe';
+import { TipoVehiculo } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
+import { Empresa } from 'src/empresa/schemas/empresa.schema';
+
+@Controller('vehiculo')
+export class VehiculoController {
+  constructor(private readonly vehiculoService: VehiculoService) {}
+
+  @ApiOperation({ summary: 'Crear un vehículo' })
+  @ApiResponse({
+    status: 201,
+    description: 'Vehículo creado correctamente',
+    type: VehiculoDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos para crear un vehículo',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una Vehículo con esa patente',
+  })
+  @Post()
+  async create(
+    @Body(
+      ValidateEntityExistsPipe(TipoVehiculo, 'tipo', 'Tipo de vehiculo'),
+      ValidateEntityExistsPipe(Empresa, 'empresa', 'Empresa'),
+      new TransformObjectIdFieldsPipe(['tipo', 'empresa']),
+    )
+    createVehiculoDto: CreateVehiculoDto,
+  ) {
+    return this.vehiculoService.create(createVehiculoDto);
+  }
+
+  @ApiOperation({ summary: 'Obtener todos los vehículos' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de vehículos obtenida correctamente',
+    type: [VehiculoDto],
+  })
+  @ApiResponse({ status: 404, description: 'No se encontraron vehículos' })
+  @Get()
+  async findAll() {
+    return this.vehiculoService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Obtener un vehículo por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Vehículo obtenido correctamente',
+    type: VehiculoDto,
+  })
+  @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
+  @Get(':id')
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.vehiculoService.findOne(id);
+  }
+
+  @ApiOperation({ summary: 'Actualizar un vehículo' })
+  @ApiResponse({
+    status: 200,
+    description: 'Vehículo actualizado correctamente',
+    type: VehiculoDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos para actualizar un vehículo',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Vehículo no encontrado',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe una Vehículo con esa patente',
+  })
+  @Patch(':id')
+  update(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body(
+      EmptyObjectPipe,
+      ValidateEntityExistsPipe(TipoVehiculo, 'tipo', 'Tipo de vehiculo'),
+      ValidateEntityExistsPipe(Empresa, 'empresa', 'Empresa'),
+      new TransformObjectIdFieldsPipe(['tipo', 'empresa']),
+    )
+    updateVehiculoDto: UpdateVehiculoDto,
+  ) {
+    return this.vehiculoService.update(id, updateVehiculoDto);
+  }
+
+  @ApiOperation({ summary: 'Eliminar un vehículo por ID' })
+  @ApiResponse({ status: 200, description: 'Vehículo eliminado correctamente' })
+  @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
+  @ApiResponse({
+    status: 409,
+    description: 'El vehículo está en uso y no puede ser eliminado',
+  })
+  @Delete(':id')
+  remove(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.vehiculoService.remove(id);
+  }
+}
