@@ -19,6 +19,7 @@ export class EmpresaService {
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
     @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
   ) {}
+
   async findAll(): Promise<Empresa[]> {
     return this.empresaModel.find({ deletedAt: null }).exec();
   }
@@ -26,6 +27,7 @@ export class EmpresaService {
   async findOne(id: string): Promise<Empresa | null> {
     return this.empresaModel.findOne({ _id: id, deletedAt: null }).exec();
   }
+
   async create(createEmpresaDto: CreateEmpresaDto): Promise<Empresa> {
     const { cuit } = createEmpresaDto;
 
