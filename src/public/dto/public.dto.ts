@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ContactoDto } from 'src/common/dto/contacto.dto';
 import { TipoVehiculoDto } from 'src/tipo_vehiculo/dto/tipo-vehiculo.dto';
 
-class EmpresaPublicDto {
+export class EmpresaPublicDto {
   @ApiProperty({
     description: 'ID de la empresa',
     example: 1,
