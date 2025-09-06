@@ -15,7 +15,7 @@ export class PublicService {
     private tipoVehiculoModel: Model<TipoVehiculoDocument>,
   ) {}
 
-  async findAllV1() {
+  async findAllEmpresasV1() {
     const empresas = await this.empresaModel
       .find(
         {},
@@ -28,8 +28,12 @@ export class PublicService {
       )
       .lean();
 
+    return { empresas };
+  }
+
+  async findAllTiposVehiculoV1() {
     const tiposVehiculo = await this.tipoVehiculoModel.find().lean();
 
-    return [{ empresas, tipos_vehiculo: tiposVehiculo }];
+    return { tiposVehiculo };
   }
 }
