@@ -9,6 +9,7 @@ import { ChoferModule } from './chofer/chofer.module';
 import { DepositoModule } from './deposito/deposito.module';
 import { ViajeModule } from './viaje/viaje.module';
 import { ViajeDistribucionModule } from './viaje_distribucion/viaje-distribucion.module';
+import { PublicModule } from './public/public.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ViajeDistribucionModule } from './viaje_distribucion/viaje-distribucion
     DepositoModule,
     ViajeModule,
     ViajeDistribucionModule,
+    PublicModule,
   ],
   controllers: [AppController],
   providers: [AppService],
