@@ -17,7 +17,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
           };
         }
         return {
-          uri: `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@gestion-viajes.n4d4ucz.mongodb.net/entidades?retryWrites=true&w=majority&appName=gestion-viajes`,
+          uri: `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@gestion-viajes.n4d4ucz.mongodb.net/entidades?retryWrites=true&w=majority&appName=gestion-viajes&authSource=admin`,
         };
       },
     }),
