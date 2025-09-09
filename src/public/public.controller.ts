@@ -24,7 +24,7 @@ export class PublicController {
     return this.publicService.findAllEmpresasV1();
   }
 
-  @ApiOperation({ summary: 'Obtener todas las tipos de vehículo' })
+  @ApiOperation({ summary: 'Obtener todos los tipos de vehículo' })
   @ApiResponse({
     status: 200,
     description: 'Tipos de vehículo obtenidos correctamente',
