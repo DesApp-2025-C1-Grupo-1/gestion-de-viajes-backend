@@ -10,7 +10,7 @@ import { DepositoModule } from './deposito/deposito.module';
 import { ViajeModule } from './viaje/viaje.module';
 import { ViajeDistribucionModule } from './viaje_distribucion/viaje-distribucion.module';
 import { PublicModule } from './public/public.module';
-
+import { TarifasModule } from './tarifas/tarifas.module';
 @Module({
   imports: [
     TipoVehiculoModule,
@@ -22,6 +22,7 @@ import { PublicModule } from './public/public.module';
     ViajeModule,
     ViajeDistribucionModule,
     PublicModule,
+    TarifasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
