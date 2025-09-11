@@ -3,11 +3,13 @@ import { PublicService } from './public.service';
 import { PublicController } from './public.controller';
 import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
 import { EmpresaModule } from 'src/empresa/empresa.module';
+import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
 
 @Module({
   imports: [
     forwardRef(() => TipoVehiculoModule),
     forwardRef(() => EmpresaModule),
+    forwardRef(() => VehiculoModule),
   ],
   controllers: [PublicController],
   providers: [PublicService],

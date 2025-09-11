@@ -3,6 +3,7 @@ import { PublicService } from './public.service';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { EmpresaPublicDto, PublicDto } from './dto/public.dto';
 import { TipoVehiculoDto } from 'src/tipo_vehiculo/dto/tipo-vehiculo.dto';
+import { VehiculoDto } from 'src/vehiculo/dto/vehiculo.dto';
 
 @Controller('public')
 export class PublicController {
@@ -23,7 +24,7 @@ export class PublicController {
     return this.publicService.findAllEmpresasV1();
   }
 
-  @ApiOperation({ summary: 'Obtener todas las tipos de vehículo' })
+  @ApiOperation({ summary: 'Obtener todos los tipos de vehículo' })
   @ApiResponse({
     status: 200,
     description: 'Tipos de vehículo obtenidos correctamente',
@@ -36,5 +37,20 @@ export class PublicController {
   @Get('tipos_vehiculo/v1')
   findAllTiposVehiculoV1() {
     return this.publicService.findAllTiposVehiculoV1();
+  }
+
+  @ApiOperation({ summary: 'Obtener todos los vehículos' })
+  @ApiResponse({
+    status: 200,
+    description: 'Vehículos obtenidos correctamente',
+    type: [VehiculoDto],
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No se encontraron vehículos',
+  })
+  @Get('vehiculos/v1')
+  findAllVehiculosV1() {
+    return this.publicService.findAllVehiculosV1();
   }
 }

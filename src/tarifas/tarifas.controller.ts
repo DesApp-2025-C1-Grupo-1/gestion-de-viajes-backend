@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { TarifaService } from './tarifas.service';
+import { TarifasService } from './tarifas.service';
 
 @Controller('tarifas')
-export class TarifaController {
-  constructor(private readonly tarifaService: TarifaService) {}
+export class TarifasController {
+  constructor(private readonly tarifasService: TarifasService) {}
 
   @Get()
-  async listarTarifas() {
-    return this.tarifaService.obtenerTarifas();
+  async obtenerTarifas() {
+    return this.tarifasService.obtenerTarifas();
   }
 }

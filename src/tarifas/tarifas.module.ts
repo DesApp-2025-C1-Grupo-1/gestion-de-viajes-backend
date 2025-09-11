@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios'; // para hacer requests HTTP
-import { TarifaService } from './tarifas.service';
-import { TarifaController } from './tarifas.controller';
+import { TarifasService } from './tarifas.service';
+import { TarifasController } from './tarifas.controller';
 
 @Module({
-  imports: [HttpModule],
-  controllers: [TarifaController],
-  providers: [TarifaService],
+  controllers: [TarifasController],
+  providers: [TarifasService],
 })
-export class TarifaModule {}
+export class TarifasModule {}     

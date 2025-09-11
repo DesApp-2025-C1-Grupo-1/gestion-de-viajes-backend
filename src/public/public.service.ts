@@ -6,11 +6,13 @@ import {
   TipoVehiculo,
   TipoVehiculoDocument,
 } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
+import { Vehiculo, VehiculoDocument } from 'src/vehiculo/schemas/vehiculo.schema';
 
 @Injectable()
 export class PublicService {
   constructor(
     @InjectModel(Empresa.name) private empresaModel: Model<EmpresaDocument>,
+    @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
     @InjectModel(TipoVehiculo.name)
     private tipoVehiculoModel: Model<TipoVehiculoDocument>,
   ) {}
@@ -35,5 +37,11 @@ export class PublicService {
     const tiposVehiculo = await this.tipoVehiculoModel.find().lean();
 
     return { tiposVehiculo };
+  }
+
+  async findAllVehiculosV1() {
+    const vehiculos = await this.vehiculoModel.find().lean();
+
+    return { vehiculos };
   }
 }

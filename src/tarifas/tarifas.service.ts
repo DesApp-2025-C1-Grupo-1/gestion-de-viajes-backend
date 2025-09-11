@@ -1,27 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import axios from 'axios';
 
 @Injectable()
-export class TarifaService {
-  constructor(private readonly httpService: HttpService) {}
+export class TarifasService {
+  private readonly baseUrl = 'https://tarifas-de-costos-acme-backend.onrender.com';
 
-  async obtenerTarifas(): Promise<any> {
-    const url = 'https://API-EXTERNA-AQUI'; // reemplazar con la URL real
-
-    // Si la API necesita headers o token, agregalos aquí
-    const headers = {
-      // 'Authorization': 'Bearer TU_TOKEN',
-    };
-
+  async obtenerTarifas(): Promise<any[]> {
     try {
-      const response = await firstValueFrom(
-        this.httpService.get(url, { headers })
-      );
+      const response = await axios.get(`${this.baseUrl}/tarifas`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener tarifas:', error.message);
-      throw new Error('No se pudo obtener tarifas');
+      throw new HttpException(
+        'Error al obtener tarifas desde la API externa',
+        HttpStatus.BAD_GATEWAY,
+      );
     }
   }
 }
