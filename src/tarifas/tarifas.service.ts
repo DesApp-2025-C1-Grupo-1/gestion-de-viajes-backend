@@ -1,57 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { ZonaDto } from './dto/zona.dto';
-import { TarifaDto } from './dto/tarifa.dto';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
-export class TarifasService {
-  private zonas: ZonaDto[] = [
-    { id: 1, nombre: 'Ituzaingó' },
-    { id: 2, nombre: 'Morón' },
-    { id: 3, nombre: 'Merlo' },
-  ];
+export class TarifaService {
+  constructor(private readonly httpService: HttpService) {}
 
-  private tarifas: TarifaDto[] = [
-    {
-      id: 1,
-      nombre: 'Tarifa 2',
-      valorBase: 30000,
-      esVigente: true,
-      transportistaNombre: 'Oca',
-      tipoVehiculoNombre: 'Camión',
-      zonaNombre: 'Ituzaingó',
-      tipoCargaNombre: 'Madera',
-      transportistaId: 1,
-      tipoVehiculoId: 1,
-      zonaId: 1,
-      tipoCargaId: 1,
-      total: 34000,
-      adicionales: [
-        {
-          id: 1,
-          nombre: 'Estadia',
-          costoDefault: 4000,
-          descripcion: '2 noches',
-          activo: true,
-          esGlobal: false,
-          costoEspecifico: 4000,
-        },
-      ],
-    },
-  ];
+  async obtenerTarifas(): Promise<any> {
+    const url = 'https://API-EXTERNA-AQUI'; // reemplazar con la URL real
 
-  async getZonas(): Promise<ZonaDto[]> {
-    return this.zonas;
-  }
+    // Si la API necesita headers o token, agregalos aquí
+    const headers = {
+      // 'Authorization': 'Bearer TU_TOKEN',
+    };
 
-  async getTarifas(
-    transportistaId?: number,
-    tipoVehiculoId?: number,
-  ): Promise<TarifaDto[]> {
-    // Filtra por transportista y tipo de vehículo si se pasan parámetros
-    return this.tarifas.filter(
-      (t) =>
-        (!transportistaId || t.transportistaId === transportistaId) &&
-        (!tipoVehiculoId || t.tipoVehiculoId === tipoVehiculoId),
-    );
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(url, { headers })
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener tarifas:', error.message);
+      throw new Error('No se pudo obtener tarifas');
+    }
   }
 }
