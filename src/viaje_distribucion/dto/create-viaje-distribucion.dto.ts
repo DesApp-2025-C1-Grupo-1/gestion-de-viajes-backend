@@ -8,6 +8,7 @@ import {
   IsArray,
   ArrayNotEmpty,
   ArrayUnique,
+  IsInt,
 } from 'class-validator';
 
 export class CreateViajeDistribucionDto {
@@ -36,12 +37,16 @@ export class CreateViajeDistribucionDto {
   @IsMongoId()
   vehiculo: string;
 
-  @ApiProperty({ example: ['REM-2024-001', 'REM-2024-002'] })
+  @ApiProperty({ example: [1, 2] })
   @IsArray()
   @ArrayNotEmpty()
   @ArrayUnique()
-  @IsString({ each: true })
-  remito_ids: string[];
+  @IsInt({ each: true })
+  remito_ids: number[];
+
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  tarifa_id: number;
 
   @ApiProperty({
     enum: ['iniciado', 'cargando', 'cargado', 'finalizado'],

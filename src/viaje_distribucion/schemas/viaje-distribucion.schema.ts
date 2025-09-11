@@ -35,12 +35,12 @@ export class ViajeDistribucion {
   vehiculo: Types.ObjectId;
 
   // Relación con Remitos
-  @Prop({ type: [String], required: true })
-  remito_ids: string[];
+  @Prop({ type: [Number], required: true })
+  remito_ids: number[];
 
   // Relación con Tarifa
-  @Prop({ type: String, required: true })
-  tarifa_id: string;
+  @Prop({ type: Number, required: true })
+  tarifa_id: number;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;

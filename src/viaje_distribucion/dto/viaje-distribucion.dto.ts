@@ -55,15 +55,15 @@ export class ViajeDistribucionDto {
   @ApiProperty({ example: '64a123456789abcdef012348' })
   vehiculo: Types.ObjectId;
 
-  @ApiProperty({ example: ['REM-2024-001', 'REM-2024-002'] })
-  remito_ids: string[];
+  @ApiProperty({ example: [1, 2] })
+  remito_ids: number[];
 
   @ApiProperty({ type: [RemitoInfoDto], required: false })
   @Type(() => RemitoInfoDto)
   remitos_info?: RemitoInfoDto[];
 
-  @ApiProperty({ example: '1' })
-  tarifa_id: string;
+  @ApiProperty({ example: 1 })
+  tarifa_id: number;
 
   @ApiProperty({ type: TarifaDto, required: false })
   tarifa?: TarifaDto;

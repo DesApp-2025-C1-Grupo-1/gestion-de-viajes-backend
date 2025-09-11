@@ -128,36 +128,3 @@ export class ViajeDistribucionService {
     return updatedViajeDistribucion;
   }
 }
-
-const tarifas = [
-  {
-    id: 1,
-    nombre: 'Tarifa 2',
-    valorBase: 30000,
-    esVigente: true,
-    transportistaNombre: 'Oca',
-    tipoVehiculoNombre: 'Camion',
-    zonaNombre: 'Ituzaingo',
-    tipoCargaNombre: 'Madera',
-    transportistaId: 1,
-    tipoVehiculoId: 1,
-    zonaId: 1,
-    tipoCargaId: 1,
-    total: 34000,
-    adicionales: [
-      {
-        id: 1,
-        adicional: {
-          id: 1,
-          nombre: 'Estadia',
-          costoDefault: 4000,
-          descripcion: '2 noches',
-          activo: true,
-          esGlobal: false,
-        },
-        costoEspecifico: 4000,
-        activo: true,
-      },
-    ],
-  },
-];
