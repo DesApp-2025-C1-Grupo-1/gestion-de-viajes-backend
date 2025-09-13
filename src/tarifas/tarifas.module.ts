@@ -6,4 +6,4 @@ import { TarifasController } from './tarifas.controller';
   controllers: [TarifasController],
   providers: [TarifasService],
 })
-export class TarifasModule {}     
+export class TarifasModule {}

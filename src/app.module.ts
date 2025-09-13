@@ -11,6 +11,8 @@ import { ViajeModule } from './viaje/viaje.module';
 import { ViajeDistribucionModule } from './viaje_distribucion/viaje-distribucion.module';
 import { PublicModule } from './public/public.module';
 import { TarifasModule } from './tarifas/tarifas.module';
+import { RemitosModule } from './remitos/remitos.module';
+
 @Module({
   imports: [
     TipoVehiculoModule,
@@ -23,6 +25,7 @@ import { TarifasModule } from './tarifas/tarifas.module';
     ViajeDistribucionModule,
     PublicModule,
     TarifasModule,
+    RemitosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsBoolean, IsInt, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class AdicionalDto {
@@ -11,7 +11,10 @@ class AdicionalDto {
   @IsString()
   nombre: string;
 
-  @ApiProperty({ example: 4000, description: 'Costo por defecto del adicional' })
+  @ApiProperty({
+    example: 4000,
+    description: 'Costo por defecto del adicional',
+  })
   @IsInt()
   costoDefault: number;
 
