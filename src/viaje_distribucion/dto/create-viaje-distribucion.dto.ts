@@ -16,11 +16,6 @@ export class CreateViajeDistribucionDto {
   @IsDateString()
   fecha_inicio: Date;
 
-  @ApiProperty({ example: '2024-01-15T18:00:00.000Z', required: false })
-  @IsOptional()
-  @IsDateString()
-  fecha_llegada?: Date;
-
   @ApiProperty({ example: '64a123456789abcdef012345' })
   @IsMongoId()
   origen: string;
@@ -46,7 +41,7 @@ export class CreateViajeDistribucionDto {
 
   @ApiProperty({ example: 1 })
   @IsInt()
-  tarifa_id: number;
+  tarifa_id?: number;
 
   @ApiProperty({
     enum: ['iniciado', 'cargando', 'cargado', 'finalizado'],

@@ -8,9 +8,6 @@ export class ViajeDistribucion {
   @Prop({ type: Date, required: true })
   fecha_inicio: Date;
 
-  @Prop({ type: Date })
-  fecha_llegada: Date;
-
   @Prop({
     type: String,
     enum: ['iniciado', 'cargando', 'cargado', 'finalizado'],
@@ -40,7 +37,7 @@ export class ViajeDistribucion {
 
   // Relación con Tarifa
   @Prop({ type: Number, required: true })
-  tarifa_id: number;
+  tarifa_id?: number;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;

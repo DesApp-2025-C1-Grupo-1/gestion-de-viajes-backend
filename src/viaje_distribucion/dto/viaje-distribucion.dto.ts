@@ -40,9 +40,6 @@ export class ViajeDistribucionDto {
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
   fecha_inicio: Date;
 
-  @ApiProperty({ example: '2024-01-15T18:00:00.000Z' })
-  fecha_llegada?: Date;
-
   @ApiProperty({ example: '64a123456789abcdef012345' })
   origen: Types.ObjectId;
 
@@ -63,7 +60,7 @@ export class ViajeDistribucionDto {
   remitos_info?: RemitoInfoDto[];
 
   @ApiProperty({ example: 1 })
-  tarifa_id: number;
+  tarifa_id?: number;
 
   @ApiProperty({ type: TarifaDto, required: false })
   tarifa?: TarifaDto;

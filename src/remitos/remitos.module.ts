@@ -7,5 +7,6 @@ import { RemitosService } from './remitos.service';
   imports: [HttpModule],
   controllers: [RemitosController],
   providers: [RemitosService],
+  exports: [RemitosService],
 })
 export class RemitosModule {}
