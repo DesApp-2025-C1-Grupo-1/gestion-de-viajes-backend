@@ -119,8 +119,13 @@ export class ViajeDistribucionController {
   async updateEstado(
     @Param('id') id: string,
     @Body('estado') estado: string,
+    @Body('kilometros') kilometros?: number,
   ): Promise<ViajeDistribucionDto> {
-    return await this.viajeDistribucionService.updateEstado(id, estado);
+    return await this.viajeDistribucionService.updateEstado(
+      id,
+      estado,
+      kilometros,
+    );
   }
 
   @Delete(':id')

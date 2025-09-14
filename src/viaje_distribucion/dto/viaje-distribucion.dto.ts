@@ -43,6 +43,12 @@ export class ViajeDistribucionDto {
   @ApiProperty({ example: '64a123456789abcdef012345' })
   origen: Types.ObjectId;
 
+  @ApiProperty({
+    description: 'Tipo de viaje',
+    example: 'Nacional / Internacional',
+  })
+  tipo_viaje: string;
+
   @ApiProperty({ example: '64a123456789abcdef012346' })
   chofer: Types.ObjectId;
 
@@ -54,6 +60,9 @@ export class ViajeDistribucionDto {
 
   @ApiProperty({ example: [1, 2] })
   remito_ids: number[];
+
+  @ApiProperty({ example: 125 })
+  kilometros: number;
 
   @ApiProperty({ type: [RemitoInfoDto], required: false })
   @Type(() => RemitoInfoDto)

@@ -120,6 +120,7 @@ export class ViajeDistribucionService {
   async updateEstado(
     id: string,
     nuevoEstado: string,
+    kilometros?: number,
   ): Promise<ViajeDistribucion> {
     const estadosValidos = ['iniciado', 'cargando', 'cargado', 'finalizado'];
     if (!estadosValidos.includes(nuevoEstado)) {
@@ -144,9 +145,7 @@ export class ViajeDistribucionService {
       );
     }
 
-    // Según el cambio de estado del viaje, actualizar estados de remitos
     if (nuevoEstado === 'cargando') {
-      // Primero actualizar remitos -> luego persistir estado del viaje
       await this.actualizarEstadosRemitos(
         viaje.remito_ids,
         this.mapEstadoRemito('cargando'),
@@ -157,6 +156,12 @@ export class ViajeDistribucionService {
         this.mapEstadoRemito('cargado'),
       );
     } else if (nuevoEstado === 'finalizado') {
+      if (!kilometros || kilometros < 0) {
+        throw new BadRequestException(
+          'Debe proporcionar un valor válido de kilómetros al finalizar el viaje',
+        );
+      }
+
       // Validar que todos los remitos estén en "No entregado" o "Entregado" antes de finalizar viaje
       const remitos = await Promise.all(
         viaje.remito_ids.map((rid) => this.remitosService.getRemitoById(rid)),
@@ -171,27 +176,25 @@ export class ViajeDistribucionService {
           'No se puede finalizar el viaje: hay remitos que no están en estados "No entregado" o "Entregado"',
         );
       }
+      viaje.kilometros = Math.max(0, kilometros - (viaje.kilometros ?? 0));
     }
 
-    // Persistir el cambio de estado del viaje
     viaje.estado = nuevoEstado;
     await viaje.save();
     return viaje;
   }
 
   private mapEstadoRemito(estadoViaje: string): number {
-    // Mapeo de estados de viaje -> estadoId de remitos backend
-    // Suposiciones:
     // 1: Autorizado, 2: En preparación, 3: En carga, 4: En camino, 5: Entregado, 6: No entregado, 7: Retenido
     switch (estadoViaje) {
       case 'iniciado':
-        return 2; // En preparación
+        return 2;
       case 'cargando':
-        return 3; // En carga
+        return 3;
       case 'cargado':
-        return 4; // En camino
+        return 4;
       default:
-        return 0; // no aplica
+        return 0;
     }
   }
 

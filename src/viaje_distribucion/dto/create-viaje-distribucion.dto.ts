@@ -9,6 +9,8 @@ import {
   ArrayNotEmpty,
   ArrayUnique,
   IsInt,
+  IsIn,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateViajeDistribucionDto {
@@ -19,6 +21,15 @@ export class CreateViajeDistribucionDto {
   @ApiProperty({ example: '64a123456789abcdef012345' })
   @IsMongoId()
   origen: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(['nacional', 'internacional'])
+  @ApiProperty({
+    description: 'Tipo de viaje',
+    example: 'Nacional / Internacional',
+  })
+  tipo_viaje: string;
 
   @ApiProperty({ example: '64a123456789abcdef012346' })
   @IsMongoId()
@@ -39,7 +50,12 @@ export class CreateViajeDistribucionDto {
   @IsInt({ each: true })
   remito_ids: number[];
 
+  @ApiProperty({ example: 125 })
+  @IsInt()
+  kilometros: number;
+
   @ApiProperty({ example: 1 })
+  @IsOptional()
   @IsInt()
   tarifa_id?: number;
 
