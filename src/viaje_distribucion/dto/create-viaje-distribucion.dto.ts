@@ -59,6 +59,10 @@ export class CreateViajeDistribucionDto {
   @IsInt()
   tarifa_id?: number;
 
+  @ApiProperty({ example: 10 })
+  @IsInt()
+  viaje_id: number; // Agregado
+
   @ApiProperty({
     enum: ['iniciado', 'cargando', 'cargado', 'finalizado'],
     example: 'iniciado',

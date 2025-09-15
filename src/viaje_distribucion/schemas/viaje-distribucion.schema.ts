@@ -36,6 +36,9 @@ export class ViajeDistribucion {
   @Prop({ type: Number, required: true })
   tarifa_id?: number;
 
+  @Prop({ type: Number, required: true })
+  viaje_id: number;   
+
   @Prop({ type: Number, required: true, min: 0 })
   kilometros: number;
 
