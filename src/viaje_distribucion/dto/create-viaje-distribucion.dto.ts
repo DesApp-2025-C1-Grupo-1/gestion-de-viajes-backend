@@ -14,9 +14,6 @@ import {
 } from 'class-validator';
 
 export class CreateViajeDistribucionDto {
-  @ApiProperty({ example: '64a123456789abcdef012345' })
-  _id: string;
-
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
   @IsDateString()
   fecha_inicio: Date;
