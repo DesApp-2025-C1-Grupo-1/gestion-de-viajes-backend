@@ -5,6 +5,9 @@ export type ViajeDistribucionDocument = ViajeDistribucion & Document;
 
 @Schema({ collection: 'viaje_distribucion', versionKey: false })
 export class ViajeDistribucion {
+  @Prop({ type: Types.ObjectId, required: true })
+  _id: Types.ObjectId;
+
   @Prop({ type: Date, required: true })
   fecha_inicio: Date;
 
@@ -35,9 +38,6 @@ export class ViajeDistribucion {
 
   @Prop({ type: Number, required: true })
   tarifa_id?: number;
-
-  @Prop({ type: Number, required: true })
-  viaje_id: number;   
 
   @Prop({ type: Number, required: true, min: 0 })
   kilometros: number;
