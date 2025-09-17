@@ -54,7 +54,7 @@ export class CreateViajeDistribucionDto {
   @IsInt()
   kilometros: number;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: 1, required: false })
   @IsOptional()
   @IsInt()
   tarifa_id?: number;

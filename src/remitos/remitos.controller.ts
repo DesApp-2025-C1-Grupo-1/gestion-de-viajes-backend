@@ -11,7 +11,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { RemitosService } from './remitos.service';
-import { RemitoDto } from './dto/remito.dto';
+import { RemitoDto, RemitoResponseDto } from './dto/remito.dto';
 
 @Controller('remito')
 export class RemitosController {
@@ -22,7 +22,7 @@ export class RemitosController {
   @ApiResponse({
     status: 200,
     description: 'Lista de remitos obtenida correctamente',
-    type: [RemitoDto],
+    type: RemitoResponseDto,
   })
   @ApiResponse({ status: 404, description: 'No se encontraron remitos' })
   @ApiQuery({
@@ -91,7 +91,9 @@ export class RemitosController {
     type: String,
     description: 'Filtra por localidad del destino',
   })
-  async getRemitos(@Query() query: Record<string, any>): Promise<RemitoDto[]> {
+  async getRemitos(
+    @Query() query: Record<string, any>,
+  ): Promise<RemitoResponseDto> {
     return this.remitosService.getRemitos(query);
   }
 
@@ -122,35 +124,35 @@ export class RemitosController {
     return this.remitosService.cambiarEstado(id, eid);
   }
 
-  // @Put(':id/entregar')
-  // @UseInterceptors(FileInterceptor('file'))
-  // @ApiOperation({ summary: 'Entregar remito (requiere archivo firmado)' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Remito entregado correctamente',
-  //   type: RemitoDto,
-  // })
-  // @ApiResponse({ status: 400, description: 'Archivo inválido' })
-  // @ApiResponse({ status: 404, description: 'Remito no encontrado' })
-  // async entregarRemito(
-  //   @Param('id') id: number,
-  //   @UploadedFile() file: Express.Multer.File,
-  // ): Promise<RemitoDto> {
-  //   return this.remitosService.entregarRemito(id, file);
-  // }
+  @Put(':id/firmar')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Entregar remito (requiere archivo firmado)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Remito entregado correctamente',
+    type: RemitoDto,
+  })
+  @ApiResponse({ status: 400, description: 'Archivo inválido' })
+  @ApiResponse({ status: 404, description: 'Remito no encontrado' })
+  async entregarRemito(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<RemitoDto> {
+    return this.remitosService.entregarRemito(id, file);
+  }
 
-  // @Put(':id/noEntregado')
-  // @ApiOperation({ summary: 'Marcar remito como no entregado' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Remito marcado como no entregado correctamente',
-  //   type: RemitoDto,
-  // })
-  // @ApiResponse({ status: 404, description: 'Remito no encontrado' })
-  // async marcarNoEntregado(
-  //   @Param('id') id: number,
-  //   @Body('razonNoEntrega') razon: string,
-  // ): Promise<RemitoDto> {
-  //   return this.remitosService.marcarNoEntregado(id, razon);
-  // }
+  @Put(':id/no-entregado')
+  @ApiOperation({ summary: 'Marcar remito como no entregado' })
+  @ApiResponse({
+    status: 200,
+    description: 'Remito marcado como no entregado correctamente',
+    type: RemitoDto,
+  })
+  @ApiResponse({ status: 404, description: 'Remito no encontrado' })
+  async marcarNoEntregado(
+    @Param('id') id: number,
+    @Body('razonNoEntrega') razon: string,
+  ): Promise<RemitoDto> {
+    return this.remitosService.marcarNoEntregado(id, razon);
+  }
 }

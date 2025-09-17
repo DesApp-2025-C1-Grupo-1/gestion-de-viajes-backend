@@ -74,7 +74,7 @@ export class ViajeDistribucionDto {
   @Type(() => RemitoInfoDto)
   remitos_info?: RemitoInfoDto[];
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: 1, required: false })
   tarifa_id?: number;
 
   @ApiProperty({ type: TarifaDto, required: false })

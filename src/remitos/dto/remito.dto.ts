@@ -221,21 +221,21 @@ export class RemitoDto {
     description: 'Observaciones del remito',
     required: false,
   })
-  observaciones?: string | null;
+  observaciones?: string;
 
   @ApiProperty({
     example: null,
     description: 'Archivo adjunto del remito',
     required: false,
   })
-  archivoAdjunto?: string | null;
+  archivoAdjunto?: string;
 
   @ApiProperty({
     example: null,
     description: 'Razón de no entrega',
     required: false,
   })
-  razonNoEntrega?: string | null;
+  razonNoEntrega?: string;
 
   @ApiProperty({
     example: 'alta',
@@ -255,14 +255,14 @@ export class RemitoDto {
     description: 'Fecha agendada para el remito',
     required: false,
   })
-  fechaAgenda?: string | null;
+  fechaAgenda?: string;
 
   @ApiProperty({
     example: null,
     description: 'Archivo del remito firmado',
     required: false,
   })
-  remitoFirmado?: string | null;
+  remitoFirmado?: string;
 
   @ApiProperty({ example: 38, description: 'ID del cliente' })
   clienteId: number;
@@ -278,7 +278,7 @@ export class RemitoDto {
     description: 'ID del estado anterior del remito',
     required: false,
   })
-  estadoAnteriorId?: number | null;
+  estadoAnteriorId?: number;
 
   @ApiProperty({
     example: '2025-09-13T00:42:16.462Z',
@@ -319,4 +319,18 @@ export class RemitoDto {
     required: false,
   })
   mercaderias?: MercaderiaDto[];
+}
+
+export class RemitoResponseDto {
+  @ApiProperty({ type: [RemitoDto], description: 'Lista de remitos' })
+  data: RemitoDto[];
+
+  @ApiProperty({ example: '30', description: 'Cantidad de remitos' })
+  totalItems: number;
+
+  @ApiProperty({ example: '2', description: 'Cantidad total de páginas' })
+  totalPages: number;
+
+  @ApiProperty({ example: '1', description: 'Página actual' })
+  currentPage: number;
 }

@@ -34,7 +34,7 @@ export class ViajeDistribucionController {
   @ApiResponse({
     status: 201,
     description: 'Viaje de distribución creado exitosamente.',
-    type: ViajeDistribucionDto,
+    type: CreateViajeDistribucionDto,
   })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos.' })
   async create(
