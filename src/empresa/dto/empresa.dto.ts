@@ -10,6 +10,12 @@ export class EmpresaDto {
   _id: string;
 
   @ApiProperty({
+    description: 'CUIT de la empresa (único)',
+    example: 30712345678,
+  })
+  cuit: string;
+
+  @ApiProperty({
     description: 'Razón social de la empresa',
     example: 'Transporte S.A.',
   })
