@@ -5,9 +5,6 @@ export type ViajeDistribucionDocument = ViajeDistribucion & Document;
 
 @Schema({ collection: 'viaje_distribucion', versionKey: false })
 export class ViajeDistribucion {
-  @Prop({ type: String, required: true })
-  _id: string;
-
   @Prop({ type: Date, required: true })
   fecha_inicio: Date;
 
@@ -36,7 +33,7 @@ export class ViajeDistribucion {
   @Prop({ type: [Number], required: true })
   remito_ids: number[];
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number, required: false })
   tarifa_id?: number;
 
   @Prop({ type: Number, required: true, min: 0 })

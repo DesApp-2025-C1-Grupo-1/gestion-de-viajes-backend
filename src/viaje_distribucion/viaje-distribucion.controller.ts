@@ -21,6 +21,8 @@ import { CreateViajeDistribucionDto } from './dto/create-viaje-distribucion.dto'
 import { UpdateViajeDistribucionDto } from './dto/update-viaje-distribucion.dto';
 import { ViajeDistribucionDto } from './dto/viaje-distribucion.dto';
 import { ViajeDistribucionService } from './viaje-distribucion.service';
+import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
+import { ViajeDistribucion } from './schemas/viaje-distribucion.schema';
 
 @ApiTags('viaje-distribucion')
 @Controller('viaje-distribucion')
@@ -38,11 +40,18 @@ export class ViajeDistribucionController {
   })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos.' })
   async create(
-    @Body() createViajeDistribucionDto: CreateViajeDistribucionDto,
-  ): Promise<ViajeDistribucionDto> {
+    @Body(
+      new TransformObjectIdFieldsPipe([
+        'origen',
+        'chofer',
+        'transportista',
+        'vehiculo',
+      ]),
+    )
+    createViajeDistribucionDto: CreateViajeDistribucionDto,
+  ) {
     return this.viajeDistribucionService.create(createViajeDistribucionDto);
   }
-
   @Get()
   @ApiOperation({ summary: 'Obtener todos los viajes de distribución' })
   @ApiResponse({

@@ -16,7 +16,6 @@ export class RemitosService {
       this.http.get(`${this.baseUrl}/remito`, { params: query }),
     );
 
-    console.log(response);
     return response.data as RemitoResponseDto;
   }
 

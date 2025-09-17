@@ -41,7 +41,7 @@ export class ViajeDistribucionDto {
     example: '665f0ec9fe1846d5a9f3baf2',
     description: 'ID del viaje',
   })
-  _id: string;
+  _id?: string;
 
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
   fecha_inicio: Date;
