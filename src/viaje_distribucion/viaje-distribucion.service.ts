@@ -24,9 +24,11 @@ export class ViajeDistribucionService {
   async create(
     createViajeDistribucionDto: CreateViajeDistribucionDto,
   ): Promise<ViajeDistribucion> {
-    const createdViajeDistribucion = new this.viajeDistribucionModel(
-      createViajeDistribucionDto,
-    );
+    const createdViajeDistribucion = new this.viajeDistribucionModel({
+      ...createViajeDistribucionDto,
+      deletedAt: null,
+    });
+
     const saved = await createdViajeDistribucion.save();
 
     // Al crear el viaje, cambiar los estados de los remitos a "En preparación"

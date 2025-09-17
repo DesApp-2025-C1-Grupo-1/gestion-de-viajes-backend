@@ -5,8 +5,8 @@ export type ViajeDistribucionDocument = ViajeDistribucion & Document;
 
 @Schema({ collection: 'viaje_distribucion', versionKey: false })
 export class ViajeDistribucion {
-  @Prop({ type: Types.ObjectId, required: true })
-  _id: Types.ObjectId;
+  @Prop({ type: String, required: true })
+  _id: string;
 
   @Prop({ type: Date, required: true })
   fecha_inicio: Date;
