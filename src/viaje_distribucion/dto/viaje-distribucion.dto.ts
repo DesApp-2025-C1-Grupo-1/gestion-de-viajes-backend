@@ -64,7 +64,7 @@ export class ViajeDistribucionDto {
   @ApiProperty({ example: '64a123456789abcdef012348' })
   vehiculo: Types.ObjectId;
 
-  @ApiProperty({ example: [1, 2] })
+  @ApiProperty({ example: [1, 2], type: [Number] })
   remito_ids: number[];
 
   @ApiProperty({ example: 125 })
@@ -80,7 +80,9 @@ export class ViajeDistribucionDto {
   @ApiProperty({ type: TarifaDto, required: false })
   tarifa?: TarifaDto;
 
-  @ApiProperty({ enum: ['iniciado', 'cargando', 'cargado', 'finalizado'] })
+  @ApiProperty({
+    enum: ['iniciado', 'inicio de carga', 'fin de carga', 'fin de viaje'],
+  })
   estado: string;
 
   @ApiProperty({ example: '2024-01-15T10:00:00.000Z' })
