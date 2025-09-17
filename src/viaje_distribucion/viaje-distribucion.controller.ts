@@ -22,7 +22,6 @@ import { UpdateViajeDistribucionDto } from './dto/update-viaje-distribucion.dto'
 import { ViajeDistribucionDto } from './dto/viaje-distribucion.dto';
 import { ViajeDistribucionService } from './viaje-distribucion.service';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
-import { ViajeDistribucion } from './schemas/viaje-distribucion.schema';
 
 @ApiTags('viaje-distribucion')
 @Controller('viaje-distribucion')
