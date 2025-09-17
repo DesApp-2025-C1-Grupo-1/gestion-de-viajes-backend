@@ -52,7 +52,8 @@ export class RemitosService {
   async entregarRemito(id: number, file: Express.Multer.File) {
     try {
       const formData = new FormData();
-      formData.append('file', file.buffer, {
+
+      formData.append('remitoFirmado', file.buffer, {
         filename: file.originalname,
         contentType: file.mimetype,
       });
@@ -62,7 +63,8 @@ export class RemitosService {
           headers: formData.getHeaders(),
         }),
       );
-      return response.data;
+
+      return response.data as RemitoDto;
     } catch (err) {
       const error = err as AxiosError;
 
@@ -86,7 +88,7 @@ export class RemitosService {
           razonNoEntrega,
         }),
       );
-      return response.data;
+      return response.data as RemitoDto;
     } catch (err) {
       const error = err as AxiosError;
 
