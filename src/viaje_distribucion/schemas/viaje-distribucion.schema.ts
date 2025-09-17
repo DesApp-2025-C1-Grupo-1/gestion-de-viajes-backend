@@ -10,7 +10,7 @@ export class ViajeDistribucion {
 
   @Prop({
     type: String,
-    enum: ['iniciado', 'cargando', 'cargado', 'finalizado'],
+    enum: ['iniciado', 'inicio de carga', 'fin de carga', 'fin de viaje'],
     default: 'iniciado',
   })
   estado: string;

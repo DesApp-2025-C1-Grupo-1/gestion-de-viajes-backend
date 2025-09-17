@@ -238,9 +238,9 @@ export class RemitoDto {
   razonNoEntrega?: string;
 
   @ApiProperty({
-    example: 'alta',
+    example: 'normal',
     description: 'Prioridad del remito',
-    enum: ['alta', 'media', 'baja'],
+    enum: ['normal', 'alta', 'urgente'],
   })
   prioridad: string;
 

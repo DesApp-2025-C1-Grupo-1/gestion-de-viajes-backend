@@ -43,7 +43,7 @@ export class CreateViajeDistribucionDto {
   @IsMongoId()
   vehiculo: string;
 
-  @ApiProperty({ example: [1, 2] })
+  @ApiProperty({ example: [1, 2], type: [Number] })
   @IsArray()
   @ArrayNotEmpty()
   @ArrayUnique()
@@ -60,12 +60,12 @@ export class CreateViajeDistribucionDto {
   tarifa_id?: number;
 
   @ApiProperty({
-    enum: ['iniciado', 'cargando', 'cargado', 'finalizado'],
+    enum: ['iniciado', 'inicio de carga', 'fin de carga', 'fin de viaje'],
     example: 'iniciado',
     required: false,
   })
   @IsOptional()
-  @IsEnum(['iniciado', 'cargando', 'cargado', 'finalizado'])
+  @IsEnum(['iniciado', 'inicio de carga', 'fin de carga', 'fin de viaje'])
   estado?: string;
 
   @ApiProperty({ example: 'Viaje de distribución urgente', required: false })
