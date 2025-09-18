@@ -58,13 +58,13 @@ export class ViajeDistribucionDto {
   })
   tipo_viaje: string;
 
-  @ApiProperty({ example: '64a123456789abcdef012346' })
+  @ApiProperty({ type: ChoferDto })
   chofer: ChoferDto;
 
-  @ApiProperty({ example: '64a123456789abcdef012347' })
+  @ApiProperty({ type: EmpresaDto })
   transportista: EmpresaDto;
 
-  @ApiProperty({ example: '64a123456789abcdef012348' })
+  @ApiProperty({ type: VehiculoDto })
   vehiculo: VehiculoDto;
 
   @ApiProperty({ example: [1, 2], type: [Number] })

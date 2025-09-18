@@ -22,6 +22,7 @@ import { UpdateViajeDistribucionDto } from './dto/update-viaje-distribucion.dto'
 import { ViajeDistribucionDto } from './dto/viaje-distribucion.dto';
 import { ViajeDistribucionService } from './viaje-distribucion.service';
 import { TransformObjectIdFieldsPipe } from 'src/common/pipes/transform_objectId_fields.pipe';
+import { ViajeDistribucion } from './schemas/viaje-distribucion.schema';
 
 @ApiTags('viaje-distribucion')
 @Controller('viaje-distribucion')
@@ -66,7 +67,7 @@ export class ViajeDistribucionController {
   })
   async findAll(
     @Query('estado') estado?: string,
-  ): Promise<ViajeDistribucionDto[]> {
+  ): Promise<ViajeDistribucion[]> {
     const viajesDistribucion = estado
       ? await this.viajeDistribucionService.findByEstado(estado)
       : await this.viajeDistribucionService.findAll();
@@ -86,7 +87,7 @@ export class ViajeDistribucionController {
     status: 404,
     description: 'Viaje de distribución no encontrado.',
   })
-  async findOne(@Param('id') id: string): Promise<ViajeDistribucionDto> {
+  async findOne(@Param('id') id: string): Promise<ViajeDistribucion> {
     return await this.viajeDistribucionService.findOne(id);
   }
 
@@ -105,7 +106,7 @@ export class ViajeDistribucionController {
   async update(
     @Param('id') id: string,
     @Body() updateViajeDistribucionDto: UpdateViajeDistribucionDto,
-  ): Promise<ViajeDistribucionDto> {
+  ): Promise<ViajeDistribucion> {
     return await this.viajeDistribucionService.update(
       id,
       updateViajeDistribucionDto,
@@ -128,7 +129,7 @@ export class ViajeDistribucionController {
     @Param('id') id: string,
     @Body('estado') estado: string,
     @Body('kilometros') kilometros?: number,
-  ): Promise<ViajeDistribucionDto> {
+  ): Promise<ViajeDistribucion> {
     return await this.viajeDistribucionService.updateEstado(
       id,
       estado,
