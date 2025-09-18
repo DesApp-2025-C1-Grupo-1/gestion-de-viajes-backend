@@ -124,7 +124,12 @@ export class ViajeDistribucionService {
     nuevoEstado: string,
     kilometros?: number,
   ): Promise<ViajeDistribucion> {
-    const estadosValidos = ['iniciado', 'cargando', 'cargado', 'finalizado'];
+    const estadosValidos = [
+      'iniciado',
+      'inicio de carga',
+      'fin de carga',
+      'fin de viaje',
+    ];
     if (!estadosValidos.includes(nuevoEstado)) {
       throw new BadRequestException(
         `Estado inválido: ${nuevoEstado}. Permitidos: ${estadosValidos.join(
@@ -190,7 +195,7 @@ export class ViajeDistribucionService {
     // 1: Autorizado, 2: En preparación, 3: En carga, 4: En camino, 5: Entregado, 6: No entregado, 7: Retenido
     switch (estadoViaje) {
       case 'iniciado':
-        return 2;
+        return 3;
       case 'inicio de carga':
         return 3;
       case 'fin de carga':
