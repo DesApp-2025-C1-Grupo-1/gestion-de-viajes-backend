@@ -191,9 +191,9 @@ export class ViajeDistribucionService {
     switch (estadoViaje) {
       case 'iniciado':
         return 2;
-      case 'cargando':
+      case 'inicio de carga':
         return 3;
-      case 'cargado':
+      case 'fin de carga':
         return 4;
       default:
         return 0;

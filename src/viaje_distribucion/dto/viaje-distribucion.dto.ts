@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
+import { ChoferDto } from 'src/chofer/dto/chofer.dto';
+import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
+import { VehiculoDto } from 'src/vehiculo/dto/vehiculo.dto';
 
 class RemitoInfoDto {
   @ApiProperty({ example: '64a123456789abcdef012345' })
@@ -56,13 +59,13 @@ export class ViajeDistribucionDto {
   tipo_viaje: string;
 
   @ApiProperty({ example: '64a123456789abcdef012346' })
-  chofer: Types.ObjectId;
+  chofer: ChoferDto;
 
   @ApiProperty({ example: '64a123456789abcdef012347' })
-  transportista: Types.ObjectId;
+  transportista: EmpresaDto;
 
   @ApiProperty({ example: '64a123456789abcdef012348' })
-  vehiculo: Types.ObjectId;
+  vehiculo: VehiculoDto;
 
   @ApiProperty({ example: [1, 2], type: [Number] })
   remito_ids: number[];
