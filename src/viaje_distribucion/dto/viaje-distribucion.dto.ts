@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Types } from 'mongoose';
+import { ChoferDto } from 'src/chofer/dto/chofer.dto';
+import { DepositoDto } from 'src/deposito/dto/deposito.dto';
+import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
+import { VehiculoDto } from 'src/vehiculo/dto/vehiculo.dto';
 
 class RemitoInfoDto {
   @ApiProperty({ example: '64a123456789abcdef012345' })
@@ -46,29 +49,34 @@ export class ViajeDistribucionDto {
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
   fecha_inicio: Date;
 
-  @ApiProperty({ example: '64a123456789abcdef012345' })
-  origen: Types.ObjectId;
-
   @ApiProperty({
     description: 'Tipo de viaje',
     example: 'Nacional / Internacional',
   })
   tipo_viaje: string;
 
-  @ApiProperty({ example: '64a123456789abcdef012346' })
-  chofer: Types.ObjectId;
-
-  @ApiProperty({ example: '64a123456789abcdef012347' })
-  transportista: Types.ObjectId;
-
-  @ApiProperty({ example: '64a123456789abcdef012348' })
-  vehiculo: Types.ObjectId;
-
-  @ApiProperty({ example: [1, 2], type: [Number] })
-  remito_ids: number[];
+  @ApiProperty({
+    enum: ['iniciado', 'inicio de carga', 'fin de carga', 'fin de viaje'],
+  })
+  estado: string;
 
   @ApiProperty({ example: 125 })
   kilometros: number;
+
+  @ApiProperty({ type: DepositoDto })
+  origen: DepositoDto;
+
+  @ApiProperty({ type: ChoferDto })
+  chofer: ChoferDto;
+
+  @ApiProperty({ type: EmpresaDto })
+  transportista: EmpresaDto;
+
+  @ApiProperty({ type: VehiculoDto })
+  vehiculo: VehiculoDto;
+
+  @ApiProperty({ example: [1, 2], type: [Number] })
+  remito_ids: number[];
 
   @ApiProperty({ type: [RemitoInfoDto], required: false })
   @Type(() => RemitoInfoDto)
@@ -79,11 +87,6 @@ export class ViajeDistribucionDto {
 
   @ApiProperty({ type: TarifaDto, required: false })
   tarifa?: TarifaDto;
-
-  @ApiProperty({
-    enum: ['iniciado', 'inicio de carga', 'fin de carga', 'fin de viaje'],
-  })
-  estado: string;
 
   @ApiProperty({ example: '2024-01-15T10:00:00.000Z' })
   createdAt: Date;
