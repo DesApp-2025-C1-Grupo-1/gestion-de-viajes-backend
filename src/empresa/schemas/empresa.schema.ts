@@ -21,6 +21,7 @@ export class Empresa {
 
   @Prop({ type: DireccionSchema, required: true })
   direccion: Direccion;
+
   @Prop({ type: ContactoSchema, required: true })
   contacto: Contacto;
 

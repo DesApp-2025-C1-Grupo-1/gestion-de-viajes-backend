@@ -8,6 +8,10 @@ import { DatabaseModule } from './database/database.module';
 import { ChoferModule } from './chofer/chofer.module';
 import { DepositoModule } from './deposito/deposito.module';
 import { ViajeModule } from './viaje/viaje.module';
+import { ViajeDistribucionModule } from './viaje_distribucion/viaje-distribucion.module';
+import { PublicModule } from './public/public.module';
+import { TarifasModule } from './tarifas/tarifas.module';
+import { RemitosModule } from './remitos/remitos.module';
 
 @Module({
   imports: [
@@ -18,6 +22,10 @@ import { ViajeModule } from './viaje/viaje.module';
     ChoferModule,
     DepositoModule,
     ViajeModule,
+    ViajeDistribucionModule,
+    PublicModule,
+    TarifasModule,
+    RemitosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

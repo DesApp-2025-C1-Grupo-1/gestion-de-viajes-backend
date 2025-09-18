@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ContactoDto } from 'src/common/dto/contacto.dto';
-import { DireccionDto } from 'src/common/dto/direccion.dto';
+import { TipoVehiculoDto } from 'src/tipo_vehiculo/dto/tipo-vehiculo.dto';
 
-export class EmpresaDto {
+export class EmpresaPublicDto {
   @ApiProperty({
     description: 'ID de la empresa',
     example: 1,
@@ -16,26 +16,19 @@ export class EmpresaDto {
   cuit: string;
 
   @ApiProperty({
-    description: 'Razón social de la empresa',
-    example: 'Transporte S.A.',
-  })
-  razon_social: string;
-
-  @ApiProperty({
     description: 'Nombre comercial de la empresa',
     example: 'Transporte Rápido',
   })
   nombre_comercial: string;
 
-  @ApiProperty({
-    example: 'Juan Pérez',
-    description: 'Nombre del contacto',
-  })
-  nombre_contacto: string;
-
-  @ApiProperty({ type: DireccionDto })
-  direccion: DireccionDto;
-
   @ApiProperty({ type: ContactoDto })
   contacto: ContactoDto;
+}
+
+export class PublicDto {
+  @ApiProperty({ type: [EmpresaPublicDto] })
+  empresas: EmpresaPublicDto[];
+
+  @ApiProperty({ type: [TipoVehiculoDto] })
+  tipos_vehiculo: TipoVehiculoDto[];
 }
