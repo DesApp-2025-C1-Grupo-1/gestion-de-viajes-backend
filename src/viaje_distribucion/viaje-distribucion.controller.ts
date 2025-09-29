@@ -30,6 +30,7 @@ import { Deposito } from 'src/deposito/schemas/deposito.schema';
 import { Chofer } from 'src/chofer/schemas/chofer.schema';
 import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 import { PaginacionDistribucionDto } from 'src/common/dto/paginacion-distribucion.dto';
+import { BuscarViajeDistribucionDto } from './dto/buscar-viaje-distribucion.dto';
 
 @ApiTags('viaje-distribucion')
 @Controller('viaje-distribucion')
@@ -161,5 +162,19 @@ export class ViajeDistribucionController {
   })
   async remove(@Param('id') id: string): Promise<void> {
     await this.viajeDistribucionService.remove(id);
+  }
+
+  @ApiOperation({ summary: 'Buscar viajes por filtros' })
+  @ApiResponse({
+    status: 200,
+    description: 'Viajes filtrados correctamente',
+    type: PaginacionDistribucionDto,
+  })
+  @Post('buscar')
+  async buscar(
+    @Body() filtros: BuscarViajeDistribucionDto,
+    @Query() queryPaginacion: QueryPaginacionDto,
+  ) {
+    return this.viajeDistribucionService.buscar(filtros, queryPaginacion);
   }
 }
