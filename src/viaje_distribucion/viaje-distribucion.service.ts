@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,6 +13,22 @@ import {
   ViajeDistribucionDocument,
 } from './schemas/viaje-distribucion.schema';
 import { RemitosService } from 'src/remitos/remitos.service';
+import {
+  TipoVehiculo,
+  TipoVehiculoDocument,
+} from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
+import {
+  Deposito,
+  DepositoDocument,
+} from 'src/deposito/schemas/deposito.schema';
+import { Empresa, EmpresaDocument } from 'src/empresa/schemas/empresa.schema';
+import {
+  Vehiculo,
+  VehiculoDocument,
+} from 'src/vehiculo/schemas/vehiculo.schema';
+import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
+import { validateLicenseCompatibility } from 'src/common/function/licencias';
+import { QueryPaginacionDto } from 'src/common/dto/query-paginacion.dto';
 
 @Injectable()
 export class ViajeDistribucionService {
@@ -19,6 +36,12 @@ export class ViajeDistribucionService {
     @InjectModel(ViajeDistribucion.name)
     private viajeDistribucionModel: Model<ViajeDistribucionDocument>,
     private readonly remitosService: RemitosService,
+    @InjectModel(Deposito.name) private depositoModel: Model<DepositoDocument>,
+    @InjectModel(Empresa.name) private empresaModel: Model<EmpresaDocument>,
+    @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
+    @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
+    @InjectModel(TipoVehiculo.name)
+    private tipoVehiculoModel: Model<TipoVehiculoDocument>,
   ) {}
 
   async create(
@@ -28,6 +51,85 @@ export class ViajeDistribucionService {
       ...createViajeDistribucionDto,
       deletedAt: null,
     });
+
+    const { origen, fecha_inicio, chofer, vehiculo, transportista } =
+      createdViajeDistribucion;
+
+    //Validar que no exista un viaje con los mismos datos
+    const viajeExistente = await this.viajeDistribucionModel.findOne({
+      origen,
+      fecha_inicio,
+      chofer,
+      deletedAt: null,
+    });
+    if (viajeExistente) {
+      console.log('Viaje existente:', viajeExistente);
+      throw new ConflictException('Ya existe un Viaje con esos datos');
+    }
+
+    //Validar que chofer y vehiculo tengan el mismo id de empresa
+    const vehiculoEncontrado = await this.vehiculoModel
+      .findOne({
+        _id: vehiculo,
+        deletedAt: null,
+      })
+      .populate<{ tipo: TipoVehiculoDocument }>('tipo');
+    const choferEncontrado = await this.choferModel.findOne({
+      _id: chofer,
+      deletedAt: null,
+    });
+    const empresaEncontrada = await this.empresaModel.findOne({
+      _id: transportista,
+      deletedAt: null,
+    });
+
+    if (!vehiculoEncontrado) {
+      throw new NotFoundException('El vehículo no existe');
+    } else if (!choferEncontrado) {
+      throw new NotFoundException('El chofer no existe');
+    } else if (!empresaEncontrada) {
+      throw new NotFoundException('La empresa no existe');
+    }
+
+    if (vehiculoEncontrado.empresa?.toString() !== transportista.toString()) {
+      throw new ConflictException(
+        'El vehículo no pertenece a la misma empresa que el viaje',
+      );
+    } else if (
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      choferEncontrado.empresa?.toString() !== transportista.toString()
+    ) {
+      throw new ConflictException(
+        'El chofer no pertenece a la misma empresa que el viaje',
+      );
+    }
+
+    // validacion de licencia
+    if (!choferEncontrado.tipo_licencia) {
+      throw new BadRequestException(
+        'El chofer seleccionado no tiene un tipo de licencia definido.',
+      );
+    }
+    const tipoVehiculoDelVehiculo = vehiculoEncontrado.tipo;
+    if (
+      !tipoVehiculoDelVehiculo ||
+      !tipoVehiculoDelVehiculo.licencia_permitida
+    ) {
+      throw new NotFoundException(
+        'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
+      );
+    }
+
+    const esLicenciaCompatible = validateLicenseCompatibility(
+      tipoVehiculoDelVehiculo.licencia_permitida,
+      choferEncontrado.tipo_licencia,
+    );
+
+    if (!esLicenciaCompatible) {
+      throw new BadRequestException(
+        `La licencia del chofer no es compatible con la licencia requerida por el vehículo.`,
+      );
+    }
 
     const saved = await createdViajeDistribucion.save();
 
@@ -40,14 +142,30 @@ export class ViajeDistribucionService {
     return saved;
   }
 
-  async findAll(): Promise<ViajeDistribucion[]> {
-    return this.viajeDistribucionModel
-      .find({ deletedAt: null })
-      .populate('origen')
-      .populate('chofer')
-      .populate('transportista')
-      .populate('vehiculo')
-      .exec();
+  async findAll(queryPaginacionDto: QueryPaginacionDto): Promise<{
+    data: ViajeDistribucion[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const { page = 1, limit = 10 } = queryPaginacionDto;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.viajeDistribucionModel
+        .find({ deletedAt: null })
+        .sort({ fecha_inicio: 1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('origen')
+        .populate('chofer')
+        .populate('transportista')
+        .populate('vehiculo')
+        .exec(),
+      this.viajeDistribucionModel.countDocuments({ deletedAt: null }),
+    ]);
+
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<ViajeDistribucion> {

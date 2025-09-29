@@ -168,6 +168,7 @@ export class ViajeService {
     const createdViaje = new this.viajeModel(createViajeDto);
     return createdViaje.save();
   }
+
   async findAll(queryPaginacionDto: QueryPaginacionDto): Promise<{
     data: Viaje[];
     total: number;
