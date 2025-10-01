@@ -3,40 +3,12 @@ import { Type } from 'class-transformer';
 import { ChoferDto } from 'src/chofer/dto/chofer.dto';
 import { DepositoDto } from 'src/deposito/dto/deposito.dto';
 import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
+import { TarifaDto } from 'src/tarifas/dto/tarifa.dto';
 import { VehiculoDto } from 'src/vehiculo/dto/vehiculo.dto';
 
 class RemitoInfoDto {
   @ApiProperty({ example: '64a123456789abcdef012345' })
   id: string;
-}
-
-class TarifaDto {
-  id: number;
-  nombre: string;
-  valorBase: number;
-  esVigente: boolean;
-  transportistaNombre: string;
-  tipoVehiculoNombre: string;
-  zonaNombre: string;
-  tipoCargaNombre: string;
-  transportistaId: number;
-  tipoVehiculoId: number;
-  zonaId: number;
-  tipoCargaId: number;
-  total: number;
-  adicionales: {
-    id: number;
-    adicional: {
-      id: number;
-      nombre: string;
-      costoDefault: number;
-      descripcion: string;
-      activo: boolean;
-      esGlobal: boolean;
-    };
-    costoEspecifico: number;
-    activo: boolean;
-  }[];
 }
 
 export class ViajeDistribucionDto {
