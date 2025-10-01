@@ -100,6 +100,14 @@ export class ViajeDistribucionService {
       );
     }
 
+    if (updateViajeDistribucionDto.estado) {
+      await this.updateEstado(
+        id,
+        updateViajeDistribucionDto.estado,
+        updateViajeDistribucionDto.kilometros,
+      );
+    }
+
     return updatedViajeDistribucion;
   }
 
