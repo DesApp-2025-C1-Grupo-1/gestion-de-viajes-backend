@@ -152,17 +152,17 @@ export class ViajeDistribucionService {
       );
     }
 
-    if (nuevoEstado === 'cargando') {
+    if (nuevoEstado === 'inicio de carga') {
       await this.actualizarEstadosRemitos(
         viaje.remito_ids,
-        this.mapEstadoRemito('cargando'),
+        this.mapEstadoRemito('inicio de carga'),
       );
-    } else if (nuevoEstado === 'cargado') {
+    } else if (nuevoEstado === 'fin de carga') {
       await this.actualizarEstadosRemitos(
         viaje.remito_ids,
-        this.mapEstadoRemito('cargado'),
+        this.mapEstadoRemito('fin de carga'),
       );
-    } else if (nuevoEstado === 'finalizado') {
+    } else if (nuevoEstado === 'fin de viaje') {
       if (!kilometros || kilometros < 0) {
         throw new BadRequestException(
           'Debe proporcionar un valor válido de kilómetros al finalizar el viaje',
