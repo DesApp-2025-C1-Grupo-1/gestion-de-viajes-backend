@@ -85,6 +85,9 @@ export class ViajeDistribucionDto {
   @ApiProperty({ example: 1, required: false })
   tarifa_id?: number;
 
+  @ApiProperty({ type: String, required: false })
+  observaciones?: string;
+
   @ApiProperty({ type: TarifaDto, required: false })
   tarifa?: TarifaDto;
 

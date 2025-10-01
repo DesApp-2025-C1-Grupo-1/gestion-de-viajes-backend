@@ -39,6 +39,9 @@ export class ViajeDistribucion {
   @Prop({ type: Number, required: true, min: 0 })
   kilometros: number;
 
+  @Prop({ type: String, required: false })
+  observaciones?: string;
+
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
