@@ -10,13 +10,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateViajeDistribucionDto } from './dto/create-viaje-distribucion.dto';
 import { UpdateViajeDistribucionDto } from './dto/update-viaje-distribucion.dto';
 import { ViajeDistribucionDto } from './dto/viaje-distribucion.dto';
@@ -75,12 +69,6 @@ export class ViajeDistribucionController {
     status: 200,
     description: 'Lista de viajes de distribución obtenida exitosamente.',
     type: PaginacionDistribucionDto,
-  })
-  @ApiQuery({
-    name: 'estado',
-    required: false,
-    description: 'Filtrar por estado',
-    enum: ['iniciado', 'cargando', 'cargado', 'finalizado'],
   })
   async findAll(@Query() queryPaginacionDto: QueryPaginacionDto) {
     return this.viajeDistribucionService.findAll(queryPaginacionDto);

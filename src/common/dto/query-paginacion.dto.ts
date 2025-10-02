@@ -1,20 +1,20 @@
 import { IsOptional, Min } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 export class QueryPaginacionDto {
-  @ApiProperty({
-    example: '10',
-    description: 'Cuantos registros se deben omitir para la paginación',
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Número de página para la paginación',
   })
   @IsOptional()
   @Type(() => Number)
   @Min(1)
   page?: number;
 
-  @ApiProperty({
-    example: '6',
-    description: 'Cuantos registros se deben devolver en la paginación',
+  @ApiPropertyOptional({
+    example: 10,
+    description: 'Cantidad de registros a devolver en la paginación',
   })
   @IsOptional()
   @Type(() => Number)
