@@ -64,7 +64,6 @@ export class ViajeDistribucionService {
       deletedAt: null,
     });
     if (viajeExistente) {
-      console.log('Viaje existente:', viajeExistente);
       throw new ConflictException('Ya existe un Viaje con esos datos');
     }
 
