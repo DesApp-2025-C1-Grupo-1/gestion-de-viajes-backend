@@ -346,7 +346,8 @@ export class ViajeDistribucionService {
     const skip = (page - 1) * limit;
 
     const {
-      fecha_inicio,
+      fecha_desde,
+      fecha_hasta,
       _id,
       transportista,
       chofer,
@@ -360,10 +361,27 @@ export class ViajeDistribucionService {
       deletedAt: null,
     };
 
-    if (fecha_inicio) {
-      const fechaInicio = new Date(fecha_inicio);
-      fechaInicio.setHours(0, 0, 0, 0);
-      query.fecha_inicio = { $gte: fechaInicio };
+    if (fecha_desde || fecha_hasta) {
+      const rangoFecha: Record<string, Date> = {};
+      const offset = 3 * 60; // Argentina UTC-3 en minutos
+
+      if (fecha_desde) {
+        const desde = new Date(fecha_desde);
+        desde.setHours(0, 0, 0, 0);
+        // Ajusta la diferencia horaria
+        desde.setMinutes(desde.getMinutes() - offset);
+        rangoFecha.$gte = desde;
+      }
+
+      if (fecha_hasta) {
+        const hasta = new Date(fecha_hasta);
+        hasta.setHours(23, 59, 59, 999);
+        // Ajusta la diferencia horaria
+        hasta.setMinutes(hasta.getMinutes() - offset);
+        rangoFecha.$lte = hasta;
+      }
+
+      query.fecha_inicio = rangoFecha;
     }
 
     // Búsqueda parcial en _id (cualquier substring del hex)
