@@ -11,6 +11,7 @@ import { EmpresaModule } from 'src/empresa/empresa.module';
 import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
 import { DepositoModule } from 'src/deposito/deposito.module';
 import { RemitosModule } from 'src/remitos/remitos.module';
+import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RemitosModule } from 'src/remitos/remitos.module';
     forwardRef(() => EmpresaModule),
     forwardRef(() => VehiculoModule),
     forwardRef(() => DepositoModule),
+    forwardRef(() => TipoVehiculoModule),
     RemitosModule,
   ],
   controllers: [ViajeDistribucionController],
