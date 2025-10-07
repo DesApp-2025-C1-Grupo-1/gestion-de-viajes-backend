@@ -170,7 +170,7 @@ export class ViajeDistribucionService {
 
   async findOne(id: string): Promise<ViajeDistribucion> {
     const viajeDistribucion = await this.viajeDistribucionModel
-      .findOne({ id, deletedAt: null })
+      .findOne({ _id: id, deletedAt: null })
       .populate('origen')
       .populate('chofer')
       .populate('transportista')
@@ -201,16 +201,30 @@ export class ViajeDistribucionService {
     updateViajeDistribucionDto: UpdateViajeDistribucionDto,
   ): Promise<ViajeDistribucion> {
     try {
-      // Si el update incluye cambio de estado, derivamos a updateEstado
-      if (updateViajeDistribucionDto.estado) {
+      // Si el update incluye cambio de estado O remitos, derivamos a updateEstado
+      if (
+        updateViajeDistribucionDto.estado ||
+        updateViajeDistribucionDto.remito_ids
+      ) {
+        const viajeActual = await this.viajeDistribucionModel
+          .findById(id)
+          .exec();
+
+        if (!viajeActual) {
+          throw new NotFoundException(
+            `Viaje de distribución con ID ${id} no encontrado`,
+          );
+        }
+
         return await this.updateEstado(
           id,
-          updateViajeDistribucionDto.estado,
+          updateViajeDistribucionDto.estado || viajeActual.estado,
           updateViajeDistribucionDto.kilometros,
+          updateViajeDistribucionDto.remito_ids,
         );
       }
 
-      // Construyo el objeto de campos permitidos, convirtiendo a ObjectId
+      // Resto del código para updates que no incluyen estado ni remitos...
       const camposPermitidos: Partial<UpdateViajeDistribucionDto> = {};
 
       if (updateViajeDistribucionDto.chofer) {
@@ -230,7 +244,7 @@ export class ViajeDistribucionService {
 
       const updatedViajeDistribucion = await this.viajeDistribucionModel
         .findOneAndUpdate(
-          { id, deletedAt: null },
+          { _id: id, deletedAt: null },
           { $set: camposPermitidos },
           { new: true },
         )
@@ -249,16 +263,13 @@ export class ViajeDistribucionService {
       return updatedViajeDistribucion;
     } catch (err: unknown) {
       if (err instanceof NotFoundException) {
-        // Re-lanzamos tal cual
         throw err;
       }
 
       if (err instanceof Error) {
-        // Cualquier otro error controlado
         throw new BadRequestException(err.message);
       }
 
-      // Error no esperado (ej: un número, objeto raro, etc.)
       throw new BadRequestException('Error inesperado al actualizar el viaje');
     }
   }
@@ -266,7 +277,7 @@ export class ViajeDistribucionService {
   async remove(id: string): Promise<void> {
     const result = await this.viajeDistribucionModel
       .findOneAndUpdate(
-        { id, deletedAt: null },
+        { _id: id, deletedAt: null },
         { deletedAt: new Date() },
         { new: true },
       )
@@ -283,6 +294,7 @@ export class ViajeDistribucionService {
     id: string,
     nuevoEstado: string,
     kilometros?: number,
+    nuevosRemitos: number[] = [],
   ): Promise<ViajeDistribucion> {
     const estadosValidos = [
       'iniciado',
@@ -297,7 +309,7 @@ export class ViajeDistribucionService {
     }
 
     const viaje = await this.viajeDistribucionModel
-      .findOne({ id, deletedAt: null })
+      .findOne({ _id: id, deletedAt: null })
       .populate('origen')
       .populate('chofer')
       .populate('transportista')
@@ -310,15 +322,31 @@ export class ViajeDistribucionService {
       );
     }
 
-    if (nuevoEstado === 'inicio de carga') {
+    // ACTUALIZACIÓN: Si hay nuevos remitos, actualizar el array del viaje
+    if (nuevosRemitos.length > 0) {
+      const todosRemitos = [
+        ...new Set([...viaje.remito_ids, ...nuevosRemitos]),
+      ];
+      viaje.remito_ids = todosRemitos;
+    }
+
+    const todosRemitos = viaje.remito_ids;
+
+    if (nuevoEstado === 'iniciado') {
       await this.actualizarEstadosRemitos(
-        viaje.remito_ids,
+        todosRemitos,
+        this.mapEstadoRemito('iniciado'),
+      );
+      viaje.estado = nuevoEstado;
+    } else if (nuevoEstado === 'inicio de carga') {
+      await this.actualizarEstadosRemitos(
+        todosRemitos,
         this.mapEstadoRemito('inicio de carga'),
       );
       viaje.estado = nuevoEstado;
     } else if (nuevoEstado === 'fin de carga') {
       await this.actualizarEstadosRemitos(
-        viaje.remito_ids,
+        todosRemitos,
         this.mapEstadoRemito('fin de carga'),
       );
       viaje.estado = nuevoEstado;
@@ -331,7 +359,7 @@ export class ViajeDistribucionService {
 
       // Validar que todos los remitos estén en "No entregado" o "Entregado"
       const remitos = await Promise.all(
-        viaje.remito_ids.map((rid) => this.remitosService.getRemitoById(rid)),
+        todosRemitos.map((rid) => this.remitosService.getRemitoById(rid)),
       );
 
       const estadosPermitidos = new Set(['No entregado', 'Entregado']);
