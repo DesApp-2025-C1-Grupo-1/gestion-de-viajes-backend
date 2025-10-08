@@ -322,15 +322,19 @@ export class ViajeDistribucionService {
       );
     }
 
-    // ACTUALIZACIÓN: Si hay nuevos remitos, actualizar el array del viaje
-    if (nuevosRemitos.length > 0) {
-      const todosRemitos = [
-        ...new Set([...viaje.remito_ids, ...nuevosRemitos]),
-      ];
-      viaje.remito_ids = todosRemitos;
+    //convierte remitos eliminados en estado 2 "En preparación"
+    for (const rmtViejo of viaje.remito_ids) {
+      const remitosEliminados: number[] = [];
+
+      if (!nuevosRemitos.includes(rmtViejo)) {
+        remitosEliminados.push(rmtViejo);
+      }
+
+      await this.actualizarEstadosRemitos(remitosEliminados, 2);
     }
 
-    const todosRemitos = viaje.remito_ids;
+    viaje.remito_ids = nuevosRemitos;
+    const todosRemitos = nuevosRemitos;
 
     if (nuevoEstado === 'iniciado') {
       await this.actualizarEstadosRemitos(
