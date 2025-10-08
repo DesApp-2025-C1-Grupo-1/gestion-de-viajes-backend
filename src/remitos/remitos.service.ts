@@ -105,4 +105,27 @@ export class RemitosService {
       );
     }
   }
+
+  async getRemitosByIds(ids: number[]): Promise<RemitoDto[]> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post(`${this.baseUrl}/remitos/by-id`, { ids }),
+      );
+
+      return response.data as RemitoDto[];
+    } catch (err) {
+      const error = err as AxiosError;
+
+      if (error.response) {
+        throw new HttpException(
+          error.response.data as string | Record<string, any>,
+          error.response.status,
+        );
+      }
+      throw new HttpException(
+        'Error comunicándose con backend de remitos',
+        500,
+      );
+    }
+  }
 }
