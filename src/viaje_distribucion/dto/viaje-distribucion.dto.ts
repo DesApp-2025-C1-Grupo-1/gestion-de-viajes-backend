@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import { ChoferDto } from 'src/chofer/dto/chofer.dto';
 import { DepositoDto } from 'src/deposito/dto/deposito.dto';
 import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
+import { TarifaDto } from 'src/tarifas/dto/tarifa.dto';
 import { VehiculoDto } from 'src/vehiculo/dto/vehiculo.dto';
 
 class RemitoInfoDto {
@@ -10,41 +11,12 @@ class RemitoInfoDto {
   id: string;
 }
 
-class TarifaDto {
-  id: number;
-  nombre: string;
-  valorBase: number;
-  esVigente: boolean;
-  transportistaNombre: string;
-  tipoVehiculoNombre: string;
-  zonaNombre: string;
-  tipoCargaNombre: string;
-  transportistaId: number;
-  tipoVehiculoId: number;
-  zonaId: number;
-  tipoCargaId: number;
-  total: number;
-  adicionales: {
-    id: number;
-    adicional: {
-      id: number;
-      nombre: string;
-      costoDefault: number;
-      descripcion: string;
-      activo: boolean;
-      esGlobal: boolean;
-    };
-    costoEspecifico: number;
-    activo: boolean;
-  }[];
-}
-
 export class ViajeDistribucionDto {
   @ApiProperty({
-    example: '665f0ec9fe1846d5a9f3baf2',
-    description: 'ID del viaje',
+    example: 'VD-ABCDE',
+    description: 'ID legible del viaje de distribución',
   })
-  _id: string;
+  id: string;
 
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
   fecha_inicio: Date;
@@ -84,6 +56,9 @@ export class ViajeDistribucionDto {
 
   @ApiProperty({ example: 1, required: false })
   tarifa_id?: number;
+
+  @ApiProperty({ type: String, required: false })
+  observaciones?: string;
 
   @ApiProperty({ type: TarifaDto, required: false })
   tarifa?: TarifaDto;

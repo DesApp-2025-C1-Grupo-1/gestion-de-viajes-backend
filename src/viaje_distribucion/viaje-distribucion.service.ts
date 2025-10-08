@@ -200,25 +200,78 @@ export class ViajeDistribucionService {
     id: string,
     updateViajeDistribucionDto: UpdateViajeDistribucionDto,
   ): Promise<ViajeDistribucion> {
-    const updatedViajeDistribucion = await this.viajeDistribucionModel
-      .findOneAndUpdate(
-        { _id: id, deletedAt: null },
-        updateViajeDistribucionDto,
-        { new: true },
-      )
-      .populate('origen')
-      .populate('chofer')
-      .populate('transportista')
-      .populate('vehiculo')
-      .exec();
+    try {
+      // Si el update incluye cambio de estado O remitos, derivamos a updateEstado
+      if (
+        updateViajeDistribucionDto.estado ||
+        updateViajeDistribucionDto.remito_ids
+      ) {
+        const viajeActual = await this.viajeDistribucionModel
+          .findById(id)
+          .exec();
 
-    if (!updatedViajeDistribucion) {
-      throw new NotFoundException(
-        `Viaje de distribución con ID ${id} no encontrado`,
-      );
+        if (!viajeActual) {
+          throw new NotFoundException(
+            `Viaje de distribución con ID ${id} no encontrado`,
+          );
+        }
+
+        return await this.updateEstado(
+          id,
+          updateViajeDistribucionDto.estado || viajeActual.estado,
+          updateViajeDistribucionDto.kilometros,
+          updateViajeDistribucionDto.remito_ids,
+        );
+      }
+
+      // Resto del código para updates que no incluyen estado ni remitos...
+      const camposPermitidos: Partial<UpdateViajeDistribucionDto> = {};
+
+      if (updateViajeDistribucionDto.chofer) {
+        camposPermitidos.chofer = String(updateViajeDistribucionDto.chofer);
+      }
+      if (updateViajeDistribucionDto.vehiculo) {
+        camposPermitidos.vehiculo = String(updateViajeDistribucionDto.vehiculo);
+      }
+      if (updateViajeDistribucionDto.transportista) {
+        camposPermitidos.transportista = String(
+          updateViajeDistribucionDto.transportista,
+        );
+      }
+      if (updateViajeDistribucionDto.origen) {
+        camposPermitidos.origen = String(updateViajeDistribucionDto.origen);
+      }
+
+      const updatedViajeDistribucion = await this.viajeDistribucionModel
+        .findOneAndUpdate(
+          { _id: id, deletedAt: null },
+          { $set: camposPermitidos },
+          { new: true },
+        )
+        .populate('origen')
+        .populate('chofer')
+        .populate('transportista')
+        .populate('vehiculo')
+        .exec();
+
+      if (!updatedViajeDistribucion) {
+        throw new NotFoundException(
+          `Viaje de distribución con ID ${id} no encontrado`,
+        );
+      }
+
+      return updatedViajeDistribucion;
+    } catch (err: unknown) {
+      if (err instanceof NotFoundException) {
+        throw err;
+      }
+
+      if (err instanceof Error) {
+        throw new BadRequestException(err.message);
+      }
+
+      throw new BadRequestException('Error inesperado al actualizar el viaje');
     }
-
-    return updatedViajeDistribucion;
   }
 
   async remove(id: string): Promise<void> {
@@ -241,6 +294,7 @@ export class ViajeDistribucionService {
     id: string,
     nuevoEstado: string,
     kilometros?: number,
+    nuevosRemitos: number[] = [],
   ): Promise<ViajeDistribucion> {
     const estadosValidos = [
       'iniciado',
@@ -250,9 +304,7 @@ export class ViajeDistribucionService {
     ];
     if (!estadosValidos.includes(nuevoEstado)) {
       throw new BadRequestException(
-        `Estado inválido: ${nuevoEstado}. Permitidos: ${estadosValidos.join(
-          ', ',
-        )}`,
+        `Estado inválido: ${nuevoEstado}. Permitidos: ${estadosValidos.join(', ')}`,
       );
     }
 
@@ -270,41 +322,65 @@ export class ViajeDistribucionService {
       );
     }
 
-    if (nuevoEstado === 'cargando') {
+    //convierte remitos eliminados en estado 2 "En preparación"
+    for (const rmtViejo of viaje.remito_ids) {
+      const remitosEliminados: number[] = [];
+
+      if (!nuevosRemitos.includes(rmtViejo)) {
+        remitosEliminados.push(rmtViejo);
+      }
+
+      await this.actualizarEstadosRemitos(remitosEliminados, 2);
+    }
+
+    viaje.remito_ids = nuevosRemitos;
+    const todosRemitos = nuevosRemitos;
+
+    if (nuevoEstado === 'iniciado') {
       await this.actualizarEstadosRemitos(
-        viaje.remito_ids,
-        this.mapEstadoRemito('cargando'),
+        todosRemitos,
+        this.mapEstadoRemito('iniciado'),
       );
-    } else if (nuevoEstado === 'cargado') {
+      viaje.estado = nuevoEstado;
+    } else if (nuevoEstado === 'inicio de carga') {
       await this.actualizarEstadosRemitos(
-        viaje.remito_ids,
-        this.mapEstadoRemito('cargado'),
+        todosRemitos,
+        this.mapEstadoRemito('inicio de carga'),
       );
-    } else if (nuevoEstado === 'finalizado') {
+      viaje.estado = nuevoEstado;
+    } else if (nuevoEstado === 'fin de carga') {
+      await this.actualizarEstadosRemitos(
+        todosRemitos,
+        this.mapEstadoRemito('fin de carga'),
+      );
+      viaje.estado = nuevoEstado;
+    } else if (nuevoEstado === 'fin de viaje') {
       if (!kilometros || kilometros < 0) {
         throw new BadRequestException(
           'Debe proporcionar un valor válido de kilómetros al finalizar el viaje',
         );
       }
 
-      // Validar que todos los remitos estén en "No entregado" o "Entregado" antes de finalizar viaje
+      // Validar que todos los remitos estén en "No entregado" o "Entregado"
       const remitos = await Promise.all(
-        viaje.remito_ids.map((rid) => this.remitosService.getRemitoById(rid)),
+        todosRemitos.map((rid) => this.remitosService.getRemitoById(rid)),
       );
 
       const estadosPermitidos = new Set(['No entregado', 'Entregado']);
       const invalidos = remitos.filter(
         (r) => !r.estado?.nombre || !estadosPermitidos.has(r.estado.nombre),
       );
+
       if (invalidos.length > 0) {
         throw new BadRequestException(
           'No se puede finalizar el viaje: hay remitos que no están en estados "No entregado" o "Entregado"',
         );
+      } else {
+        viaje.kilometros = Math.max(0, kilometros - (viaje.kilometros ?? 0));
+        viaje.estado = nuevoEstado;
       }
-      viaje.kilometros = Math.max(0, kilometros - (viaje.kilometros ?? 0));
     }
 
-    viaje.estado = nuevoEstado;
     await viaje.save();
     return viaje;
   }
@@ -346,7 +422,8 @@ export class ViajeDistribucionService {
     const skip = (page - 1) * limit;
 
     const {
-      fecha_inicio,
+      fecha_desde,
+      fecha_hasta,
       _id,
       transportista,
       chofer,
@@ -360,10 +437,27 @@ export class ViajeDistribucionService {
       deletedAt: null,
     };
 
-    if (fecha_inicio) {
-      const fechaInicio = new Date(fecha_inicio);
-      fechaInicio.setHours(0, 0, 0, 0);
-      query.fecha_inicio = { $gte: fechaInicio };
+    if (fecha_desde || fecha_hasta) {
+      const rangoFecha: Record<string, Date> = {};
+      const offset = 3 * 60; // Argentina UTC-3 en minutos
+
+      if (fecha_desde) {
+        const desde = new Date(fecha_desde);
+        desde.setHours(0, 0, 0, 0);
+        // Ajusta la diferencia horaria
+        desde.setMinutes(desde.getMinutes() - offset);
+        rangoFecha.$gte = desde;
+      }
+
+      if (fecha_hasta) {
+        const hasta = new Date(fecha_hasta);
+        hasta.setHours(23, 59, 59, 999);
+        // Ajusta la diferencia horaria
+        hasta.setMinutes(hasta.getMinutes() - offset);
+        rangoFecha.$lte = hasta;
+      }
+
+      query.fecha_inicio = rangoFecha;
     }
 
     // Búsqueda parcial en _id (cualquier substring del hex)

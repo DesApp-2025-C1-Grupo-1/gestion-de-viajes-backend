@@ -7,6 +7,8 @@ import {
   Body,
   UploadedFile,
   UseInterceptors,
+  Post,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
@@ -154,5 +156,21 @@ export class RemitosController {
     @Body('razonNoEntrega') razon: string,
   ): Promise<RemitoDto> {
     return this.remitosService.marcarNoEntregado(id, razon);
+  }
+
+  @Post('by-id')
+  @ApiOperation({ summary: 'Obtener remitos por lista de IDs' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de remitos obtenida correctamente',
+    type: [RemitoDto],
+  })
+  @ApiResponse({ status: 400, description: 'Body inválido' })
+  async getRemitosByIds(@Body('ids') ids: number[]): Promise<RemitoDto[]> {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new BadRequestException('Debe enviar un array de IDs válido');
+    }
+
+    return this.remitosService.getRemitosByIds(ids);
   }
 }

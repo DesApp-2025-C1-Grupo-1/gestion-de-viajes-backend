@@ -5,6 +5,9 @@ export type ViajeDistribucionDocument = ViajeDistribucion & Document;
 
 @Schema({ collection: 'viaje_distribucion', versionKey: false })
 export class ViajeDistribucion {
+  @Prop({ type: String, unique: true, index: true })
+  id: string;
+
   @Prop({ type: Date, required: true })
   fecha_inicio: Date;
 
@@ -39,6 +42,9 @@ export class ViajeDistribucion {
   @Prop({ type: Number, required: true, min: 0 })
   kilometros: number;
 
+  @Prop({ type: String, required: false })
+  observaciones?: string;
+
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
@@ -48,3 +54,15 @@ export class ViajeDistribucion {
 
 export const ViajeDistribucionSchema =
   SchemaFactory.createForClass(ViajeDistribucion);
+
+// Genera un código legible automáticamente al crear el documento
+ViajeDistribucionSchema.pre('save', function (next) {
+  // Solo generar si no existe todavía
+  if (!this.id) {
+    const sufijo = this._id
+      ? this._id.toString().slice(-5).toUpperCase()
+      : Math.random().toString(36).slice(-5).toUpperCase();
+    this.id = `V-${sufijo}`;
+  }
+  next();
+});

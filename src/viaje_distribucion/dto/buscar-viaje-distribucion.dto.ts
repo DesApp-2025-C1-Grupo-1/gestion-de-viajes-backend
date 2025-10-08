@@ -4,13 +4,24 @@ import { IsDateString, IsIn, IsOptional, IsString } from 'class-validator';
 
 export class BuscarViajeDistribucionDto {
   @ApiProperty({
-    description: 'Fecha de inicio del viaje en formato ISO 8601',
+    description:
+      'Fecha de desde la cual se empieza a filtrar el viaje en formato ISO 8601',
     example: '2025-06-01T08:00:00Z',
     required: false,
   })
   @IsOptional()
   @IsDateString()
-  fecha_inicio?: Date;
+  fecha_desde?: Date;
+
+  @ApiProperty({
+    description:
+      'Fecha hasta la cual se empieza a filtrar el viaje en formato ISO 8601',
+    example: '2025-07-02T08:00:00Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  fecha_hasta?: Date;
 
   @ApiProperty({
     description: 'ID del viaje | ID parcial del viaje',
