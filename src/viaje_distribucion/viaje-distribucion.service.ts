@@ -170,7 +170,7 @@ export class ViajeDistribucionService {
 
   async findOne(id: string): Promise<ViajeDistribucion> {
     const viajeDistribucion = await this.viajeDistribucionModel
-      .findOne({ id: id, deletedAt: null })
+      .findOne({ _id: id, deletedAt: null })
       .populate('origen')
       .populate('chofer')
       .populate('transportista')
@@ -244,7 +244,7 @@ export class ViajeDistribucionService {
 
       const updatedViajeDistribucion = await this.viajeDistribucionModel
         .findOneAndUpdate(
-          { id: id, deletedAt: null },
+          { _id: id, deletedAt: null },
           { $set: camposPermitidos },
           { new: true },
         )
@@ -277,7 +277,7 @@ export class ViajeDistribucionService {
   async remove(id: string): Promise<void> {
     const result = await this.viajeDistribucionModel
       .findOneAndUpdate(
-        { id: id, deletedAt: null },
+        { _id: id, deletedAt: null },
         { deletedAt: new Date() },
         { new: true },
       )
@@ -309,7 +309,7 @@ export class ViajeDistribucionService {
     }
 
     const viaje = await this.viajeDistribucionModel
-      .findOne({ id: id, deletedAt: null })
+      .findOne({ _id: id, deletedAt: null })
       .populate('origen')
       .populate('chofer')
       .populate('transportista')

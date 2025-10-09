@@ -13,10 +13,16 @@ class RemitoInfoDto {
 
 export class ViajeDistribucionDto {
   @ApiProperty({
-    example: 'VD-ABCDE',
-    description: 'ID legible del viaje de distribución',
+    example: '652a1f5c8d1b2a3e4f567890',
+    description: 'ID de Mongo del viaje',
   })
-  id: string;
+  _id: string;
+
+  @ApiProperty({
+    example: 'V-ABCDE',
+    description: 'Código legible del viaje de distribución',
+  })
+  numeroDeViaje: string;
 
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
   fecha_inicio: Date;
