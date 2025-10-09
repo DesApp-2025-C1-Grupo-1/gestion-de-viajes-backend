@@ -22,7 +22,7 @@ export class ViajeDistribucionDto {
     example: 'V-ABCDE',
     description: 'Código legible del viaje de distribución',
   })
-  numeroDeViaje: string;
+  nro_viaje: string;
 
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
   fecha_inicio: Date;
