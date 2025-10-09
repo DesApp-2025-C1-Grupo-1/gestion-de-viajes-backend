@@ -11,7 +11,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { RemitosService } from './remitos.service';
 import { RemitoDto, RemitoResponseDto } from './dto/remito.dto';
 
@@ -166,6 +166,14 @@ export class RemitosController {
     type: [RemitoDto],
   })
   @ApiResponse({ status: 400, description: 'Body inválido' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        ids: { type: 'array', items: { type: 'number' } },
+      },
+    },
+  })
   async getRemitosByIds(@Body('ids') ids: number[]): Promise<RemitoDto[]> {
     if (!Array.isArray(ids) || ids.length === 0) {
       throw new BadRequestException('Debe enviar un array de IDs válido');
