@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ViajeDto } from './viaje.dto';
 import { ViajeDistribucionDto } from 'src/viaje_distribucion/dto/viaje-distribucion.dto';
 
 export class EmpresaViajesDto {
