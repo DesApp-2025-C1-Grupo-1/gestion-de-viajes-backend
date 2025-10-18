@@ -27,10 +27,14 @@ import {
   TipoVehiculoDocument,
 } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
 import { DashboardResponseDto } from './dto/dashboard.dto';
-import { ViajeDto } from './dto/viaje.dto';
 import { startOfDay } from 'date-fns';
 import { plainToInstance } from 'class-transformer';
 import { validateLicenseCompatibility } from 'src/common/function/licencias';
+import { ViajeDistribucionDto } from 'src/viaje_distribucion/dto/viaje-distribucion.dto';
+import {
+  ViajeDistribucion,
+  ViajeDistribucionDocument,
+} from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
 
 const { ObjectId } = Types;
 
@@ -44,6 +48,8 @@ export class ViajeService {
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
     @InjectModel(TipoVehiculo.name)
     private tipoVehiculoModel: Model<TipoVehiculoDocument>,
+    @InjectModel(ViajeDistribucion.name)
+    private viajeDistribucionModel: Model<ViajeDistribucionDocument>,
   ) {}
 
   async create(createViajeDto: CreateViajeDto): Promise<Viaje> {
@@ -489,89 +495,95 @@ export class ViajeService {
   }
 
   async getDashboard(): Promise<DashboardResponseDto> {
-    const hoy = startOfDay(new Date());
-    const sieteDiasAtras = new Date();
-    sieteDiasAtras.setDate(sieteDiasAtras.getDate() - 7);
+    try {
+      const hoy = startOfDay(new Date());
+      const sieteDiasAtras = new Date();
+      sieteDiasAtras.setDate(sieteDiasAtras.getDate() - 7);
 
-    // Generar ObjectId mínimo para los últimos 7 días
-    const objectIdMinimo = new ObjectId(Math.floor(Date.now() / 1000 - 604800));
+      const objectIdMinimo = new ObjectId(
+        Math.floor(Date.now() / 1000 - 604800),
+      );
 
-    const [
-      viajes,
-      totalVehiculos,
-      totalChoferes,
-      totalEmpresas,
-      topEmpresas,
-      vehiculosRecientes,
-      choferesRecientes,
-      empresasRecientes,
-    ] = await Promise.all([
-      // Próximos viajes
-      this.viajeModel
-        .find({
-          fecha_inicio: { $gte: hoy },
-          deletedAt: null,
-        })
-        .sort({ fecha_inicio: 1 })
-        .limit(3)
-        .populate('deposito_origen')
-        .populate('deposito_destino')
-        .populate('empresa')
-        .populate('chofer')
-        .populate('vehiculo')
-        .lean()
-        .exec(),
+      const [
+        viajes,
+        totalVehiculos,
+        totalChoferes,
+        totalEmpresas,
+        topEmpresas,
+        vehiculosRecientes,
+        choferesRecientes,
+        empresasRecientes,
+      ] = await Promise.all([
+        this.viajeDistribucionModel
+          .find({
+            fecha_inicio: { $gte: hoy },
+            deletedAt: null,
+          })
+          .sort({ fecha_inicio: 1 })
+          .limit(3)
+          .populate('origen')
+          .populate('chofer')
+          .populate('transportista')
+          .populate('vehiculo')
+          .lean()
+          .exec(),
 
-      // Totales
-      this.vehiculoModel.countDocuments({ deletedAt: null }),
-      this.choferModel.countDocuments({ deletedAt: null }),
-      this.empresaModel.countDocuments({ deletedAt: null }),
+        this.vehiculoModel.countDocuments({ deletedAt: null }),
+        this.choferModel.countDocuments({ deletedAt: null }),
+        this.empresaModel.countDocuments({ deletedAt: null }),
 
-      // Top 3 empresas con más viajes
-      this.viajeModel
-        .aggregate([
-          { $match: { deletedAt: null } },
-          { $group: { _id: '$empresa', count: { $sum: 1 } } },
-          { $sort: { count: -1 } },
-          { $limit: 3 },
-          {
-            $lookup: {
-              from: 'empresa',
-              localField: '_id',
-              foreignField: '_id',
-              as: 'empresaData',
+        this.viajeDistribucionModel
+          .aggregate([
+            { $match: { deletedAt: null } },
+            { $group: { _id: '$transportista', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 3 },
+            {
+              $lookup: {
+                from: 'empresa',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'empresaData',
+              },
             },
-          },
-          { $unwind: '$empresaData' },
-          {
-            $project: {
-              empresaId: '$_id',
-              nombre: '$empresaData.nombre_comercial',
-              cantidadViajes: '$count',
-              _id: 0,
+            { $unwind: '$empresaData' },
+            {
+              $project: {
+                empresaId: '$_id',
+                nombre: '$empresaData.nombre_comercial',
+                cantidadViajes: '$count',
+                _id: 0,
+              },
             },
-          },
-        ])
-        .exec(),
+          ])
+          .exec(),
 
-      // Registros recientes (últimos 7 días)
-      this.vehiculoModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
-      this.choferModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
-      this.empresaModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
-    ]);
+        this.vehiculoModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
+        this.choferModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
+        this.empresaModel.countDocuments({ _id: { $gte: objectIdMinimo } }),
+      ]);
 
-    return {
-      proximosViajes: plainToInstance(ViajeDto, viajes),
-      totalVehiculos,
-      totalChoferes,
-      totalEmpresas,
-      topEmpresas: topEmpresas || [],
-      estadisticasRecientes: {
-        vehiculos: vehiculosRecientes,
-        choferes: choferesRecientes,
-        empresas: empresasRecientes,
-        desde: sieteDiasAtras,
-      },
-    };
+      return {
+        proximosViajes: plainToInstance(ViajeDistribucionDto, viajes),
+        totalVehiculos,
+        totalChoferes,
+        totalEmpresas,
+        topEmpresas: topEmpresas || [],
+        estadisticasRecientes: {
+          vehiculos: vehiculosRecientes,
+          choferes: choferesRecientes,
+          empresas: empresasRecientes,
+          desde: sieteDiasAtras,
+        },
+      };
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        throw new BadRequestException(
+          `Error al obtener dashboard: ${err.message}`,
+        );
+      } else {
+        throw new BadRequestException('Error desconocido al obtener dashboard');
+      }
+    }
   }
 }

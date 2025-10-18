@@ -7,6 +7,7 @@ import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
 import { EmpresaModule } from 'src/empresa/empresa.module';
 import { ViajeModule } from 'src/viaje/viaje.module';
 import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
+import { ViajeDistribucionModule } from 'src/viaje_distribucion/viaje-distribucion.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
     forwardRef(() => VehiculoModule),
     forwardRef(() => EmpresaModule),
     forwardRef(() => ViajeModule),
+    forwardRef(() => ViajeDistribucionModule),
     forwardRef(() => TipoVehiculoModule),
   ],
   controllers: [ChoferController],

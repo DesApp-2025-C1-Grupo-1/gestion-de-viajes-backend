@@ -10,6 +10,10 @@ import {
 } from 'src/vehiculo/schemas/vehiculo.schema';
 import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
 import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
+import {
+  ViajeDistribucion,
+  ViajeDistribucionDocument,
+} from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
 
 @Injectable()
 export class EmpresaService {
@@ -18,6 +22,8 @@ export class EmpresaService {
     @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
     @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
+    @InjectModel(ViajeDistribucion.name)
+    private viajeDistribucionModel: Model<ViajeDistribucionDocument>,
   ) {}
 
   async findAll(): Promise<Empresa[]> {
@@ -79,21 +85,33 @@ export class EmpresaService {
       deletedAt: null,
     });
 
+    const empresaEnUsoPorViajeDistribucion =
+      await this.viajeDistribucionModel.exists({
+        transportista: new Types.ObjectId(id),
+        deletedAt: null,
+      });
+
     if (empresaEnUsoPorVehiculo) {
       throw new ConflictException(
-        'No se puede eliminar: hay vehículos que usan esta empresa',
+        'No se puede eliminar: hay vehículos que utilizan esta empresa',
       );
     }
 
     if (empresaEnUsoPorChofer) {
       throw new ConflictException(
-        'No se puede eliminar: hay choferes que usan esta empresa',
+        'No se puede eliminar: hay choferes que utilizan esta empresa',
       );
     }
 
     if (empresaEnUsoPorViaje) {
       throw new ConflictException(
-        'No se puede eliminar: hay viajes que usan esta empresa',
+        'No se puede eliminar: hay viajes punta a punta que utilizan esta empresa',
+      );
+    }
+
+    if (empresaEnUsoPorViajeDistribucion) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes de distribución que utilizan esta empresa',
       );
     }
 

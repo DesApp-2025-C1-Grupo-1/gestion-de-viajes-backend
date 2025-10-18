@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ViajeDto } from './viaje.dto';
+import { ViajeDistribucionDto } from 'src/viaje_distribucion/dto/viaje-distribucion.dto';
 
 export class EmpresaViajesDto {
   @ApiProperty({
@@ -40,10 +41,10 @@ export class EstadisticasRecientesDto {
 
 export class DashboardResponseDto {
   @ApiProperty({
-    type: [ViajeDto],
-    description: 'Próximos 5 viajes programados',
+    type: [ViajeDistribucionDto],
+    description: 'Próximos 5 viajes de distribución programados',
   })
-  proximosViajes: ViajeDto[];
+  proximosViajes: ViajeDistribucionDto[];
 
   @ApiProperty({
     type: Number,

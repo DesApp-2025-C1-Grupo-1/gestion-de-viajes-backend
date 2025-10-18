@@ -8,6 +8,7 @@ import { DepositoModule } from 'src/deposito/deposito.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Viaje, ViajeSchema } from './schemas/viaje.schema';
 import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
+import { ViajeDistribucionModule } from 'src/viaje_distribucion/viaje-distribucion.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TipoVehiculoModule } from 'src/tipo_vehiculo/tipo_vehiculo.module';
     forwardRef(() => ChoferModule),
     forwardRef(() => DepositoModule),
     forwardRef(() => TipoVehiculoModule),
+    forwardRef(() => ViajeDistribucionModule),
   ],
   controllers: [ViajeController],
   providers: [ViajeService],
