@@ -7,6 +7,10 @@ import { Vehiculo, VehiculoDocument } from './schemas/vehiculo.schema';
 import { Chofer, ChoferDocument } from 'src/chofer/schemas/chofer.schema';
 import { NotFoundException } from '@nestjs/common';
 import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
+import {
+  ViajeDistribucion,
+  ViajeDistribucionDocument,
+} from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
 
 @Injectable()
 export class VehiculoService {
@@ -14,6 +18,8 @@ export class VehiculoService {
     @InjectModel(Vehiculo.name) private vehiculoModel: Model<VehiculoDocument>,
     @InjectModel(Chofer.name) private choferModel: Model<ChoferDocument>,
     @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
+    @InjectModel(ViajeDistribucion.name)
+    private viajeDistribucionModel: Model<ViajeDistribucionDocument>,
   ) {}
   async create(createVehiculoDto: CreateVehiculoDto): Promise<Vehiculo> {
     const { patente } = createVehiculoDto;
@@ -77,6 +83,7 @@ export class VehiculoService {
 
     return updatedVehiculo;
   }
+
   async remove(id: string): Promise<Vehiculo> {
     const vehiculoEnUsoPorChofer = await this.choferModel.exists({
       vehiculo: new Types.ObjectId(id),
@@ -88,15 +95,27 @@ export class VehiculoService {
       deletedAt: null,
     });
 
+    const empresaEnUsoPorViajeDistribucion =
+      await this.viajeDistribucionModel.exists({
+        transportista: new Types.ObjectId(id),
+        deletedAt: null,
+      });
+
     if (vehiculoEnUsoPorChofer) {
       throw new ConflictException(
-        'No se puede eliminar: hay choferes que usan este vehículo',
+        'No se puede eliminar: hay choferes que utilizan este vehículo',
       );
     }
 
     if (vehiculoEnUsoPorViaje) {
       throw new ConflictException(
-        'No se puede eliminar: hay viajes que usan este vehículo',
+        'No se puede eliminar: hay viajes punta a punta que utilizan este vehículo',
+      );
+    }
+
+    if (empresaEnUsoPorViajeDistribucion) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes de distribución que utilizan este vehículo',
       );
     }
 

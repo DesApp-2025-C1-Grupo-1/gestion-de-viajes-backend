@@ -124,7 +124,7 @@ export class TipoVehiculoService {
 
     if (tipoVehiculoEnUsoPorVehiculo) {
       throw new ConflictException(
-        'No se puede eliminar: hay vehículos que usan este tipo de vehículo',
+        'No se puede eliminar: hay vehículos que utilizan este tipo de vehículo',
       );
     }
 

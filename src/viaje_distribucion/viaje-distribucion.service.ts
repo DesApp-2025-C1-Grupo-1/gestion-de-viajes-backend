@@ -53,12 +53,11 @@ export class ViajeDistribucionService {
       deletedAt: null,
     });
 
-    const { origen, fecha_inicio, chofer, vehiculo, transportista } =
+    const { fecha_inicio, chofer, vehiculo, transportista } =
       createdViajeDistribucion;
 
     //Validar que no exista un viaje con los mismos datos
     const viajeExistente = await this.viajeDistribucionModel.findOne({
-      origen,
       fecha_inicio,
       chofer,
       deletedAt: null,
@@ -201,22 +200,104 @@ export class ViajeDistribucionService {
     updateViajeDistribucionDto: UpdateViajeDistribucionDto,
   ): Promise<ViajeDistribucion> {
     try {
-      // Si el update incluye cambio de estado O remitos, derivamos a updateEstado
-      if (
-        updateViajeDistribucionDto.estado ||
-        updateViajeDistribucionDto.remito_ids
+      const viajeActual = await this.viajeDistribucionModel.findById(id).exec();
+
+      if (!viajeActual) {
+        throw new NotFoundException(
+          `Viaje de distribución con ID ${id} no encontrado`,
+        );
+      }
+
+      const {
+        fecha_inicio = viajeActual.fecha_inicio,
+        chofer = viajeActual.chofer,
+        vehiculo = viajeActual.vehiculo,
+        transportista = viajeActual.transportista,
+      } = updateViajeDistribucionDto;
+
+      //Validar que no exista un viaje con los mismos datos
+      const viajeExistente = await this.viajeDistribucionModel.findOne({
+        fecha_inicio,
+        chofer,
+        deletedAt: null,
+      });
+      if (viajeExistente) {
+        throw new ConflictException('Ya existe un Viaje con esos datos');
+      }
+
+      //Validar que chofer y vehiculo tengan el mismo id de empresa
+      const vehiculoEncontrado = await this.vehiculoModel
+        .findOne({
+          _id: vehiculo,
+          deletedAt: null,
+        })
+        .populate<{ tipo: TipoVehiculoDocument }>('tipo');
+      const choferEncontrado = await this.choferModel.findOne({
+        _id: chofer,
+        deletedAt: null,
+      });
+      const empresaEncontrada = await this.empresaModel.findOne({
+        _id: transportista,
+        deletedAt: null,
+      });
+
+      if (!vehiculoEncontrado) {
+        throw new NotFoundException('El vehículo no existe');
+      } else if (!choferEncontrado) {
+        throw new NotFoundException('El chofer no existe');
+      } else if (!empresaEncontrada) {
+        throw new NotFoundException('La empresa no existe');
+      }
+
+      if (vehiculoEncontrado.empresa?.toString() !== transportista.toString()) {
+        throw new ConflictException(
+          'El vehículo no pertenece a la misma empresa que el viaje',
+        );
+      } else if (
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        choferEncontrado.empresa?.toString() !== transportista.toString()
       ) {
-        const viajeActual = await this.viajeDistribucionModel
-          .findById(id)
-          .exec();
+        throw new ConflictException(
+          'El chofer no pertenece a la misma empresa que el viaje',
+        );
+      }
 
-        if (!viajeActual) {
-          throw new NotFoundException(
-            `Viaje de distribución con ID ${id} no encontrado`,
-          );
-        }
+      // validacion de licencia
+      if (!choferEncontrado.tipo_licencia) {
+        throw new BadRequestException(
+          'El chofer seleccionado no tiene un tipo de licencia definido.',
+        );
+      }
+      const tipoVehiculoDelVehiculo = vehiculoEncontrado.tipo;
+      if (
+        !tipoVehiculoDelVehiculo ||
+        !tipoVehiculoDelVehiculo.licencia_permitida
+      ) {
+        throw new NotFoundException(
+          'El tipo de vehículo asociado al vehículo no tiene licencias permitidas definidas.',
+        );
+      }
 
-        return await this.updateEstado(
+      const esLicenciaCompatible = validateLicenseCompatibility(
+        tipoVehiculoDelVehiculo.licencia_permitida,
+        choferEncontrado.tipo_licencia,
+      );
+
+      if (!esLicenciaCompatible) {
+        throw new BadRequestException(
+          `La licencia del chofer no es compatible con la licencia requerida por el vehículo.`,
+        );
+      }
+
+      const estadoCambio =
+        updateViajeDistribucionDto.estado !== viajeActual.estado;
+
+      const remitosCambio =
+        JSON.stringify(updateViajeDistribucionDto.remito_ids) !==
+        JSON.stringify(viajeActual.remito_ids);
+
+      if (estadoCambio || remitosCambio) {
+        await this.updateEstado(
           id,
           updateViajeDistribucionDto.estado || viajeActual.estado,
           updateViajeDistribucionDto.kilometros,
@@ -240,6 +321,17 @@ export class ViajeDistribucionService {
       }
       if (updateViajeDistribucionDto.origen) {
         camposPermitidos.origen = String(updateViajeDistribucionDto.origen);
+      }
+      if (updateViajeDistribucionDto.observaciones) {
+        camposPermitidos.observaciones = String(
+          updateViajeDistribucionDto.observaciones,
+        );
+      }
+      if (updateViajeDistribucionDto.fecha_inicio) {
+        camposPermitidos.fecha_inicio = updateViajeDistribucionDto.fecha_inicio;
+      }
+      if (updateViajeDistribucionDto.kilometros) {
+        camposPermitidos.kilometros = updateViajeDistribucionDto.kilometros;
       }
 
       const updatedViajeDistribucion = await this.viajeDistribucionModel
@@ -288,6 +380,23 @@ export class ViajeDistribucionService {
         `Viaje de distribución con ID ${id} no encontrado`,
       );
     }
+
+    // Obtener todos los remitos
+    const remitos = await Promise.all(
+      result.remito_ids.map((rid) => this.remitosService.getRemitoById(rid)),
+    );
+
+    // Filtrar los que NO están entregados (estadoId !== 3)
+    const remitosNoEntregados = remitos
+      .filter((r) => r.estado?.id !== this.mapEstadoRemito('Entregado'))
+      .map((r) => r.id);
+
+    if (remitosNoEntregados.length > 0) {
+      await this.actualizarEstadosRemitos(
+        remitosNoEntregados,
+        this.mapEstadoRemito('En preparación'),
+      );
+    }
   }
 
   async updateEstado(
@@ -297,6 +406,7 @@ export class ViajeDistribucionService {
     nuevosRemitos: number[] = [],
   ): Promise<ViajeDistribucion> {
     const estadosValidos = [
+      'En preparación',
       'iniciado',
       'inicio de carga',
       'fin de carga',
@@ -388,12 +498,16 @@ export class ViajeDistribucionService {
   private mapEstadoRemito(estadoViaje: string): number {
     // 1: Autorizado, 2: En preparación, 3: En carga, 4: En camino, 5: Entregado, 6: No entregado, 7: Retenido
     switch (estadoViaje) {
+      case 'En preparación':
+        return 2;
       case 'iniciado':
         return 3;
       case 'inicio de carga':
         return 3;
       case 'fin de carga':
         return 4;
+      case 'Entregado':
+        return 5;
       default:
         return 0;
     }
