@@ -61,7 +61,7 @@ export class TarifasController {
   };
 
   // Endpoint para obtener tarifa por ID
-  @Get('tarifas/:id')
+  @Get(':id')
   @ApiOperation({ summary: 'Obtener tarifa por ID' })
   @ApiResponse({
     status: 200,
