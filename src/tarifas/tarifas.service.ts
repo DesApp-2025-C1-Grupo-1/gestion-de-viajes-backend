@@ -23,15 +23,28 @@ export class TarifasService {
 
   // Obtener tarifas filtradas por tipoVehiculo, zona y transportista
   async obtenerTarifasFiltradas(
-    tipoVehiculo: number,
+    tipoVehiculo: string,
     zona: number,
-    transportista: number,
+    transportista: string,
   ): Promise<TarifaDto[]> {
     try {
       const response = await axios.get(`${this.baseUrl}/tarifas`, {
         params: { tipoVehiculo, zona, transportista },
       });
       return response.data as TarifaDto[];
+    } catch {
+      throw new HttpException(
+        'Error al obtener tarifas desde la API externa',
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
+  }
+
+  async obtenerTarifaById(id: number): Promise<TarifaDto> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/tarifas/${id}`);
+
+      return response.data as TarifaDto;
     } catch {
       throw new HttpException(
         'Error al obtener tarifas desde la API externa',

@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { TarifasService } from './tarifas.service';
 import { ZonaDto } from './dto/zona.dto';
@@ -49,17 +49,27 @@ export class TarifasController {
   })
   async tarifasFiltradas(
     @Query('tipoVehiculo') tipoVehiculo: string,
-    @Query('zona') zona: string,
+    @Query('zona') zona: number,
     @Query('transportista') transportista: string,
   ): Promise<TarifaDto[]> {
-    const tipoVehiculoId = parseInt(tipoVehiculo, 10);
-    const zonaId = parseInt(zona, 10);
-    const transportistaId = parseInt(transportista, 10);
 
     return this.tarifasService.obtenerTarifasFiltradas(
-      tipoVehiculoId,
-      zonaId,
-      transportistaId,
+      tipoVehiculo,
+      zona,
+      transportista,
     );
+  };
+
+  // Endpoint para obtener tarifa por ID
+  @Get('tarifas/:id')
+  @ApiOperation({ summary: 'Obtener tarifa por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Tarifa obtenida correctamente',
+    type: TarifaDto,
+  })
+  @ApiResponse({ status: 404, description: 'No se encontraron tarifas' })
+  async getTarifaById(@Param('id') id: number): Promise<TarifaDto> {
+    return this.tarifasService.obtenerTarifaById(id);
   }
 }

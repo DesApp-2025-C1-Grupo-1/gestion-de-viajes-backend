@@ -56,7 +56,7 @@ export class TarifaDto {
 
   @ApiProperty({ example: 'Tarifa-001' })
   @IsString()
-  nombre: string;
+  nombreTarifa: string;
 
   @ApiProperty({ example: 2500 })
   @IsInt()

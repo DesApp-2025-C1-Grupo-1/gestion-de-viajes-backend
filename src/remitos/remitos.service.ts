@@ -112,7 +112,7 @@ export class RemitosService {
         this.http.post(`${this.baseUrl}/remitos/by-id`, { ids }),
       );
 
-      return response.data as RemitoDto[];
+      return response.data.data as RemitoDto[];
     } catch (err) {
       const error = err as AxiosError;
 
