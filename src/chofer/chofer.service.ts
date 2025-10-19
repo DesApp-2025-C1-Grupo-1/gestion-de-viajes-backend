@@ -20,6 +20,10 @@ import {
 } from 'src/tipo_vehiculo/schemas/tipo_vehiculo.schema';
 import { validateLicenseCompatibility } from '../common/function/licencias';
 import { Types } from 'mongoose';
+import {
+  ViajeDistribucion,
+  ViajeDistribucionDocument,
+} from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
 
 @Injectable()
 export class ChoferService {
@@ -29,6 +33,8 @@ export class ChoferService {
     @InjectModel(Vehiculo.name)
     private vehiculoModel: mongoose.Model<VehiculoDocument>,
     @InjectModel(Viaje.name) private viajeModel: mongoose.Model<ViajeDocument>,
+    @InjectModel(ViajeDistribucion.name)
+    private viajeDistribucionModel: mongoose.Model<ViajeDistribucionDocument>,
     @InjectModel(TipoVehiculo.name)
     private tipoVehiculoModel: mongoose.Model<TipoVehiculoDocument>,
   ) {}
@@ -184,15 +190,29 @@ export class ChoferService {
 
     return chofer;
   }
+
   async remove(id: string): Promise<Chofer> {
     const choferEnUsoPorViaje = await this.viajeModel.exists({
       chofer: new Types.ObjectId(id),
       deletedAt: null,
     });
 
+    const choferEnUsoPorViajeDistribucion =
+      await this.viajeDistribucionModel.exists({
+        chofer: new Types.ObjectId(id),
+        deletedAt: null,
+      });
+
     if (choferEnUsoPorViaje) {
+      console.log(choferEnUsoPorViaje);
       throw new ConflictException(
-        'No se puede eliminar: hay viajes que usan este chofer',
+        'No se puede eliminar: hay viajes punta a punta que utilizan este chofer',
+      );
+    }
+
+    if (choferEnUsoPorViajeDistribucion) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes de distribucion que utilizan este chofer',
       );
     }
 

@@ -6,7 +6,7 @@ export type ViajeDistribucionDocument = ViajeDistribucion & Document;
 @Schema({ collection: 'viaje_distribucion', versionKey: false })
 export class ViajeDistribucion {
   @Prop({ type: String, unique: true, index: true })
-  numeroDeViaje: string;
+  nro_viaje: string;
 
   @Prop({ type: Date, required: true })
   fecha_inicio: Date;
@@ -57,11 +57,11 @@ export const ViajeDistribucionSchema =
 
 // Genera un código legible automáticamente al crear el documento
 ViajeDistribucionSchema.pre('save', function (next) {
-  if (!this.numeroDeViaje) {
+  if (!this.nro_viaje) {
     const sufijo = this._id
       ? this._id.toString().slice(-5).toUpperCase()
       : Math.random().toString(36).slice(-5).toUpperCase();
-    this.numeroDeViaje = `V-${sufijo}`;
+    this.nro_viaje = `V-${sufijo}`;
   }
   next();
 });

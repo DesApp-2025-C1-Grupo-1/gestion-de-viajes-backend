@@ -10,6 +10,10 @@ import { Model } from 'mongoose';
 import { Deposito, DepositoDocument } from './schemas/deposito.schema';
 import { Viaje, ViajeDocument } from 'src/viaje/schemas/viaje.schema';
 import { Types } from 'mongoose';
+import {
+  ViajeDistribucion,
+  ViajeDistribucionDocument,
+} from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
 
 @Injectable()
 export class DepositoService {
@@ -17,6 +21,8 @@ export class DepositoService {
     @InjectModel(Deposito.name)
     private DepositoModel: Model<DepositoDocument>,
     @InjectModel(Viaje.name) private viajeModel: Model<ViajeDocument>,
+    @InjectModel(ViajeDistribucion.name)
+    private viajeDistribucionModel: Model<ViajeDistribucionDocument>,
   ) {}
   async create(createDepositoDto: CreateDepositoDto): Promise<Deposito> {
     const { lat, long } = createDepositoDto;
@@ -46,7 +52,7 @@ export class DepositoService {
       deletedAt: null,
     }).exec();
     if (!deposito) {
-      throw new NotFoundException(`Deposito no encontrado`);
+      throw new NotFoundException(`Depósito no encontrado`);
     }
     return deposito;
   }
@@ -107,9 +113,21 @@ export class DepositoService {
       deletedAt: null,
     });
 
+    const depositoEnUsoPorViajeDistribucion =
+      await this.viajeDistribucionModel.exists({
+        origen: new Types.ObjectId(id),
+        deletedAt: null,
+      });
+
+    if (depositoEnUsoPorViajeDistribucion) {
+      throw new ConflictException(
+        'No se puede eliminar: hay viajes de distribución que utilizan este depósito',
+      );
+    }
+
     if (depositoEnUsoPorViaje) {
       throw new ConflictException(
-        'No se puede eliminar: hay viajes que usan este deposito',
+        'No se puede eliminar: hay viajes punta a punta que utilizan este depósito',
       );
     }
 
@@ -120,7 +138,7 @@ export class DepositoService {
     ).exec();
 
     if (!deposito) {
-      throw new NotFoundException(`Deposito no encontrado`);
+      throw new NotFoundException(`Depósito no encontrado`);
     }
 
     return deposito;
