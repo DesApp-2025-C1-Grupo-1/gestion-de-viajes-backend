@@ -12,6 +12,7 @@ import { ViajeDistribucionModule } from './viaje_distribucion/viaje-distribucion
 import { PublicModule } from './public/public.module';
 import { TarifasModule } from './tarifas/tarifas.module';
 import { RemitosModule } from './remitos/remitos.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RemitosModule } from './remitos/remitos.module';
     PublicModule,
     TarifasModule,
     RemitosModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
