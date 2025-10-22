@@ -217,6 +217,7 @@ export class ViajeDistribucionService {
 
       //Validar que no exista un viaje con los mismos datos
       const viajeExistente = await this.viajeDistribucionModel.findOne({
+        _id: { $ne: id },
         fecha_inicio,
         chofer,
         deletedAt: null,

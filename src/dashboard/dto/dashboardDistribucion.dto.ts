@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { RemitoDto } from 'src/remitos/dto/remito.dto';
 import { ComparativaCostoDto } from 'src/tarifas/dto/comparativaCosto.dto';
 import { ViajeDistribucionDto } from 'src/viaje_distribucion/dto/viaje-distribucion.dto';
 
@@ -36,10 +37,10 @@ export class DashboardDistribucionResponseDto {
   viajesEnCamino: number;
 
   @ApiProperty({
-    type: [ViajeDistribucionDto],
+    type: Number,
     description: 'Viajes recientes realizados en la última semana',
   })
-  viajesRecientes: ViajeDistribucionDto[];
+  viajesRecientes: number;
 
   @ApiProperty({
     type: [EmpresaViajesDistribucionDto],
@@ -64,4 +65,16 @@ export class DashboardDistribucionResponseDto {
     description: 'Cantidad total de tarifas',
   })
   cantidadTarifas: number;
+
+  @ApiProperty({
+    type: [RemitoDto],
+    description: 'Lista de remitos próximos a preparar',
+  })
+  remitosProximos: RemitoDto[];
+
+  @ApiProperty({
+    type: Number,
+    description: 'Cantidad de remitos recientes realizados en la última semana',
+  })
+  cantidadRemitosRecientes: number;
 }

@@ -5,7 +5,7 @@ import {
   ViajeDistribucionDocument,
 } from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
 import { Model } from 'mongoose';
-import { startOfDay, subDays } from 'date-fns';
+import { isWithinInterval, startOfDay, subDays } from 'date-fns';
 import {
   DashboardDistribucionResponseDto,
   EmpresaViajesDistribucionDto,
@@ -42,7 +42,7 @@ export class DashboardService {
         this.viajeDistribucionModel
           .find({ fecha_inicio: { $gte: hoy }, deletedAt: null })
           .sort({ fecha_inicio: 1 })
-          .limit(5)
+          .limit(3)
           .populate(['vehiculo', 'chofer', 'transportista'])
           .lean(),
 
@@ -56,7 +56,7 @@ export class DashboardService {
         this.viajeDistribucionModel
           .find({ createdAt: { $gte: sieteDiasAtras }, deletedAt: null })
           .populate(['vehiculo', 'chofer', 'transportista'])
-          .lean(),
+          .lean().countDocuments(),
 
         // Top empresas
         this.viajeDistribucionModel.aggregate([
@@ -117,14 +117,29 @@ export class DashboardService {
         ? remitosResponse.data.length
         : 0;
 
+      const remitosProximos = remitosResponse.data.filter((remito) => {
+        return remito.estado?.nombre === 'En preparación';
+      }).slice(0, 3);
+
+      const cantidadRemitosRecientes = remitosResponse.data.filter((remito) => {
+        const createdAt = remito.createdAt
+          ? new Date(remito.createdAt) : null;
+        return createdAt && isWithinInterval(createdAt, {
+          start: sieteDiasAtras,
+          end: hoy,
+        });
+      }).length;
+
       return {
         proximosViajes: plainToInstance(ViajeDistribucionDto, proximosViajes),
         viajesEnCamino,
-        viajesRecientes: plainToInstance(ViajeDistribucionDto, viajesRecientes),
+        viajesRecientes: viajesRecientes,
         topEmpresas: plainToInstance(EmpresaViajesDistribucionDto, topEmpresas),
         comparativaCostos,
         remitos: remitosCount,
         cantidadTarifas: cantidadTarifas.total,
+        remitosProximos: remitosProximos,
+        cantidadRemitosRecientes: cantidadRemitosRecientes,
       };
     } catch (err) {
       if (err instanceof Error) {
