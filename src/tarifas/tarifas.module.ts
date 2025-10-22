@@ -5,5 +5,6 @@ import { TarifasController } from './tarifas.controller';
 @Module({
   controllers: [TarifasController],
   providers: [TarifasService],
+  exports: [TarifasService],
 })
 export class TarifasModule {}

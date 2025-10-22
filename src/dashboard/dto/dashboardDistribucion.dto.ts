@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ComparativaCostoDto } from 'src/tarifas/dto/comparativaCosto.dto';
 import { ViajeDistribucionDto } from 'src/viaje_distribucion/dto/viaje-distribucion.dto';
 
 export class EmpresaViajesDistribucionDto {
@@ -45,4 +46,22 @@ export class DashboardDistribucionResponseDto {
     description: 'Top empresas con más viajes realizados',
   })
   topEmpresas: EmpresaViajesDistribucionDto[];
+
+  @ApiProperty({
+    type: [ComparativaCostoDto],
+    description: 'Comparativa de costos por zona',
+  })
+  comparativaCostos: ComparativaCostoDto[];
+
+  @ApiProperty({
+    type: Number,
+    description: 'Lista de remitos (sin filtros)',
+  })
+  remitos: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Cantidad total de tarifas',
+  })
+  cantidadTarifas: number;
 }
