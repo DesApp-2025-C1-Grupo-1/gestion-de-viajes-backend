@@ -547,6 +547,7 @@ export class ViajeDistribucionService {
       origen,
       remito,
       tarifa,
+      estado,
     } = filtros;
     const query: RootFilterQuery<BuscarViajeDistribucionDto> = {
       deletedAt: null,
@@ -695,6 +696,10 @@ export class ViajeDistribucionService {
 
     if (typeof tarifa === 'number') {
       query.tarifa_id = tarifa;
+    }
+
+    if (estado === 'iniciado' || estado === 'inicio de carga' || estado === 'fin de carga' || estado === 'fin de viaje') {
+      query.estado = estado;
     }
 
     const [data, total] = await Promise.all([

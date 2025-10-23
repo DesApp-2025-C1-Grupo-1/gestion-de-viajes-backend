@@ -98,4 +98,13 @@ export class BuscarViajeDistribucionDto {
   })
   @IsOptional()
   tarifa?: number;
+
+  @ApiProperty({
+    description: 'Estado del viaje',
+    example: "inicio de carga",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  estado?:  string;
 }
