@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gestion-de-viajes-backend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGO_USER=test
+      - MONGO_PASS=test
+    restart: unless-stopped
+  frontend:
+    build:
+      context: ../gestion-de-viajes-frontend
+      dockerfile: Dockerfile
+    image: gestion-de-viajes-frontend:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_BACKEND_URL=http://backend:3000
+    restart: unless-stopped
