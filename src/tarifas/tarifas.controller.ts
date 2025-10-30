@@ -118,4 +118,17 @@ export class TarifasController {
   async getTarifaById(@Param('id') id: number): Promise<TarifaDto> {
     return this.tarifasService.obtenerTarifaById(id);
   }
+
+  // Obtener todas las tarifas
+  @Get()
+  @ApiOperation({ summary: 'Obtener todas las tarifas' }) 
+  @ApiResponse({
+    status: 200,
+    description: 'Tarifas obtenidas correctamente',
+    type: [TarifaDto],
+  })
+  @ApiResponse({ status: 404, description: 'No se encontraron tarifas' })
+  async getTarifas(): Promise<TarifaDto[]> {
+    return this.tarifasService.obtenerTarifas();
+  }
 }

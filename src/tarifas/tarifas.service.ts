@@ -133,4 +133,21 @@ export class TarifasService {
       }
     }
   }
+
+  async obtenerTarifas(): Promise<TarifaDto[]> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/tarifas`);
+      return response.data as TarifaDto[];
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        throw new BadRequestException(
+          `Error al obtener tarifas: ${err.message}`,
+        );
+      } else {
+        throw new BadRequestException(
+          'Error desconocido al obtener tarifas',
+        );
+      }
+    }
+  }
 }
