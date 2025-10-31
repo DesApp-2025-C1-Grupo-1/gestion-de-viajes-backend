@@ -11,7 +11,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { RemitosService } from './remitos.service';
 import { RemitoDto, RemitoResponseDto } from './dto/remito.dto';
 
@@ -128,7 +128,27 @@ export class RemitosController {
 
   @Put(':id/firmar')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Entregar remito (requiere archivo firmado)' })
+  @ApiOperation({ summary: 'Entregar remito (archivo o base64)' })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiBody({
+    description: 'Archivo firmado del remito (puede ser binario o base64)',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          oneOf: [
+            {
+              type: 'string',
+              format: 'binary',
+              description: 'Archivo PDF o imagen (binario)',
+            },
+            { type: 'string', description: 'Archivo codificado en base64' },
+          ],
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Remito entregado correctamente',
@@ -138,9 +158,15 @@ export class RemitosController {
   @ApiResponse({ status: 404, description: 'Remito no encontrado' })
   async entregarRemito(
     @Param('id') id: number,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
+    @Body('file') base64?: string,
   ): Promise<RemitoDto> {
-    return this.remitosService.entregarRemito(id, file);
+    const input = file ?? base64;
+    if (!input) {
+      throw new BadRequestException('Debe proporcionar un archivo o un base64');
+    }
+
+    return this.remitosService.entregarRemito(id, input);
   }
 
   @Put(':id/no-entregado')
@@ -149,6 +175,15 @@ export class RemitosController {
     status: 200,
     description: 'Remito marcado como no entregado correctamente',
     type: RemitoDto,
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        razonNoEntrega: { type: 'string' },
+      },
+      required: ['razonNoEntrega'],
+    },
   })
   @ApiResponse({ status: 404, description: 'Remito no encontrado' })
   async marcarNoEntregado(

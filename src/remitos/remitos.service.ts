@@ -49,14 +49,18 @@ export class RemitosService {
     }
   }
 
-  async entregarRemito(id: number, file: Express.Multer.File) {
+  async entregarRemito(id: number, input: Express.Multer.File | string) {
     try {
       const formData = new FormData();
 
-      formData.append('remitoFirmado', file.buffer, {
-        filename: file.originalname,
-        contentType: file.mimetype,
-      });
+      if (typeof input === 'string') {
+        formData.append('remitoFirmado', input);
+      } else {
+        formData.append('remitoFirmado', input.buffer, {
+          filename: input.originalname,
+          contentType: input.mimetype,
+        });
+      }
 
       const response = await firstValueFrom(
         this.http.put(`${this.baseUrl}/remito/${id}/firmar`, formData, {
@@ -74,6 +78,7 @@ export class RemitosService {
           error.response.status,
         );
       }
+
       throw new HttpException(
         'Error comunicándose con backend de remitos',
         500,

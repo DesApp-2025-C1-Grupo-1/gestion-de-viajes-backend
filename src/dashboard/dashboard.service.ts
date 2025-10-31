@@ -56,7 +56,8 @@ export class DashboardService {
         this.viajeDistribucionModel
           .find({ createdAt: { $gte: sieteDiasAtras }, deletedAt: null })
           .populate(['vehiculo', 'chofer', 'transportista'])
-          .lean().countDocuments(),
+          .lean()
+          .countDocuments(),
 
         // Top empresas
         this.viajeDistribucionModel.aggregate([
@@ -117,17 +118,21 @@ export class DashboardService {
         ? remitosResponse.data.length
         : 0;
 
-      const remitosProximos = remitosResponse.data.filter((remito) => {
-        return remito.estado?.nombre === 'En preparación';
-      }).slice(0, 3);
+      const remitosProximos = remitosResponse.data
+        .filter((remito) => {
+          return remito.estado?.nombre === 'En preparación';
+        })
+        .slice(0, 3);
 
       const cantidadRemitosRecientes = remitosResponse.data.filter((remito) => {
-        const createdAt = remito.createdAt
-          ? new Date(remito.createdAt) : null;
-        return createdAt && isWithinInterval(createdAt, {
-          start: sieteDiasAtras,
-          end: hoy,
-        });
+        const createdAt = remito.createdAt ? new Date(remito.createdAt) : null;
+        return (
+          createdAt &&
+          isWithinInterval(createdAt, {
+            start: sieteDiasAtras,
+            end: hoy,
+          })
+        );
       }).length;
 
       return {
