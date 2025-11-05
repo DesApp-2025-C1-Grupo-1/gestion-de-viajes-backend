@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { DashboardService } from './dashboard.service';
 import { DashboardDistribucionResponseDto } from './dto/dashboardDistribucion.dto';
@@ -15,7 +15,17 @@ export class DashboardController {
     type: DashboardDistribucionResponseDto,
   })
   @Get()
-  getDashboard() {
-    return this.dashboardService.getDashboard();
+  async getDashboard(): Promise<DashboardDistribucionResponseDto> {
+    try {
+      return await this.dashboardService.getDashboard();
+    } catch (err) {
+      throw new BadRequestException(
+        typeof err === 'string'
+          ? err
+          : err instanceof Error && typeof err.message === 'string'
+            ? err.message
+            : 'Error desconocido al obtener dashboard',
+      );
+    }
   }
 }

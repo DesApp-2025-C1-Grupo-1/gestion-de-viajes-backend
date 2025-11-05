@@ -4,17 +4,15 @@ import {
   ViajeDistribucion,
   ViajeDistribucionDocument,
 } from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
-import { Model } from 'mongoose';
-import { isWithinInterval, startOfDay, subDays } from 'date-fns';
+import { Model, Types } from 'mongoose';
+import { startOfDay } from 'date-fns';
 import {
   DashboardDistribucionResponseDto,
-  EmpresaViajesDistribucionDto,
+  ProximoViajeDto,
 } from './dto/dashboardDistribucion.dto';
-import { plainToInstance } from 'class-transformer';
-import { ViajeDistribucionDto } from 'src/viaje_distribucion/dto/viaje-distribucion.dto';
 import { TarifasService } from 'src/tarifas/tarifas.service';
 import { RemitosService } from 'src/remitos/remitos.service';
-import { ComparativaCostoDto } from 'src/tarifas/dto/comparativaCosto.dto';
+import { RemitoDto } from 'src/remitos/dto/remito.dto';
 
 @Injectable()
 export class DashboardService {
@@ -28,131 +26,125 @@ export class DashboardService {
   async getDashboard(): Promise<DashboardDistribucionResponseDto> {
     try {
       const hoy = startOfDay(new Date());
-      const sieteDiasAtras = subDays(hoy, 7);
 
-      const [
-        proximosViajes,
-        viajesEnCamino,
-        viajesRecientes,
-        topEmpresas,
-        comparativaCostosRaw,
-        cantidadTarifas,
-      ] = await Promise.all([
-        // Próximos viajes
-        this.viajeDistribucionModel
-          .find({ fecha_inicio: { $gte: hoy }, deletedAt: null })
-          .sort({ fecha_inicio: 1 })
-          .limit(3)
-          .populate(['vehiculo', 'chofer', 'transportista'])
-          .lean(),
+      // 1️⃣ Consultas de viajes
+      interface EstadoAggregate {
+        _id: string;
+        cantidad: number;
+      }
 
-        // Viajes en camino (solo cantidad)
-        this.viajeDistribucionModel.countDocuments({
-          estado: 'fin de carga',
-          deletedAt: null,
-        }),
+      const [totalViajes, viajesPorEstadoRaw, proximosViajes] =
+        await Promise.all([
+          this.viajeDistribucionModel.countDocuments({ deletedAt: null }),
+          this.viajeDistribucionModel.aggregate<EstadoAggregate>([
+            { $match: { deletedAt: null } },
+            { $group: { _id: '$estado', cantidad: { $sum: 1 } } },
+          ]),
+          this.viajeDistribucionModel
+            .find({ fecha_inicio: { $gte: hoy }, deletedAt: null })
+            .sort({ fecha_inicio: 1 })
+            .limit(3)
+            .populate([
+              { path: 'transportista', select: 'nombre_comercial' },
+              { path: 'chofer', select: 'nombre apellido' },
+            ])
+            .lean(),
+        ]);
 
-        // Viajes recientes última semana
-        this.viajeDistribucionModel
-          .find({ createdAt: { $gte: sieteDiasAtras }, deletedAt: null })
-          .populate(['vehiculo', 'chofer', 'transportista'])
-          .lean()
-          .countDocuments(),
+      // 2️⃣ Mapear estados de viajes
+      const viajesPorEstado = {
+        iniciado: 0,
+        inicioCarga: 0,
+        finCarga: 0,
+        finViaje: 0,
+      };
+      viajesPorEstadoRaw.forEach((v) => {
+        switch (v._id) {
+          case 'iniciado':
+            viajesPorEstado.iniciado = v.cantidad;
+            break;
+          case 'inicio de carga':
+            viajesPorEstado.inicioCarga = v.cantidad;
+            break;
+          case 'fin de carga':
+            viajesPorEstado.finCarga = v.cantidad;
+            break;
+          case 'fin de viaje':
+            viajesPorEstado.finViaje = v.cantidad;
+            break;
+        }
+      });
 
-        // Top empresas
-        this.viajeDistribucionModel.aggregate([
-          { $match: { deletedAt: null, transportista: { $ne: null } } },
-          {
-            $group: {
-              _id: { $toString: '$transportista' },
-              cantidadViajes: { $sum: 1 },
-            },
-          },
-          {
-            $lookup: {
-              from: 'empresa',
-              let: { transporteIdStr: '$_id' },
-              pipeline: [
-                { $addFields: { _idStr: { $toString: '$_id' } } },
-                {
-                  $match: { $expr: { $eq: ['$_idStr', '$$transporteIdStr'] } },
-                },
-              ],
-              as: 'empresaData',
-            },
-          },
-          { $unwind: '$empresaData' },
-          {
-            $project: {
-              empresaId: '$_id',
-              nombre: '$empresaData.nombre_comercial',
-              cantidadViajes: 1,
-              _id: 0,
-            },
-          },
-          { $sort: { cantidadViajes: -1 } },
-          { $limit: 3 },
-        ]),
-
-        // Comparativa de costos
-        this.tarifasService.obtenerComparativaCostos(),
-
-        // Cantidad total de tarifas
-        this.tarifasService.obtenerCantidadTarifas(),
-      ]);
-
-      // Transformamos comparativaCostos para que cumpla con el DTO
-      const comparativaCostos: ComparativaCostoDto[] = comparativaCostosRaw.map(
-        (c) => ({
-          nombre: c.nombre,
-          average: c.promedio, // mapeamos 'promedio' → 'average'
-          max: c.maximo, // mapeamos 'maximo' → 'max'
-        }),
-      );
-
+      // 3️⃣ Obtener remitos
       const remitosResponse = await this.remitosService.getRemitos({
         page: 1,
-        limit: 300,
+        limit: 1000,
       });
-      const remitosCount = Array.isArray(remitosResponse.data)
-        ? remitosResponse.data.length
-        : 0;
+      const remitos: RemitoDto[] = remitosResponse.data || [];
+      const totalRemitos = remitos.length;
 
-      const remitosProximos = remitosResponse.data
-        .filter((remito) => {
-          return remito.estado?.nombre === 'En preparación';
-        })
-        .slice(0, 3);
+      const remitosPorEstado = {
+        enCamino: remitos.filter((r) => r.estado?.nombre === 'En camino')
+          .length,
+        entregados: remitos.filter((r) => r.estado?.nombre === 'Entregado')
+          .length,
+        noEntregados: remitos.filter((r) => r.estado?.nombre === 'No entregado')
+          .length,
+      };
 
-      const cantidadRemitosRecientes = remitosResponse.data.filter((remito) => {
-        const createdAt = remito.createdAt ? new Date(remito.createdAt) : null;
-        return (
-          createdAt &&
-          isWithinInterval(createdAt, {
-            start: sieteDiasAtras,
-            end: hoy,
-          })
-        );
-      }).length;
+      // 4️⃣ Formatear próximos viajes
+      const proximosViajesFormateados: ProximoViajeDto[] = proximosViajes.map(
+        (viaje) => {
+          const remitosAsociados = remitos.filter((r) =>
+            viaje.remito_ids.includes(r.id),
+          );
+          const remitosEntregados = remitosAsociados.filter(
+            (r) => r.estado?.nombre === 'Entregado',
+          ).length;
 
+          const transportista = viaje.transportista as
+            | { nombre_comercial?: string }
+            | undefined;
+          const chofer = viaje.chofer as
+            | { nombre?: string; apellido?: string }
+            | undefined;
+
+          // Valor de tarifa: undefined por defecto, luego se puede completar desde otro backend
+          const valorTarifa: number | undefined = undefined;
+
+          return {
+            _id:
+              viaje._id instanceof Types.ObjectId
+                ? viaje._id.toHexString()
+                : // eslint-disable-next-line @typescript-eslint/no-base-to-string
+                  String(viaje._id),
+            nro_viaje: viaje.nro_viaje,
+            fecha: viaje.fecha_inicio,
+            empresa: transportista?.nombre_comercial ?? '-',
+            chofer:
+              `${chofer?.nombre ?? ''} ${chofer?.apellido ?? ''}`.trim() || '-',
+            valorTarifa,
+            totalRemitos: remitosAsociados.length,
+            remitosEntregados,
+          };
+        },
+      );
+
+      // ✅ Respuesta final
       return {
-        proximosViajes: plainToInstance(ViajeDistribucionDto, proximosViajes),
-        viajesEnCamino,
-        viajesRecientes: viajesRecientes,
-        topEmpresas: plainToInstance(EmpresaViajesDistribucionDto, topEmpresas),
-        comparativaCostos,
-        remitos: remitosCount,
-        cantidadTarifas: cantidadTarifas.total,
-        remitosProximos: remitosProximos,
-        cantidadRemitosRecientes: cantidadRemitosRecientes,
+        totalViajes,
+        viajesPorEstado,
+        totalRemitos,
+        remitosPorEstado,
+        proximosViajes: proximosViajesFormateados,
       };
     } catch (err) {
-      if (err instanceof Error) {
-        throw new BadRequestException(
-          `Error al obtener dashboard: ${err.message}`,
-        );
-      }
-      throw new BadRequestException('Error desconocido al obtener dashboard');
+      console.error(err);
+      throw new BadRequestException(
+        err instanceof Error
+          ? `Error al obtener dashboard: ${err.message}`
+          : 'Error desconocido al obtener dashboard',
+      );
     }
   }
 }
