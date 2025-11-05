@@ -1,80 +1,106 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { RemitoDto } from 'src/remitos/dto/remito.dto';
-import { ComparativaCostoDto } from 'src/tarifas/dto/comparativaCosto.dto';
-import { ViajeDistribucionDto } from 'src/viaje_distribucion/dto/viaje-distribucion.dto';
 
-export class EmpresaViajesDistribucionDto {
-  @ApiProperty({
-    description: 'ID de la empresa',
-    example: '665f0f02fe1846d5a9f3baf5',
-  })
-  empresaId: string;
+export class ViajesPorEstadoDto {
+  @ApiProperty({ example: 10, description: 'Cantidad de viajes iniciados' })
+  iniciado: number;
 
   @ApiProperty({
-    description: 'Nombre de la empresa',
-    example: 'Transportes S.A.',
+    example: 5,
+    description: 'Cantidad de viajes en inicio de carga',
   })
-  nombre: string;
+  inicioCarga: number;
 
   @ApiProperty({
-    description: 'Cantidad total de viajes realizados por la empresa',
-    example: 15,
+    example: 3,
+    description: 'Cantidad de viajes en fin de carga',
   })
-  cantidadViajes: number;
+  finCarga: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'Cantidad de viajes en fin de viaje',
+  })
+  finViaje: number;
+}
+
+export class RemitosPorEstadoDto {
+  @ApiProperty({ example: 12, description: 'Cantidad de remitos en camino' })
+  enCamino: number;
+
+  @ApiProperty({ example: 20, description: 'Cantidad de remitos entregados' })
+  entregados: number;
+
+  @ApiProperty({ example: 5, description: 'Cantidad de remitos no entregados' })
+  noEntregados: number;
+}
+
+export class ProximoViajeDto {
+  @ApiProperty({
+    example: '652a1f5c8d1b2a3e4f567890',
+    description: 'ID del viaje',
+  })
+  _id: string;
+
+  @ApiProperty({ example: 'V-ABCDE', description: 'Número de viaje' })
+  nro_viaje: string;
+
+  @ApiProperty({
+    example: '2024-01-15T08:00:00.000Z',
+    description: 'Fecha de inicio del viaje',
+  })
+  fecha: Date;
+
+  @ApiProperty({
+    example: 'Transporte Rápido',
+    description: 'Nombre comercial de la empresa transportista',
+  })
+  empresa: string;
+
+  @ApiProperty({ example: 'Juan Perez', description: 'Nombre del chofer' })
+  chofer: string;
+
+  @ApiProperty({
+    example: 37500,
+    description: 'Valor de la tarifa si existe',
+    required: false,
+  })
+  valorTarifa?: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'Cantidad total de remitos asignados al viaje',
+  })
+  totalRemitos: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'Cantidad de remitos entregados del viaje',
+  })
+  remitosEntregados: number;
 }
 
 export class DashboardDistribucionResponseDto {
-  @ApiProperty({
-    type: [ViajeDistribucionDto],
-    description: 'Próximos viajes de distribución programados (limitado a 5)',
-  })
-  proximosViajes: ViajeDistribucionDto[];
+  @ApiProperty({ example: 20, description: 'Cantidad total de viajes' })
+  totalViajes: number;
 
   @ApiProperty({
-    type: Number,
-    description: 'Viajes actualmente en camino',
+    type: ViajesPorEstadoDto,
+    description: 'Cantidad de viajes por estado',
   })
-  viajesEnCamino: number;
+  viajesPorEstado: ViajesPorEstadoDto;
+
+  @ApiProperty({ example: 37, description: 'Cantidad total de remitos' })
+  totalRemitos: number;
 
   @ApiProperty({
-    type: Number,
-    description: 'Viajes recientes realizados en la última semana',
+    type: RemitosPorEstadoDto,
+    description: 'Cantidad de remitos por estado',
   })
-  viajesRecientes: number;
+  remitosPorEstado: RemitosPorEstadoDto;
 
   @ApiProperty({
-    type: [EmpresaViajesDistribucionDto],
-    description: 'Top empresas con más viajes realizados',
+    type: [ProximoViajeDto],
+    description: 'Lista de próximos viajes con información relevante',
   })
-  topEmpresas: EmpresaViajesDistribucionDto[];
-
-  @ApiProperty({
-    type: [ComparativaCostoDto],
-    description: 'Comparativa de costos por zona',
-  })
-  comparativaCostos: ComparativaCostoDto[];
-
-  @ApiProperty({
-    type: Number,
-    description: 'Lista de remitos (sin filtros)',
-  })
-  remitos: number;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Cantidad total de tarifas',
-  })
-  cantidadTarifas: number;
-
-  @ApiProperty({
-    type: [RemitoDto],
-    description: 'Lista de remitos próximos a preparar',
-  })
-  remitosProximos: RemitoDto[];
-
-  @ApiProperty({
-    type: Number,
-    description: 'Cantidad de remitos recientes realizados en la última semana',
-  })
-  cantidadRemitosRecientes: number;
+  proximosViajes: ProximoViajeDto[];
 }
