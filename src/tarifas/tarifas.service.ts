@@ -12,7 +12,7 @@ import { ComparativaCostoDto } from './dto/comparativaCosto.dto';
 @Injectable()
 export class TarifasService {
   private readonly baseUrl = process.env.TARIFAS_API_URL ||
-    'https://tarifas-de-costos-acme-backend.onrender.com/api';
+    'http://localhost:7070';
 
   // Listar todas las zonas (provincias)
   async obtenerZonas(): Promise<ZonaDto[]> {
