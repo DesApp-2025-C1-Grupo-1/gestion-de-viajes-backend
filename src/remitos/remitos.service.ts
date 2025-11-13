@@ -7,7 +7,7 @@ import { RemitoDto, RemitoResponseDto } from './dto/remito.dto';
 
 @Injectable()
 export class RemitosService {
-  private readonly baseUrl = 'https://remitos-backend.onrender.com';
+  private readonly baseUrl = process.env.REMITOS_API_URL || 'https://remitos-backend.onrender.com';
 
   constructor(private readonly http: HttpService) {}
 
