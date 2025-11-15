@@ -7,7 +7,8 @@ import { RemitoDto, RemitoResponseDto } from './dto/remito.dto';
 
 @Injectable()
 export class RemitosService {
-  private readonly baseUrl = process.env.REMITOS_API_URL || 'http://localhost:3002';
+  private readonly baseUrl =
+    process.env.REMITOS_API_URL || 'http://localhost:3002';
 
   constructor(private readonly http: HttpService) {}
 
