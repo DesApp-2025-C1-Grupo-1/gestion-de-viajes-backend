@@ -12,6 +12,7 @@ import {
   IsIn,
   IsNotEmpty,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateViajeDistribucionDto {
   @ApiProperty({ example: '2024-01-15T08:00:00.000Z' })
@@ -20,7 +21,7 @@ export class CreateViajeDistribucionDto {
 
   @ApiProperty({ example: '64a123456789abcdef012345' })
   @IsMongoId()
-  origen: string;
+  origen: Types.ObjectId;
 
   @IsString()
   @IsNotEmpty()
@@ -33,15 +34,15 @@ export class CreateViajeDistribucionDto {
 
   @ApiProperty({ example: '64a123456789abcdef012346' })
   @IsMongoId()
-  chofer: string;
+  chofer: Types.ObjectId;
 
   @ApiProperty({ example: '64a123456789abcdef012347' })
   @IsMongoId()
-  transportista: string;
+  transportista: Types.ObjectId;
 
   @ApiProperty({ example: '64a123456789abcdef012348' })
   @IsMongoId()
-  vehiculo: string;
+  vehiculo: Types.ObjectId;
 
   @ApiProperty({ example: [1, 2], type: [Number] })
   @IsArray()

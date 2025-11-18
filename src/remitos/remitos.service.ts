@@ -37,7 +37,6 @@ export class RemitosService {
       const error = err as AxiosError;
 
       if (error.response) {
-        console.log(error.response.data);
         throw new HttpException(
           error.response.data as string | Record<string, any>,
           error.response.status,

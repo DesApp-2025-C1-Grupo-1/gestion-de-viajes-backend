@@ -310,18 +310,24 @@ export class ViajeDistribucionService {
       const camposPermitidos: Partial<UpdateViajeDistribucionDto> = {};
 
       if (updateViajeDistribucionDto.chofer) {
-        camposPermitidos.chofer = String(updateViajeDistribucionDto.chofer);
+        camposPermitidos.chofer = new Types.ObjectId(
+          updateViajeDistribucionDto.chofer,
+        );
       }
       if (updateViajeDistribucionDto.vehiculo) {
-        camposPermitidos.vehiculo = String(updateViajeDistribucionDto.vehiculo);
+        camposPermitidos.vehiculo = new Types.ObjectId(
+          updateViajeDistribucionDto.vehiculo,
+        );
       }
       if (updateViajeDistribucionDto.transportista) {
-        camposPermitidos.transportista = String(
+        camposPermitidos.transportista = new Types.ObjectId(
           updateViajeDistribucionDto.transportista,
         );
       }
       if (updateViajeDistribucionDto.origen) {
-        camposPermitidos.origen = String(updateViajeDistribucionDto.origen);
+        camposPermitidos.origen = new Types.ObjectId(
+          updateViajeDistribucionDto.origen,
+        );
       }
       if (updateViajeDistribucionDto.observaciones) {
         camposPermitidos.observaciones = String(
@@ -698,7 +704,12 @@ export class ViajeDistribucionService {
       query.tarifa_id = tarifa;
     }
 
-    if (estado === 'iniciado' || estado === 'inicio de carga' || estado === 'fin de carga' || estado === 'fin de viaje') {
+    if (
+      estado === 'iniciado' ||
+      estado === 'inicio de carga' ||
+      estado === 'fin de carga' ||
+      estado === 'fin de viaje'
+    ) {
       query.estado = estado;
     }
 
