@@ -104,7 +104,6 @@ export class DepositoService {
     return depositoActualizado;
   }
   async remove(id: string): Promise<Deposito> {
-    console.log({ id });
     const depositoEnUsoPorViaje = await this.viajeModel.exists({
       $or: [
         { deposito_origen: new Types.ObjectId(id) },

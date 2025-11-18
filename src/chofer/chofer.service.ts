@@ -204,7 +204,6 @@ export class ChoferService {
       });
 
     if (choferEnUsoPorViaje) {
-      console.log(choferEnUsoPorViaje);
       throw new ConflictException(
         'No se puede eliminar: hay viajes punta a punta que utilizan este chofer',
       );
