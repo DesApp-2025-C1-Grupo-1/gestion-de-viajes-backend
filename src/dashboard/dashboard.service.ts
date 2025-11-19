@@ -25,8 +25,6 @@ export class DashboardService {
 
   async getDashboard(): Promise<DashboardDistribucionResponseDto> {
     try {
-      const hoy = startOfDay(new Date());
-
       // 1️⃣ Consultas de viajes
       interface EstadoAggregate {
         _id: string;
@@ -41,7 +39,7 @@ export class DashboardService {
             { $group: { _id: '$estado', cantidad: { $sum: 1 } } },
           ]),
           this.viajeDistribucionModel
-            .find({ fecha_inicio: { $gte: hoy }, deletedAt: null })
+            .find({ estado: 'fin de carga', deletedAt: null })
             .sort({ fecha_inicio: 1 })
             .limit(3)
             .populate([
@@ -93,8 +91,8 @@ export class DashboardService {
       };
 
       // 4️⃣ Formatear próximos viajes
-      const proximosViajesFormateados: ProximoViajeDto[] = proximosViajes.map(
-        (viaje) => {
+      const proximosViajesFormateados: ProximoViajeDto[] = await Promise.all(
+        proximosViajes.map(async (viaje) => {
           const remitosAsociados = remitos.filter((r) =>
             viaje.remito_ids.includes(r.id),
           );
@@ -110,7 +108,21 @@ export class DashboardService {
             | undefined;
 
           // Valor de tarifa: undefined por defecto, luego se puede completar desde otro backend
-          const valorTarifa: number | undefined = undefined;
+          let valorTarifa: number | undefined = undefined;
+
+          if (viaje.tarifa_id) {
+            try {
+              const tarifa = await this.tarifasService.obtenerTarifaById(
+                viaje.tarifa_id,
+              );
+              valorTarifa = tarifa?.total ?? undefined;
+            } catch (error) {
+              console.error(
+                `Error al obtener tarifa de un viaje en camino: ${error}`,
+              );
+              valorTarifa = undefined;
+            }
+          }
 
           return {
             _id:
@@ -127,7 +139,7 @@ export class DashboardService {
             totalRemitos: remitosAsociados.length,
             remitosEntregados,
           };
-        },
+        }),
       );
 
       // ✅ Respuesta final

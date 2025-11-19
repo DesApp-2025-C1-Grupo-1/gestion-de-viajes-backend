@@ -121,7 +121,7 @@ export class TarifasController {
 
   // Obtener todas las tarifas
   @Get()
-  @ApiOperation({ summary: 'Obtener todas las tarifas' }) 
+  @ApiOperation({ summary: 'Obtener todas las tarifas' })
   @ApiResponse({
     status: 200,
     description: 'Tarifas obtenidas correctamente',
