@@ -12,7 +12,7 @@ export class Chofer {
   @Prop({ type: String, required: true })
   apellido: string;
 
-  @Prop({ type: Number, required: true, unique: true })
+  @Prop({ type: Number, required: true })
   dni: number;
 
   @Prop({ type: Date, required: true })
@@ -44,3 +44,11 @@ export class Chofer {
 }
 
 export const ChoferSchema = SchemaFactory.createForClass(Chofer);
+
+ChoferSchema.index(
+  { dni: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { deletedAt: null },
+  },
+);

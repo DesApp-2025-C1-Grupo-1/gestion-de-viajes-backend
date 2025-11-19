@@ -5,7 +5,7 @@ export type TipoVehiculoDocument = TipoVehiculo & Document;
 
 @Schema({ collection: 'tipo_vehiculo', versionKey: false })
 export class TipoVehiculo {
-  @Prop({ type: String, required: true, unique: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   nombre: string;
   @Prop({ type: String, required: true, trim: true })
   descripcion: string;
@@ -17,3 +17,11 @@ export class TipoVehiculo {
 }
 
 export const TipoVehiculoSchema = SchemaFactory.createForClass(TipoVehiculo);
+
+TipoVehiculoSchema.index(
+  { nombre: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { deletedAt: null },
+  },
+);

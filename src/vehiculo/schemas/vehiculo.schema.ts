@@ -8,7 +8,6 @@ export class Vehiculo {
   @Prop({
     type: String,
     required: true,
-    unique: true,
     trim: true,
     uppercase: true,
   })
@@ -50,3 +49,11 @@ export class Vehiculo {
 }
 
 export const VehiculoSchema = SchemaFactory.createForClass(Vehiculo);
+
+VehiculoSchema.index(
+  { patente: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { deletedAt: null },
+  },
+);

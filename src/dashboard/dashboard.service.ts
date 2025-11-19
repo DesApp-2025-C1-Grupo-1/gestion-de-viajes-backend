@@ -5,7 +5,6 @@ import {
   ViajeDistribucionDocument,
 } from 'src/viaje_distribucion/schemas/viaje-distribucion.schema';
 import { Model, Types } from 'mongoose';
-import { startOfDay } from 'date-fns';
 import {
   DashboardDistribucionResponseDto,
   ProximoViajeDto,
