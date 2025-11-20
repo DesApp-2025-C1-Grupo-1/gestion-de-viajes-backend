@@ -101,10 +101,10 @@ export class BuscarViajeDistribucionDto {
 
   @ApiProperty({
     description: 'Estado del viaje',
-    example: "inicio de carga",
+    example: 'inicio de carga',
     required: false,
   })
   @IsOptional()
   @IsString()
-  estado?:  string;
+  estado?: string;
 }

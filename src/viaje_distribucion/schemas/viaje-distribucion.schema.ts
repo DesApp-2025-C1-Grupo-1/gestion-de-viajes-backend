@@ -5,7 +5,7 @@ export type ViajeDistribucionDocument = ViajeDistribucion & Document;
 
 @Schema({ collection: 'viaje_distribucion', versionKey: false })
 export class ViajeDistribucion {
-  @Prop({ type: String, unique: true, index: true })
+  @Prop({ type: String })
   nro_viaje: string;
 
   @Prop({ type: Date, required: true })
@@ -54,6 +54,14 @@ export class ViajeDistribucion {
 
 export const ViajeDistribucionSchema =
   SchemaFactory.createForClass(ViajeDistribucion);
+
+ViajeDistribucionSchema.index(
+  { nro_viaje: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { deletedAt: null },
+  },
+);
 
 // Genera un código legible automáticamente al crear el documento
 ViajeDistribucionSchema.pre('save', function (next) {

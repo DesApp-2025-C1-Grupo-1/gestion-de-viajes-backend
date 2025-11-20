@@ -153,7 +153,7 @@ export class ViajeDistribucionService {
     const [data, total] = await Promise.all([
       this.viajeDistribucionModel
         .find({ deletedAt: null })
-        .sort({ fecha_inicio: 1 })
+        .sort({ fecha_inicio: -1 })
         .skip(skip)
         .limit(limit)
         .populate('origen')
@@ -583,20 +583,14 @@ export class ViajeDistribucionService {
     }
 
     // Búsqueda parcial en _id (cualquier substring del hex)
+    // Buscar por _id o nro_viaje
     if (_id) {
-      query.$expr = {
-        $regexMatch: {
-          input: { $toString: '$_id' },
-          regex: _id,
-          options: 'i',
-        },
-      };
-    }
-
-    if (_id) {
-      // Si también quieres filtrar por exact match cuando viene ObjectId
       if (Types.ObjectId.isValid(_id)) {
+        // Caso: ObjectId → filtro exacto
         query._id = new Types.ObjectId(_id);
+      } else {
+        // Caso: nro_viaje tipo "V-42D61"
+        query.nro_viaje = { $regex: _id, $options: 'i' };
       }
     }
 
@@ -716,7 +710,7 @@ export class ViajeDistribucionService {
     const [data, total] = await Promise.all([
       this.viajeDistribucionModel
         .find(query)
-        .sort({ fecha_inicio: 1 })
+        .sort({ fecha_inicio: -1 })
         .skip(skip)
         .limit(limit)
         .populate('origen')

@@ -11,8 +11,8 @@ import { ComparativaCostoDto } from './dto/comparativaCosto.dto';
 
 @Injectable()
 export class TarifasService {
-  private readonly baseUrl = process.env.TARIFAS_API_URL ||
-    'http://localhost:7070';
+  private readonly baseUrl =
+    process.env.TARIFAS_API_URL || 'http://localhost:7070';
 
   // Listar todas las zonas (provincias)
   async obtenerZonas(): Promise<ZonaDto[]> {
@@ -144,9 +144,7 @@ export class TarifasService {
           `Error al obtener tarifas: ${err.message}`,
         );
       } else {
-        throw new BadRequestException(
-          'Error desconocido al obtener tarifas',
-        );
+        throw new BadRequestException('Error desconocido al obtener tarifas');
       }
     }
   }
